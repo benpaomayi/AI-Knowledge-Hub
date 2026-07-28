@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>第18集 感知机 - ML学习站PPT</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#f97316;--accent2:#fb923c;--accent3:#f59e0b;--accent-glow:rgba(249,115,22,0.25);--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--accent3);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent3);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(249,115,22,0.15) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(245,158,11,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.25);border-radius:50px;font-size:1rem;color:var(--accent);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--success),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:700px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(249,115,22,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:1.8rem 2rem;margin:1.5rem 0;text-align:center;font-size:clamp(1rem,1.8vw,1.25rem);line-height:2.2;overflow-x:auto}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:1rem;display:block;text-align:left;line-height:1.7}
+.katex{color:var(--accent3)}.katex .mord.text{color:var(--ink2)}
+.hbox{background:rgba(249,115,22,0.08);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1rem 0}
+.hbox h4{color:var(--accent);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(251,191,36,0.08);border-left-color:var(--warning)}.hbox.warn h4{color:var(--warning)}
+.hbox.danger{background:rgba(248,113,111,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.orange{background:rgba(251,146,60,0.08);border-left-color:var(--accent2)}.hbox.orange h4{color:var(--accent2)}
+.hbox.amber{background:rgba(245,158,11,0.08);border-left-color:var(--accent3)}.hbox.amber h4{color:var(--accent3)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.95rem}
+table.cmp th{background:var(--bg3);color:var(--accent3);padding:12px 14px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.9rem}
+table.cmp td{padding:10px 14px;border-bottom:1px solid var(--rule);color:var(--ink2);line-height:1.6}
+table.cmp tr:hover td{background:rgba(249,115,22,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent3);background:rgba(249,115,22,0.1);color:var(--accent3);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent)}
+.tag.o{color:var(--accent2)}.tag.a{color:var(--accent3)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}.tag.d{color:var(--danger)}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent3),var(--accent2),var(--accent),var(--success));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent3);color:var(--accent3)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent3)}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.end-slide .end-buttons{display:flex;gap:1.5rem;justify-content:center;margin-top:2.5rem;flex-wrap:wrap}
+.end-slide .end-btn{padding:14px 32px;border-radius:12px;font-size:1.05rem;font-weight:600;text-decoration:none;transition:all .3s}
+.end-slide .end-btn.primary{background:linear-gradient(135deg,var(--accent3),var(--accent2));color:white}
+.end-slide .end-btn.secondary{background:var(--bg2);border:1px solid var(--rule);color:var(--ink2)}
+.end-slide .end-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(249,115,22,0.2)}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col{grid-template-columns:1fr}.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="slides.html" style="font-weight:600;color:var(--accent3)">📊 PPT课件</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="chapter5.html">回到视频页</a>
+    <a href="ppt-17.html">← 上一集</a>
+    <a href="ppt-19.html" style="color:var(--accent);font-weight:600">下一集 →</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">🧠 深度学习入门教程 · 第3集</div>
+    <h1 class="cover-title">感知机：深度学习的Hello World</h1>
+    <p class="cover-sub">从最简单的神经网络开始——理解感知机模型、学习算法，亲手实现逻辑门，发现它的关键局限<br>BV1FW9ZBhEEN · 时长 20分00秒</p>
+    <div class="tags">
+      <span class="tag a">感知机</span>
+      <span class="tag o">神经元模型</span>
+      <span class="tag">逻辑门</span>
+      <span class="tag d">XOR问题</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">2 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">本集内容导览</h1>
+    <h3 class="sub">深度学习的"Hello World"——从感知机开始理解神经网络</h3>
+    <div class="body">
+      <ul>
+        <li><strong style="color:var(--accent)">感知机是什么</strong>——Rosenblatt 1957年提出，最简单的神经网络</li>
+        <li><strong style="color:var(--accent2)">生物神经元启发</strong>——大脑神经元如何工作，如何抽象成数学模型</li>
+        <li><strong style="color:var(--accent3)">感知机模型结构</strong>——输入、权重、偏置、加权求和、激活函数</li>
+        <li><strong style="color:var(--success)">感知机学习算法</strong>——如何自动从数据中学习权重</li>
+        <li><strong style="color:var(--warning)">用感知机实现逻辑门</strong>——AND、OR、NOT门的实现</li>
+        <li><strong style="color:var(--danger)">关键局限：XOR问题</strong>——感知机的致命缺陷，无法解决非线性问题</li>
+        <li><strong>从感知机到现代神经网络</strong>——如何突破局限，走向深度学习</li>
+      </ul>
+    </div>
+    <div class="hbox amber">
+      <h4>🎯 为什么从感知机开始？</h4>
+      <p>感知机虽然简单，但是<strong>所有现代神经网络的基本构建单元</strong>。理解了感知机，再理解MLP、CNN、Transformer就水到渠成了。万丈高楼平地起！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">3 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">感知机（Perceptron）的历史</h1>
+    <h3 class="sub">AI寒冬前的第一个"神经网络"——60多年前的发明</h3>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node hl" style="min-width:130px">1943<br>McCulloch-Pitts神经元</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:130px">1949<br>Hebb学习规则</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:130px">1957<br>Rosenblatt感知机</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:140px;border-color:var(--danger);color:var(--danger)">1969<br>Minsky证明局限</div>
+    </div>
+    <div class="hbox">
+      <h4>👨‍🔬 Frank Rosenblatt与感知机</h4>
+      <p>1957年，美国心理学家、计算机科学家Frank Rosenblatt提出了<strong>感知机（Perceptron）</strong>。这是第一个用算法精确定义的神经网络模型，在当时引起了巨大轰动——媒体甚至报道说"感知机是可以学习、思考、记忆的机器"。Rosenblatt本人对它非常乐观，认为这是通向人工智能的道路。</p>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 成也萧何败也萧何</h4>
+      <p>1969年，AI先驱Marvin Minsky和Seymour Papert出版了《Perceptrons》一书，<strong>严格证明了单层感知机无法解决异或（XOR）问题</strong>，也无法处理很多非线性问题。这个结论直接导致了神经网络研究进入第一次"AI寒冬"，感知机被打入冷宫近20年。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">4 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">生物神经元的启发</h1>
+    <h3 class="sub">神经网络为什么叫"神经"网络？因为它真的是在模拟大脑</h3>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">🧠</div>
+        <h4>生物神经元如何工作？</h4>
+        <p style="margin-bottom:1rem">大脑里有大约860亿个神经元，它们通过突触连接成复杂网络：</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li><strong>树突（Dendrite）</strong>：接收其他神经元传来的信号</li>
+          <li><strong>细胞体（Soma）</strong>：处理接收到的信号，决定要不要"激活"</li>
+          <li><strong>轴突（Axon）</strong>：如果激活了，就把信号传递给其他神经元</li>
+          <li>神经元接收到的信号总和超过某个阈值，就会"放电"（激活），产生一个输出信号</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">💡</div>
+        <h4>抽象成数学模型</h4>
+        <p style="margin-bottom:1rem">感知机就是对生物神经元的极简数学抽象：</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li><strong>输入 x</strong> ← 对应树突接收的信号</li>
+          <li><strong>权重 w</strong> ← 对应突触的强度（每个输入有多重要）</li>
+          <li><strong>加权求和</strong> ← 对应细胞体整合信号</li>
+          <li><strong>偏置 b / 阈值</strong> ← 对应神经元激活的门槛</li>
+          <li><strong>激活函数 f</strong> ← 决定要不要激活放电</li>
+          <li><strong>输出 y</strong> ← 对应轴突传出的信号</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox orange">
+      <h4>🔑 核心思想</h4>
+      <p>"超过阈值就激活"——这个简单的"all-or-nothing"（全或无）机制，就是感知机的核心思想，也是所有人工神经网络的基础。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">5 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">感知机模型结构</h1>
+    <h3 class="sub">数学公式：从输入到输出的计算过程</h3>
+    <div class="formula" style="font-size:clamp(1.1rem,2vw,1.5rem);padding:2.5rem">
+      $$\displaystyle z = w_1x_1 + w_2x_2 + ... + w_nx_n + b = w \cdot x + b \ \ y = f(z) = { 1, if z \geq 0; 0, if z < 0 } <span class="desc" style="text-align:center;margin-top:1rem"> 其中：x=(x_1,x_2,...,x_n)是输入，w=(w_1,w_2,...,w_n)是权重，b是偏置，f是阶跃激活函数 </span>$$
+    </div>
+    <div class="three-col" style="margin-top:1rem">
+      <div class="card">
+        <h4 style="color:var(--accent)">📥 输入 Inputs</h4>
+        <p>x₁, x₂, ..., xₙ 是n个输入特征，可以是像素值、特征值等。每个输入都有对应的权重w。</p>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent2)">⚖️ 权重与偏置</h4>
+        <p>w₁...wₙ是权重，控制每个输入的重要程度；b是偏置，控制神经元被激活的容易程度（阈值）。这些都是<strong>模型要学习的参数</strong>。</p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--accent3)">📤 激活与输出</h4>
+        <p>先计算加权和z=w·x+b，然后用阶跃函数f激活，z≥0输出1，否则输出0——二元分类结果。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">6 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">用图来理解感知机</h2>
+    <h3 class="sub">结构很简单，就是"加权求和+阈值判断"</h3>
+    <div style="text-align:center;margin:2rem 0">
+      <div style="display:inline-flex;align-items:center;gap:2rem">
+        <div style="text-align:center">
+          <div style="display:flex;flex-direction:column;gap:1rem">
+            <div style="width:60px;height:60px;border-radius:50%;background:rgba(249,115,22,0.2);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:600">x₁</div>
+            <div style="width:60px;height:60px;border-radius:50%;background:rgba(251,146,60,0.2);border:2px solid var(--accent2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:600">x₂</div>
+            <div style="color:var(--muted);font-size:0.9rem">...</div>
+            <div style="width:60px;height:60px;border-radius:50%;background:rgba(245,158,11,0.2);border:2px solid var(--accent3);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:600">xₙ</div>
+          </div>
+          <div style="color:var(--muted);margin-top:0.5rem;font-size:0.9rem">输入</div>
+        </div>
+        <div style="font-size:2rem;color:var(--muted)">→</div>
+        <div style="text-align:center">
+          <div style="width:120px;height:120px;border-radius:50%;background:rgba(52,211,153,0.15);border:3px solid var(--success);display:flex;align-items:center;justify-content:center;flex-direction:column">
+            <div style="font-weight:700;color:var(--success)">Σ + f</div>
+            <div style="font-size:0.8rem;color:var(--muted)">加权求和 + 激活</div>
+          </div>
+          <div style="color:var(--muted);margin-top:0.5rem;font-size:0.9rem">神经元</div>
+        </div>
+        <div style="font-size:2rem;color:var(--muted)">→</div>
+        <div style="text-align:center">
+          <div style="width:60px;height:60px;border-radius:50%;background:rgba(248,113,111,0.2);border:2px solid var(--danger);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:600">y</div>
+          <div style="color:var(--muted);margin-top:0.5rem;font-size:0.9rem">输出</div>
+        </div>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>💡 直观理解</h4>
+      <p>感知机就是一个<strong>线性二元分类器</strong>——它在n维空间里画一个超平面（二维空间里就是一条直线），把空间分成两部分：直线一侧输出1，另一侧输出0。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">7 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">阶跃激活函数（Step Function）</h2>
+    <h3 class="sub">感知机用的激活函数，非常简单粗暴</h3>
+    <div class="formula">
+      $$\displaystyle f(z) = { 1, 当 z \geq 0 时 \ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0, 当 z < 0 时 }$$
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--accent)">📈 函数特点</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.5rem">
+          <li>输出只有两个值：0或1（二元）</li>
+          <li>在z=0处有一个"跳跃"</li>
+          <li>z≥0就激活（输出1），否则不激活（输出0）</li>
+          <li>模拟生物神经元的"全或无"放电</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--danger)">⚠️ 阶跃函数的问题</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.5rem">
+          <li><strong>不可导！</strong>在z=0处导数不存在，其他地方导数都是0</li>
+          <li>这意味着不能用梯度下降来训练（反传不了梯度）</li>
+          <li>这也是为什么后来大家改用Sigmoid/ReLU等可导激活函数</li>
+          <li>感知机只能用特殊的学习规则</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>🎯 先记下来这个问题</h4>
+      <p>阶跃函数不可导，无法用梯度下降——这是感知机的一个重要局限。等我们后面讲反向传播的时候你会更深刻理解为什么可导性这么重要。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">8 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">感知机学习算法</h1>
+    <h3 class="sub">如何自动找到合适的权重w和偏置b？</h3>
+    <div class="hbox amber">
+      <h4>🎓 算法思想：知错就改</h4>
+      <p>感知机的学习规则非常直观：<strong>初始化权重为0，然后不断看每个样本，预测错了就调整权重，直到所有样本都分类正确</strong>。对了就不改，错了就纠正，直到全对为止——这就是"知错能改"的学习过程！</p>
+    </div>
+    <div class="formula" style="text-align:left;font-size:0.95rem;line-height:2.2">
+      $$\displaystyle 感知机学习算法步骤： \ \ 1. 初始化权重 w = 0，偏置 b = 0 \ 2. 设置学习率 η（0 < η \leq 1，通常取0.1） \ 3. 重复以下过程直到没有误分类点： \ &nbsp;&nbsp;&nbsp;&nbsp;对每个训练样本 (x, y)： \ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;计算预测值 \hat{y} = f(w \cdot x + b) \ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;如果 \hat{y} \neq y（预测错了），更新参数： \ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;w ← w + η \cdot y \cdot x \ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b ← b + η \cdot y$$
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">9 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">理解权重更新规则</h2>
+    <h3 class="sub">为什么这样更新？背后的直觉是什么？</h3>
+    <div class="formula">
+      $$\displaystyle w ← w + η \cdot y \cdot x \ b ← b + η \cdot y$$
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="hbox danger">
+          <h4>❌ 情况1：应该是1，但预测成0了（漏报）</h4>
+          <p>此时y=1，ŷ=0，更新规则变成：w←w+ηx，b←b+η<br>
+          相当于<strong>把正样本方向的权重加大</strong>，让决策边界往正确方向挪一点，下次这个样本更容易被判定为1。</p>
+        </div>
+      </div>
+      <div>
+        <div class="hbox warn">
+          <h4>❌ 情况2：应该是0，但预测成1了（误报）</h4>
+          <p>此时y=-1？等下，注意——我们标签通常用{+1,-1}而不是{1,0}，这样y=-1时更新变成w←w-ηx，b←b-η。<strong>把权重往反方向拉</strong>，让这个样本下次不那么容易被判定为1。</p>
+        </div>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🔑 关于标签编码</h4>
+      <p>注意：感知机算法里，正类标签通常用+1而不是1，负类用-1而不是0。这样更新公式统一写成w←w+ηyx即可。如果用{0,1}编码，负类时y=0权重不更新，逻辑上需要分开处理。本质是一样的。</p>
+    </div>
+    <div class="hbox orange">
+      <h4>📌 收敛定理</h4>
+      <p>如果训练数据是<strong>线性可分</strong>的，感知机算法一定能在有限步内收敛，找到一个完美分类所有样本的解！如果线性不可分，算法会一直振荡不收敛——这也是感知机的局限。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">10 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">热身：用感知机实现逻辑门</h1>
+    <h3 class="sub">不用训练，直接给权重参数，验证感知机的表达能力</h3>
+    <div class="hbox">
+      <h4>🎮 逻辑门是什么？</h4>
+      <p>逻辑门是数字电路的基本单元，输入是0或1，输出也是0或1，实现基本的逻辑运算：与(AND)、或(OR)、非(NOT)等。我们来看看感知机能不能实现这些简单逻辑。</p>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <h4 style="color:var(--accent3)">💡 我们先不用学算法，直接"手搓"权重</h4>
+      <p style="margin-top:0.8rem">对于简单的逻辑门，我们可以直接思考出合适的w和b，不用算法去学。这能帮助你建立直觉：权重w控制每个输入的重要性，偏置b控制激活的门槛高低。</p>
+    </div>
+    <div class="hbox success" style="margin-top:1rem">
+      <h4>✅ 准备好了吗？</h4>
+      <p>接下来我们依次实现AND门、OR门、NOT门，看看感知机是怎么工作的。记住判断标准：计算z=w1x1+w2x2+b，如果z≥0输出1，否则输出0。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">11 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">实现逻辑AND（与门）</h2>
+    <h3 class="sub">只有两个输入都是1，输出才是1</h3>
+    <div class="formula">
+      $$\displaystyle w_1 = 1, w_2 = 1, b = -1.5 \ \ z = x_1 + x_2 - 1.5 \ y = 1 if z \geq 0 else 0$$
+    </div>
+    <table class="cmp">
+      <tr>
+        <th>x₁</th>
+        <th>x₂</th>
+        <th>z = x₁+x₂-1.5</th>
+        <th>y（输出）</th>
+        <th>是否符合AND？</th>
+      </tr>
+      <tr>
+        <td>0</td>
+        <td>0</td>
+        <td>-1.5</td>
+        <td><strong style="color:var(--danger)">0</strong></td>
+        <td style="color:var(--success)">✅ 正确（0 AND 0 = 0）</td>
+      </tr>
+      <tr>
+        <td>0</td>
+        <td>1</td>
+        <td>-0.5</td>
+        <td><strong style="color:var(--danger)">0</strong></td>
+        <td style="color:var(--success)">✅ 正确（0 AND 1 = 0）</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>0</td>
+        <td>-0.5</td>
+        <td><strong style="color:var(--danger)">0</strong></td>
+        <td style="color:var(--success)">✅ 正确（1 AND 0 = 0）</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>1</td>
+        <td>0.5</td>
+        <td><strong style="color:var(--success)">1</strong></td>
+        <td style="color:var(--success)">✅ 正确（1 AND 1 = 1）</td>
+      </tr>
+    </table>
+    <div class="hbox success">
+      <h4>🎉 AND门实现成功！</h4>
+      <p>验证一下：只有x1和x2都是1的时候，z=0.5≥0才输出1，其他情况都是0，完美符合与门逻辑！偏置-1.5设置了一个比较高的门槛：需要两个输入都为1才能"激活"。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">12 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">实现逻辑OR（或门）</h2>
+    <h3 class="sub">只要有一个输入是1，输出就是1</h3>
+    <div class="formula">
+      $$\displaystyle w_1 = 1, w_2 = 1, b = -0.5 \ \ z = x_1 + x_2 - 0.5 \ y = 1 if z \geq 0 else 0$$
+    </div>
+    <table class="cmp">
+      <tr>
+        <th>x₁</th>
+        <th>x₂</th>
+        <th>z = x₁+x₂-0.5</th>
+        <th>y（输出）</th>
+        <th>是否符合OR？</th>
+      </tr>
+      <tr>
+        <td>0</td>
+        <td>0</td>
+        <td>-0.5</td>
+        <td><strong style="color:var(--danger)">0</strong></td>
+        <td style="color:var(--success)">✅ 正确（0 OR 0 = 0）</td>
+      </tr>
+      <tr>
+        <td>0</td>
+        <td>1</td>
+        <td>0.5</td>
+        <td><strong style="color:var(--success)">1</strong></td>
+        <td style="color:var(--success)">✅ 正确（0 OR 1 = 1）</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>0</td>
+        <td>0.5</td>
+        <td><strong style="color:var(--success)">1</strong></td>
+        <td style="color:var(--success)">✅ 正确（1 OR 0 = 1）</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>1</td>
+        <td>1.5</td>
+        <td><strong style="color:var(--success)">1</strong></td>
+        <td style="color:var(--success)">✅ 正确（1 OR 1 = 1）</td>
+      </tr>
+    </table>
+    <div class="hbox amber">
+      <h4>🤔 对比AND门，你发现了什么？</h4>
+      <p>权重还是w1=1,w2=1，只是偏置从-1.5变成了-0.5——<strong>门槛降低了</strong>！AND需要两个都满足（总和≥1.5），OR只要有一个就行（总和≥0.5）。你看，参数微小的变化就能实现不同的逻辑！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">13 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">实现逻辑NOT（非门）</h2>
+    <h3 class="sub">输入是0输出1，输入是1输出0——翻转</h3>
+    <div class="formula">
+      $$\displaystyle NOT只有1个输入：w_1 = -1, b = 0.5 \ \ z = -x_1 + 0.5 \ y = 1 if z \geq 0 else 0$$
+    </div>
+    <table class="cmp">
+      <tr>
+        <th>x₁</th>
+        <th>z = -x₁ + 0.5</th>
+        <th>y（输出）</th>
+        <th>是否符合NOT？</th>
+      </tr>
+      <tr>
+        <td>0</td>
+        <td>0.5</td>
+        <td><strong style="color:var(--success)">1</strong></td>
+        <td style="color:var(--success)">✅ 正确（NOT 0 = 1）</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>-0.5</td>
+        <td><strong style="color:var(--danger)">0</strong></td>
+        <td style="color:var(--success)">✅ 正确（NOT 1 = 0）</td>
+      </tr>
+    </table>
+    <div class="hbox orange">
+      <h4>💡 权重是负数！</h4>
+      <p>NOT门的权重w1=-1是负的——这意味着输入越大，z反而越小。这是"抑制"作用：输入x1=1会让神经元不激活，x1=0反而激活。负权重代表"这个输入是负面信号"。</p>
+    </div>
+    <div class="hbox success">
+      <h4>🎉 小结：线性逻辑门都能实现</h4>
+      <p>AND、OR、NOT——这些简单的线性逻辑门单层感知机都能轻松实现。那是不是所有逻辑门感知机都能实现呢？接下来我们来试试XOR（异或）门——正是这个问题让感知机沉寂了20年！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">14 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">关键挑战：XOR异或门</h1>
+    <h3 class="sub">x1和x2相同输出0，不同输出1——感知机的"噩梦"</h3>
+    <div class="two-col">
+      <div>
+        <h4 style="color:var(--danger);margin-bottom:1rem">❓ XOR真值表</h4>
+        <table class="cmp">
+          <tr>
+            <th>x₁</th>
+            <th>x₂</th>
+            <th>XOR输出</th>
+          </tr>
+          <tr>
+            <td>0</td>
+            <td>0</td>
+            <td><strong style="color:var(--danger)">0</strong></td>
+          </tr>
+          <tr>
+            <td>0</td>
+            <td>1</td>
+            <td><strong style="color:var(--success)">1</strong></td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>0</td>
+            <td><strong style="color:var(--success)">1</strong></td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td>1</td>
+            <td><strong style="color:var(--danger)">0</strong></td>
+          </tr>
+        </table>
+      </div>
+      <div>
+        <div class="hbox danger">
+          <h4>🤔 我们来试试能不能找到w1,w2,b</h4>
+          <p>根据真值表，需要满足以下四个不等式：<br><br>
+          (0,0)→0: b < 0<br>
+          (0,1)→1: w₂ + b ≥ 0<br>
+          (1,0)→1: w₁ + b ≥ 0<br>
+          (1,1)→0: w₁ + w₂ + b < 0<br><br>
+          你来解一解这组不等式——能找到解吗？</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">15 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">XOR问题证明：数学上无解！</h2>
+    <h3 class="sub">让我们用简单的不等式推导，证明为什么不可能</h3>
+    <div class="formula" style="text-align:left;font-size:1rem;line-height:2">
+      $$\displaystyle 从 (0,1)→1: w_2 + b \geq 0 &nbsp;&nbsp;--- (1) \ 从 (1,0)→1: w_1 + b \geq 0 &nbsp;&nbsp;--- (2) \ (1)+(2)得: w_1 + w_2 + 2b \geq 0 &nbsp;&nbsp;--- (3) \ 从 (1,1)→0: w_1 + w_2 + b < 0 &nbsp;&nbsp;--- (4) \ 从(3): w_1 + w_2 \geq -2b，代入(4): \ -2b + b \leq w_1 + w_2 + b < 0 ⇒ -b < 0 ⇒ b > 0 \ \ 但是从(0,0)→0我们得到 b < 0 ——矛盾！无解！$$
+    </div>
+    <div class="hbox danger">
+      <h4>😱 结论：单层感知机不可能实现XOR！</h4>
+      <p>这是数学上严格证明的——无论怎么选w1、w2、b，单层感知机都不可能实现异或门。这不是我们不够聪明，而是单层感知机的表达能力天生就有局限！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">16 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">几何直观：一条直线分不开XOR</h2>
+    <h3 class="sub">用图来看，为什么线性分类器对XOR无能为力</h3>
+    <div style="text-align:center;margin:2rem 0">
+      <div style="display:inline-grid;grid-template-columns:1fr 1fr;gap:2rem;max-width:700px">
+        <div class="card" style="text-align:center">
+          <h4 style="color:var(--success);justify-content:center">✅ AND/OR：线性可分</h4>
+          <div style="width:200px;height:200px;margin:1rem auto;position:relative;background:var(--bg);border-radius:8px">
+            <div style="position:absolute;bottom:20px;left:20px;width:20px;height:20px;border-radius:50%;background:var(--danger)"></div>
+            <div style="position:absolute;bottom:20px;right:20px;width:20px;height:20px;border-radius:50%;background:var(--danger)"></div>
+            <div style="position:absolute;top:20px;left:20px;width:20px;height:20px;border-radius:50%;background:var(--danger)"></div>
+            <div style="position:absolute;top:20px;right:20px;width:20px;height:20px;border-radius:50%;background:var(--success)"></div>
+            <div style="position:absolute;top:10px;left:10px;right:-30px;height:2px;background:var(--accent);transform:rotate(-30deg);transform-origin:left"></div>
+          </div>
+          <p style="font-size:0.9rem;color:var(--muted)">一条直线能把红点和绿点分开</p>
+        </div>
+        <div class="card accent" style="text-align:center">
+          <h4 style="color:var(--danger);justify-content:center">❌ XOR：线性不可分</h4>
+          <div style="width:200px;height:200px;margin:1rem auto;position:relative;background:var(--bg);border-radius:8px">
+            <div style="position:absolute;bottom:20px;left:20px;width:20px;height:20px;border-radius:50%;background:var(--danger)"></div>
+            <div style="position:absolute;bottom:20px;right:20px;width:20px;height:20px;border-radius:50%;background:var(--success)"></div>
+            <div style="position:absolute;top:20px;left:20px;width:20px;height:20px;border-radius:50%;background:var(--success)"></div>
+            <div style="position:absolute;top:20px;right:20px;width:20px;height:20px;border-radius:50%;background:var(--danger)"></div>
+          </div>
+          <p style="font-size:0.9rem;color:var(--muted)">红点绿点交替分布，任何一条直线都分不开</p>
+        </div>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>🎯 本质原因</h4>
+      <p>单层感知机是一个<strong>线性分类器</strong>，只能学习线性决策边界（在二维平面是一条直线）。而XOR的数据分布是"对角线为同类"，<strong>不是线性可分的</strong>——你需要两条直线或者一条曲线才能把它们分开。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">17 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">感知机的能力边界</h1>
+    <h3 class="sub">线性可分就能学会，线性不可分就不行</h3>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--success)">✅</div>
+        <h4>单层感知机能做到的</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.5rem">
+          <li>学习所有<strong>线性可分</strong>的问题</li>
+          <li>实现AND、OR、NOT等线性逻辑门</li>
+          <li>线性二元分类（有一条直线/超平面能分开的）</li>
+          <li>对于线性可分数据，保证收敛到一个解</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--danger)">❌</div>
+        <h4>单层感知机做不到的</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.5rem">
+          <li>学习<strong>线性不可分</strong>的问题</li>
+          <li>无法实现XOR异或门</li>
+          <li>无法解决复杂的非线性分类问题</li>
+          <li>无法拟合简单的非线性函数</li>
+          <li>阶跃函数不可导，无法堆叠多层训练</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>😔 当年的绝望</h4>
+      <p>Minsky和Papert在书中证明了感知机的这些局限，甚至暗示多层神经网络也没救。这直接导致了神经网络研究经费被砍，进入AI寒冬——很多人以为这条路走不通了。但他们错了！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">18 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">解决方案：两层感知机（MLP）</h1>
+    <h3 class="sub">既然一条直线分不开，那就用两条直线——多层感知机！</h3>
+    <div class="hbox success">
+      <h4>💡 关键思想：组合已有门电路来实现XOR！</h4>
+      <p>虽然单层感知机做不了XOR，但我们已经有了AND、OR、NOT门——如果把这些门<strong>组合起来、叠两层</strong>，能不能做出XOR？答案是：能！</p>
+    </div>
+    <div class="formula">
+      $$\displaystyle XOR(x_1, x_2) = AND( OR(x_1,x_2), NOT(AND(x_1,x_2)) ) \ \ <span class="desc" style="text-align:center"> 翻译成人话：x1或x2是真的，但不都是真的——就是"不同为真，相同为假"，这正是XOR的定义！ </span>$$
+    </div>
+    <div class="flow" style="margin-top:1.5rem">
+      <div class="flow-node" style="min-width:100px">x₁, x₂</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:100px">OR门<br>+<br>AND门</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:100px">NOT门(AND)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:100px">AND门组合<br>= XOR!</div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">19 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">验证：两层感知机实现XOR</h2>
+    <h3 class="sub">让我们手动算一遍，验证这个组合确实能实现XOR</h3>
+    <div class="formula" style="font-size:0.95rem;text-align:left;line-height:1.8">
+      $$\displaystyle 第1层（隐藏层）： \ &nbsp;&nbsp;s_1 = OR(x_1,x_2) = 1 if x_1+x_2-0.5 \geq 0 \ &nbsp;&nbsp;s_2 = NAND(x_1,x_2) = NOT AND(x_1,x_2) = 1 if -x_1-x_2+1.5 \geq 0 \ \ 第2层（输出层）： \ &nbsp;&nbsp;y = AND(s_1,s_2) = 1 if s_1+s_2-1.5 \geq 0$$
+    </div>
+    <table class="cmp">
+      <tr>
+        <th>x₁</th>
+        <th>x₂</th>
+        <th>s₁=OR</th>
+        <th>s₂=NAND</th>
+        <th>y=AND(s₁,s₂)</th>
+        <th>XOR正确吗？</th>
+      </tr>
+      <tr>
+        <td>0</td>
+        <td>0</td>
+        <td>0</td>
+        <td>1</td>
+        <td><strong style="color:var(--danger)">0</strong></td>
+        <td style="color:var(--success)">✅ 正确（0 XOR 0 = 0）</td>
+      </tr>
+      <tr>
+        <td>0</td>
+        <td>1</td>
+        <td>1</td>
+        <td>1</td>
+        <td><strong style="color:var(--success)">1</strong></td>
+        <td style="color:var(--success)">✅ 正确（0 XOR 1 = 1）</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>0</td>
+        <td>1</td>
+        <td>1</td>
+        <td><strong style="color:var(--success)">1</strong></td>
+        <td style="color:var(--success)">✅ 正确（1 XOR 0 = 1）</td>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>1</td>
+        <td>1</td>
+        <td>0</td>
+        <td><strong style="color:var(--danger)">0</strong></td>
+        <td style="color:var(--success)">✅ 正确（1 XOR 1 = 0）</td>
+      </tr>
+    </table>
+    <div class="hbox success">
+      <h4>🎉 成功了！</h4>
+      <p>叠两层感知机，我们就解决了XOR问题！这就是<strong>多层感知机（MLP）</strong>——把多个感知机堆叠起来，一层的输出作为下一层的输入，就能解决单层做不到的非线性问题！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">20 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">几何直观：两层感知机=多条直线组合</h2>
+    <h3 class="sub">XOR需要两条直线才能分开，两层网络刚好能做到</h3>
+    <div style="text-align:center;margin:2rem 0">
+      <div class="card accent" style="display:inline-block;max-width:500px;text-align:center">
+        <h4 style="color:var(--success);justify-content:center">✅ XOR：两层感知机=两条直线围成区域</h4>
+        <div style="width:220px;height:220px;margin:1rem auto;position:relative;background:var(--bg);border-radius:8px">
+          <div style="position:absolute;bottom:20px;left:20px;width:20px;height:20px;border-radius:50%;background:var(--danger)"></div>
+          <div style="position:absolute;bottom:20px;right:20px;width:20px;height:20px;border-radius:50%;background:var(--success)"></div>
+          <div style="position:absolute;top:20px;left:20px;width:20px;height:20px;border-radius:50%;background:var(--success)"></div>
+          <div style="position:absolute;top:20px;right:20px;width:20px;height:20px;border-radius:50%;background:var(--danger)"></div>
+          <div style="position:absolute;top:0;left:0;right:0;bottom:0;border-top:2px solid var(--accent);border-right:2px solid var(--accent2);transform:rotate(45deg);transform-origin:center"></div>
+        </div>
+        <p style="font-size:0.9rem;color:var(--muted)">第1层画两条直线，第2层组合结果——中间区域就是XOR=1的情况！</p>
+      </div>
+    </div>
+    <div class="hbox amber">
+      <h4>🔑 关键洞察</h4>
+      <p>每增加一层，网络的表达能力就更强——<strong>一层是线性分类器，两层可以分凸多边形区域，三层以上可以拟合任意复杂形状</strong>。这就是"深度"的力量！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">21 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">多层感知机（MLP）的诞生</h1>
+    <h3 class="sub">堆叠感知机，就能解决非线性问题——但怎么训练呢？</h3>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node" style="min-width:100px">输入层<br>Input</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:100px">隐藏层<br>Hidden Layer</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:100px">输出层<br>Output</div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--success)">✨ 好消息：表达能力大幅提升</h4>
+        <p>多层网络理论上能解决非常复杂的问题。后来证明的<strong>万能近似定理</strong>说：单隐藏层+足够神经元的MLP能逼近任意连续函数。</p>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--danger)">😫 坏消息：怎么训练？</h4>
+        <p>问题来了——阶跃函数不可导，不知道怎么把输出层的误差"传回"隐藏层来更新权重。Minsky当年觉得这个问题解决不了。<br><br><strong style="color:var(--accent)">但是！反向传播算法（BP）的发明解决了这个问题！</strong></p>
+      </div>
+    </div>
+    <div class="hbox orange">
+      <h4>🎯 解决方案：把阶跃函数换成可导函数</h4>
+      <p>只要把不可导的阶跃激活函数换成Sigmoid、ReLU等可导的激活函数，就能用<strong>反向传播</strong>来训练多层网络了！这就是我们下一集要讲的内容。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">22 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">从感知机到现代神经网络</h1>
+    <h3 class="sub">感知机虽然简单，但它是所有神经网络的基石</h3>
+    <div class="flow" style="flex-direction:column;gap:1rem;align-items:stretch;margin:2rem 0">
+      <div class="flow-node hl" style="text-align:left;min-width:auto;padding-left:1.5rem">
+        <strong style="color:var(--accent)">🧠 1957：感知机</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.9rem">单层神经元，阶跃激活，能解决线性问题，为神经网络奠定基础</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;padding-left:1.5rem">
+        <strong style="color:var(--accent2)">🔗 1986：多层感知机+反向传播</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.9rem">Hinton等人重新发明BP算法，用Sigmoid替代阶跃函数，能训练多层网络了</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;padding-left:1.5rem">
+        <strong style="color:var(--accent3)">⚡ 2012：AlexNet/深度学习时代</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.9rem">ReLU激活、GPU训练、大数据——深度神经网络时代到来</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;padding-left:1.5rem">
+        <strong style="color:var(--success)">🌟 2017至今：Transformer/大模型</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.9rem">注意力机制、GPT、BERT——感知机的思想仍在每一个神经元里延续</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">23 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">感知机的重要意义</h2>
+    <h3 class="sub">不要因为它简单就轻视它——它是DL的起点</h3>
+    <div class="three-col" style="margin-top:1rem">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">🏗️</div>
+        <h4>基本构建单元</h4>
+        <p>现代神经网络不管多深多复杂（CNN/Transformer/GPT），里面每一个"神经元"本质上都是"加权求和+激活函数"——和感知机一模一样！</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">💡</div>
+        <h4>核心思想传承</h4>
+        <p>权重决定重要性、偏置控制阈值、通过数据学习参数——这些核心思想从感知机开始一直保留到今天最先进的大模型里。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">📚</div>
+        <h4>理解神经网络的第一步</h4>
+        <p>理解了感知机，你才能理解为什么需要激活函数、为什么需要多层、反向传播在干什么——所有后续概念都是感知机的延伸。</p>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🔑 记住这个结论</h4>
+      <p><strong>深度神经网络 = 很多很多个感知机叠很多很多层</strong>，只不过把阶跃函数换成了更好的激活函数，用反向传播来训练而已。万丈高楼平地起，感知机就是那块最重要的基石。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">24 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">本集知识点总结</h2>
+    <h3 class="sub">回顾一下，我们从感知机学到了什么？</h3>
+    <div class="card">
+      <h4 style="color:var(--accent)">📚 核心知识点回顾</h4>
+      <div class="body" style="margin-top:1rem">
+        <ul>
+          <li><strong>感知机</strong>：Rosenblatt 1957年提出，最简单的神经网络，模拟生物神经元</li>
+          <li><strong>模型结构</strong>：输入x→权重w→加权求和z=w·x+b→阶跃激活→输出y(0/1)</li>
+          <li><strong>本质</strong>：线性二元分类器，学习一个超平面分开两类</li>
+          <li><strong>学习算法</strong>：初始化0→逐个样本看→分类错了就更新w←w+ηyx，b←b+ηy→直到收敛</li>
+          <li><strong>能实现</strong>：AND、OR、NOT等线性可分问题</li>
+          <li><strong>关键局限</strong>：单层感知机是线性模型，<strong>无法解决XOR问题</strong>（线性不可分）</li>
+          <li><strong>解决方案</strong>：堆叠成两层/多层感知机（MLP），组合多个线性分类器就能解决非线性问题</li>
+          <li><strong>遗留问题</strong>：阶跃函数不可导，需要换成可导激活函数+反向传播来训练多层网络</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox amber">
+      <h4>🎯 下集预告</h4>
+      <p>下一集我们正式进入<strong>多层感知机（MLP）</strong>——理解前向传播、激活函数、万能近似定理，建立完整的神经网络架构概念！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">25 / 28</div>
+  <div class="slide-content">
+    <h1>🧠 感知机完成！</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      恭喜你理解了神经网络最基本的构建单元！<br><br>
+      <strong style="color:var(--accent)">从感知机出发，你已经推开了深度学习的大门</strong><br><br>
+      不要小看这个简单的模型——它是所有现代神经网络的祖先
+    </p>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag a">✅ 理解感知机</span>
+      <span class="tag o">🧱 DL基石</span>
+      <span class="tag g">🚀 继续前进</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">26 / 28</div>
+  <div class="slide-content">
+    <h1 style="font-size:clamp(2.2rem,4vw,3.5rem)">💻 动手练习建议</h1>
+    <p class="cover-sub" style="margin-top:1rem">光看不够，自己写代码实现一下印象更深</p>
+    <div class="card" style="margin-top:2rem;text-align:left;max-width:600px">
+      <h4>🏋️ 练习：用Python实现感知机</h4>
+      <ul style="font-size:0.95rem;color:var(--muted);margin-top:1rem">
+        <li>1. 写一个Perceptron类，有fit和predict方法</li>
+        <li>2. 用numpy实现权重更新规则</li>
+        <li>3. 生成线性可分的二分类数据，训练并验证收敛</li>
+        <li>4. 试试用它分类XOR数据，看看是不是真的分不出来</li>
+        <li>5. 可视化决策边界，直观看一下线性分类器</li>
+      </ul>
+      <div class="hbox success" style="margin-top:1rem;padding:1rem">
+        <p style="font-size:0.9rem">代码不用长，几十行就能搞定。写一遍比看十遍视频理解都深刻！</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-chapter">第18集 · 感知机</div>
+  <div class="slide-number">27 / 28</div>
+  <div class="slide-content">
+    <h1 style="font-size:clamp(2rem,4vw,3.2rem)">🤔 思考题</h1>
+    <p class="cover-sub" style="margin-top:1rem">检测一下你是不是真的理解了</p>
+    <div class="card" style="margin-top:2rem;text-align:left;max-width:650px">
+      <ol style="font-size:1rem;color:var(--ink2);line-height:2;padding-left:1.5rem">
+        <li style="margin-bottom:1rem">为什么感知机的权重w可以理解为"输入的重要性"？如果w是负数意味着什么？</li>
+        <li style="margin-bottom:1rem">偏置b的作用是什么？如果b=0会怎么样？b很大/很小分别意味着什么？</li>
+        <li style="margin-bottom:1rem">为什么阶跃函数不可导会导致多层网络难以训练？（提示：梯度怎么传？）</li>
+        <li>既然两层感知机就能解决XOR，那为什么说需要"深度"网络？宽而浅不行吗？（可以先想想，下几集会讲）</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-number">28 / 28</div>
+  <div class="slide-content">
+    <h1>🔗 下集：从MLP到神经网络</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      从感知机到多层感知机，真正的神经网络架构<br><br>
+      前向传播、激活函数、万能近似定理、网络四大组件<br>
+      层次化特征表示、输出层设计、参数计算<br><br>
+      <strong style="color:var(--accent3)">建立完整的神经网络全局观</strong>
+    </p>
+    <div class="end-buttons">
+      <a href="slides.html" class="end-btn secondary">📊 PPT目录</a>
+      <a href="chapter5.html" class="end-btn secondary">🎬 回到视频页</a>
+      <a href="ppt-19.html" class="end-btn primary">第4集：MLP与神经网络 →</a>
+    </div>
+    <div class="tags" style="justify-content:center;margin-top:3rem">
+      <span class="tag a">🧠 感知机</span>
+      <span class="tag o">🚀 向MLP前进</span>
+      <span class="tag g">💪 加油</span>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+});
+</script>
+</body></html>

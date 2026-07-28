@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<title>第5集 梯度下降 - ML学习站PPT</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#38bdf8;--accent2:#818cf8;--accent3:#c084fc;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--accent);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(56,189,248,0.1) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(129,140,248,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.25);border-radius:50px;font-size:1rem;color:var(--accent);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:700px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(56,189,248,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:2rem;margin:1.5rem 0;text-align:center;font-family:var(--mono);font-size:clamp(1rem,1.8vw,1.3rem);color:var(--accent);line-height:2}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:1rem;display:block;text-align:left;line-height:1.7}
+.katex{color:var(--accent3)}.katex .mord.text{color:var(--ink2)}
+.hbox{background:rgba(56,189,248,0.08);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1.5rem 0}
+.hbox h4{color:var(--accent);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(251,191,36,0.08);border-left-color:var(--warning)}.hbox.warn h4{color:var(--warning)}
+.hbox.danger{background:rgba(248,113,111,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.purple{background:rgba(129,140,248,0.08);border-left-color:var(--accent2)}.hbox.purple h4{color:var(--accent2)}
+.hbox.pink{background:rgba(192,132,252,0.08);border-left-color:var(--accent3)}.hbox.pink h4{color:var(--accent3)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:1rem}
+table.cmp th{background:var(--bg3);color:var(--accent);padding:12px 16px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.95rem}
+table.cmp td{padding:10px 16px;border-bottom:1px solid var(--rule);color:var(--ink2)}
+table.cmp tr:hover td{background:rgba(56,189,248,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent);background:rgba(56,189,248,0.1);color:var(--accent);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent)}
+.tag.p{color:var(--accent2)}.tag.pi{color:var(--accent3)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}.tag.d{color:var(--danger)}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent);color:var(--accent)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent)}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.code{background:var(--bg);border:1px solid var(--rule);border-radius:14px;padding:1.5rem 2rem;margin:1.5rem 0;font-family:var(--mono);font-size:clamp(0.85rem,1.4vw,1rem);line-height:1.8;color:var(--ink2);overflow-x:auto;white-space:pre}
+.code .kw{color:var(--accent3)}.code .fn{color:var(--accent)}.code .str{color:var(--success)}.code .cm{color:var(--muted);font-style:italic}.code .num{color:var(--warning)}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:2rem;align-items:center;margin:2rem 0}
+.vs-side{padding:2rem;border-radius:16px;text-align:center}.vs-left{background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.2)}
+.vs-right{background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.2)}
+.vs-divider{font-size:2rem;font-weight:800;color:var(--muted)}
+.chart-container{width:100%;height:280px;border-radius:12px;background:var(--bg)}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col,.vs{grid-template-columns:1fr}.vs-divider{text-align:center}.hint{display:none}.chart-container{height:220px}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="chapter1.html" style="font-weight:600;color:var(--accent)">📊 PPT课件</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="ppt-04.html">← 上一集</a>
+    <a href="chapter1.html">回到视频页</a>
+    <a href="ppt-06.html">下一集 →</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">机器学习入门教程 · 第5集</div>
+    <h1 class="cover-title">梯度下降</h1>
+    <p class="cover-sub">模型如何自己学会找最优参数<br>BV1w5dYBtE2b · 时长 24分32秒</p>
+    <div class="tags">
+      <span class="tag">优化算法</span>
+      <span class="tag p">梯度</span>
+      <span class="tag pi">学习率</span>
+      <span class="tag g">反向传播</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">2 / 30</div>
+  <div class="slide-content">
+    <h1 class="st">本集学习目标</h1>
+    <h3 class="sub">学完这一集，你将真正理解模型是如何"学习"的</h3>
+    <div class="body">
+      <ul>
+        <li><strong>理解最小二乘法的思想与局限</strong>——为什么不直接用数学公式解？</li>
+        <li><strong>建立梯度下降的核心直觉</strong>——蒙着眼睛下山的类比</li>
+        <li><strong>掌握梯度下降的参数更新公式</strong>——w = w - α·∂J/∂w</li>
+        <li><strong>深刻理解学习率α的作用</strong>——为什么步子不能太大也不能太小？</li>
+        <li><strong>了解三种梯度下降变体</strong>——BGD、SGD、Mini-batch的区别</li>
+        <li><strong>理解凸函数与局部最优问题</strong>——为什么线性回归不用担心局部最优？</li>
+      </ul>
+    </div>
+    <div class="hbox success">
+      <h4>🎯 本集地位</h4>
+      <p>梯度下降是<strong>整个机器学习最重要的优化算法</strong>，没有之一！不仅线性回归用它，逻辑回归、神经网络、深度学习……几乎所有模型训练都靠它。这一集一定要彻底搞懂！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">3 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">复习：上一集我们讲到了哪里？</h2>
+    <h3 class="sub">线性回归模型 + 损失函数，现在还差最后一步</h3>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node">📐 模型假设<br><small style="color:var(--muted)">f(x) = wx + b</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">📊 损失函数<br><small style="color:var(--muted)">MSE: J(w,b)</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="color:var(--warning)">❓ 怎么求最优w,b？</div>
+    </div>
+    <div class="two-col">
+      <div class="hbox">
+        <h4>✅ 我们已经知道</h4>
+        <p>线性回归模型是 f(x) = wx + b，有两个参数 w（权重）和 b（偏置）。我们用<strong>均方误差（MSE）</strong>作为损失函数 J(w,b) 来衡量预测的好坏。</p>
+      </div>
+      <div class="hbox purple">
+        <h4>🎯 我们的目标</h4>
+        <p>找到一组 (w, b)，使得损失函数 J(w,b) 的值<strong>最小</strong>——这时候模型预测最准。这就是"训练模型"的本质。</p>
+      </div>
+    </div>
+    <div class="formula">
+      $$J(w,b) = \frac{1}{2m} \sum_{i=1}^{m} \left( f(x^{(i)}) - y^{(i)} \right)^2$$
+      <span class="desc">MSE损失函数——我们的目标是最小化这个关于w和b的函数。前面加1/2是为了求导方便，不影响最优解位置。</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">4 / 30</div>
+  <div class="slide-content">
+    <h1 class="st">核心问题：如何找到最优参数？</h1>
+    <h3 class="sub">问题转化为：求函数 J(w,b) 的最小值点</h3>
+    <div class="body">
+      <p>现在问题变成了一个纯粹的数学问题：</p>
+      <p style="text-align:center;font-size:1.3rem;color:var(--accent);font-family:var(--mono);margin:1.5rem 0">
+        给定函数 J(w,b)，求 (w*, b*) = argmin J(w,b)
+      </p>
+      <p>也就是：w和b取什么值时，J(w,b)最小？</p>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="card">
+        <h4>🤔 想象一下</h4>
+        <p>把 J(w,b) 想象成一座三维的山：<br>• x轴是w<br>• y轴是b<br>• z轴（高度）是J(w,b)的值<br><br>我们要找的，就是这座山的<strong>最低点</strong>——山谷底部。</p>
+      </div>
+      <div class="hbox warn">
+        <h4>🗻 关键问题</h4>
+        <p>这座"山"可能很大很复杂，我们看不到全貌，也不能飞到天上俯瞰全局。那怎么才能<strong>站在山上任意一点</strong>，也能找到通往山谷底部的路呢？</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">5 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">方法一：最小二乘法（解析解）</h2>
+    <h3 class="sub">用数学推导直接算出答案——正规方程</h3>
+    <div class="body">
+      <p>对于线性回归这种简单模型，我们可以用微积分直接求解析解。高中数学告诉我们：函数在极值点处，导数为0。</p>
+    </div>
+    <div class="formula">
+      $$\frac{\partial J}{\partial w} = 0, \qquad \frac{\partial J}{\partial b} = 0$$
+      <span class="desc">分别对w和b求偏导，令偏导数等于0，解这个方程组就能直接得到最优解。</span>
+    </div>
+    <div class="two-col">
+      <div class="hbox success">
+        <h4>✅ 最小二乘法的优点</h4>
+        <p>• 一步到位，直接算出精确答案<br>• 不需要迭代，没有"调参"烦恼<br>• 数学上优美，理论保证最优</p>
+      </div>
+      <div class="hbox danger">
+        <h4>❌ 但它有很大局限</h4>
+        <p>• 需要计算矩阵求逆，大数据下极慢<br>• 只适用于线性回归等简单模型<br>• 无法推广到神经网络等复杂模型</p>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>📐 正规方程（矩阵形式）</h4>
+      <p style="font-family:var(--mono);text-align:center;font-size:1.1rem">w = (X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>y</p>
+      <p style="margin-top:0.8rem">看起来很美，但当特征数n>10000或样本数m>100000时，矩阵求逆的计算量会爆炸！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">6 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">为什么还需要别的方法？</h2>
+    <h3 class="sub">最小二乘法虽然能直接算，但现实中几乎不用</h3>
+    <table class="cmp">
+      <tr>
+        <th>问题</th>
+        <th>具体说明</th>
+        <th>影响程度</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--danger)">计算复杂度高</strong></td>
+        <td>矩阵求逆的复杂度是O(n³)，n是特征数。当n=10000时，需要1万亿次运算！</td>
+        <td><span class="tag d">严重</span></td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--warning)">大数据太慢</strong></td>
+        <td>深度学习动辄百万、千万级数据量和参数，用解析解要算到天荒地老</td>
+        <td><span class="tag d">致命</span></td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--danger)">适用范围极窄</strong></td>
+        <td>只有线性回归、逻辑回归等极少数模型有解析解，神经网络完全没有</td>
+        <td><span class="tag d">致命</span></td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--warning)">数值不稳定</strong></td>
+        <td>当X<sup>T</sup>X不可逆（奇异矩阵）时，方法直接失效</td>
+        <td><span class="tag w">时有发生</span></td>
+      </tr>
+    </table>
+    <div class="hbox purple">
+      <h4>💡 启示</h4>
+      <p>我们需要一种<strong>通用</strong>的优化方法：不管模型多复杂、数据量多大，都能用——哪怕不是一步到位，也能通过反复迭代，一步步逼近最优解。这就是<strong>梯度下降</strong>！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">7 / 30</div>
+  <div class="slide-content">
+    <h1 class="st">方法二：梯度下降</h1>
+    <h3 class="sub">机器学习最核心、最通用的优化算法</h3>
+    <div class="three-col" style="margin:2rem 0">
+      <div class="card accent">
+        <div class="card-icon">🌍</div>
+        <h4>通用性强</h4>
+        <p>几乎所有机器学习模型——线性回归、逻辑回归、SVM、神经网络、深度学习——都用梯度下降（或其变体）来训练。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <h4>适合大数据</h4>
+        <p>即使百万、千万级数据，也能高效计算。通过小批量（Mini-batch）技术，计算量可控。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧠</div>
+        <h4>直觉简单</h4>
+        <p>核心思想非常朴素，用一个生活中的类比就能讲明白——就是"蒙着眼睛下山"。</p>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🚀 梯度下降的地位</h4>
+      <p>可以说，没有梯度下降，就没有现代深度学习。理解了梯度下降，你就理解了模型"学习"的本质——模型就是靠梯度下降，一步步自动调整参数，越变越好的。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">8 / 30</div>
+  <div class="slide-content">
+    <h1 class="st">🏔️ 梯度下降的直觉：蒙着眼睛下山</h1>
+    <h3 class="sub">一个绝佳的类比——你不用看全山，也能走到谷底</h3>
+    <div class="card" style="margin-bottom:1.5rem">
+      <h4>🎭 场景想象</h4>
+      <p>想象你被蒙住眼睛，放到一座山的某个位置上。你的目标是走到<strong>山谷的最低点</strong>。你看不到远方，也没有地图，你只能做一件事：<strong>用脚感受你站的地方</strong>。</p>
+    </div>
+    <div class="body">
+      <p>你会怎么做？很自然的策略：</p>
+    </div>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node" style="min-width:150px">👣 站在当前位置</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl">🔍 感受最陡下坡方向</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">🚶 朝那个方向走一小步</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="color:var(--success)">🔁 重复，直到最低点</div>
+    </div>
+    <div class="hbox">
+      <h4>💡 这就是梯度下降！</h4>
+      <p>你在山上的位置，就是当前的参数(w,b)；山的高度，就是损失函数J(w,b)的值；你脚下感受到的"最陡下坡方向"，就是<strong style="color:var(--accent)">负梯度方向</strong>；你迈的那一小步，就是<strong style="color:var(--accent)">学习率α</strong>。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">9 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">下山策略详解</h2>
+    <h3 class="sub">三步走策略——简单但有效</h3>
+    <div class="flow" style="flex-direction:column;gap:1.2rem;align-items:stretch;margin:2rem 0">
+      <div class="flow-node hl" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1.5rem">
+        <div style="font-size:2rem;font-weight:800;color:var(--accent);min-width:50px">①</div>
+        <div>
+          <strong>环顾四周，找到最陡的下坡方向</strong><br>
+          <span style="color:var(--muted);font-size:0.95rem">站在当前位置，用脚探一圈：哪个方向往下倾斜得最厉害？这就是下一步要走的方向。</span>
+        </div>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1.5rem">
+        <div style="font-size:2rem;font-weight:800;color:var(--accent);min-width:50px">②</div>
+        <div>
+          <strong>朝这个方向，迈一小步</strong><br>
+          <span style="color:var(--muted);font-size:0.95rem">注意：是"一小步"，不是一大步！迈太大可能直接跨过山谷，甚至"跳"到另一座山上去。</span>
+        </div>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1.5rem">
+        <div style="font-size:2rem;font-weight:800;color:var(--accent);min-width:50px">③</div>
+        <div>
+          <strong>到达新位置后，重复①②</strong><br>
+          <span style="color:var(--muted);font-size:0.95rem">每走一步，都重新在新位置找最陡方向，再迈一步。这样一步一步走下去……</span>
+        </div>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>✅ 结果</h4>
+      <p>只要你的每一步都朝着"当前位置最陡的下坡方向"走，而且步子大小合适，你最终一定会走到山谷的最低点（至少是一个局部最低点）。这就是梯度下降的魔力！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">10 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">"最陡方向"是什么？——是梯度的反方向！</h2>
+    <h3 class="sub">微积分告诉我们：梯度方向是函数上升最快的方向</h3>
+    <div class="body">
+      <p>在多元函数中，<strong>梯度（Gradient）</strong>是一个向量，它有一个极其重要的性质：</p>
+    </div>
+    <div class="formula" style="font-size:1.4rem">
+      $$\nabla J = \left( \frac{\partial J}{\partial w},\ \frac{\partial J}{\partial b} \right)^T$$
+      <span class="desc">梯度是由函数对每个参数的偏导数组成的向量。它指向的方向，是函数值<strong style="color:var(--danger)">上升最快</strong>的方向！</span>
+    </div>
+    <div class="vs">
+      <div class="vs-side vs-left">
+        <h3 style="color:var(--danger);margin-bottom:1rem">⬆️ 梯度方向 ∇J</h3>
+        <p style="color:var(--muted);font-size:1rem">函数上升最快的方向<br><strong style="color:var(--danger)">上山的方向！</strong></p>
+      </div>
+      <div class="vs-divider">↔</div>
+      <div class="vs-side vs-right">
+        <h3 style="color:var(--success);margin-bottom:1rem">⬇️ 负梯度方向 -∇J</h3>
+        <p style="color:var(--muted);font-size:1rem">函数下降最快的方向<br><strong style="color:var(--success)">下山的方向！这才是我们要走的！</strong></p>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>🎯 关键结论</h4>
+      <p>要下山（让J减小），就应该朝着<strong style="color:var(--success)">负梯度方向</strong>走。这就是"梯度下降"这个名字的由来——沿着梯度的反方向，一步步下降。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">11 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">梯度下降参数更新公式</h2>
+    <h3 class="sub">整个算法的核心——记住这两个式子就够了</h3>
+    <div class="formula" style="font-size:1.5rem">
+      $$\begin{aligned}
+      w &= w - \alpha \cdot \frac{\partial J}{\partial w} \\
+      b &= b - \alpha \cdot \frac{\partial J}{\partial b}
+      \end{aligned}$$
+      <span class="desc">这就是梯度下降的参数更新公式！w和b同时更新，反复执行这两步，直到收敛。</span>
+    </div>
+    <div class="two-col">
+      <div class="hbox warn">
+        <h4>⚠️ 重要：同时更新！</h4>
+        <p>必须先把新的w和b都算出来，再一起赋值。不能先更新w，再用新的w算∂J/∂b——这样就不是"同时"更新了，结果会错！</p>
+      </div>
+      <div class="hbox">
+        <h4>📝 正确做法</h4>
+        <p style="font-family:var(--mono);font-size:0.95rem">
+          temp_w = w - α·∂J/∂w<br>
+          temp_b = b - α·∂J/∂b<br>
+          w = temp_w<br>
+          b = temp_b
+        </p>
+      </div>
+    </div>
+    <div class="hbox purple">
+      <h4>🔄 这就是"学习"的过程</h4>
+      <p>模型训练做的事情，就是反复执行这两行更新公式。成千上万次迭代后，w和b会慢慢靠近最优值，J(w,b)越来越小，模型预测越来越准——模型就"学会"了！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">12 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">公式逐元素详解</h2>
+    <h3 class="sub">每个符号是什么意思？掰开揉碎讲清楚</h3>
+    <table class="cmp">
+      <tr>
+        <th style="width:15%">符号</th>
+        <th style="width:25%">名称</th>
+        <th>含义</th>
+      </tr>
+      <tr>
+        <td style="font-family:var(--mono);font-size:1.2rem;color:var(--accent)">w, b</td>
+        <td><strong>模型参数</strong></td>
+        <td>我们要优化的对象。线性回归的权重和偏置，神经网络里就是成千上万的权重矩阵和偏置向量。</td>
+      </tr>
+      <tr>
+        <td style="font-family:var(--mono);font-size:1.2rem;color:var(--warning)">α</td>
+        <td><strong>学习率 (Learning Rate)</strong></td>
+        <td>控制每一步迈多大。是一个需要手动设置的超参数，太大太小都不行，后面会重点讲。</td>
+      </tr>
+      <tr>
+        <td style="font-family:var(--mono);font-size:1.2rem;color:var(--accent2)">∂J/∂w</td>
+        <td><strong>偏导数（梯度分量）</strong></td>
+        <td>告诉我们：如果稍微增大一点w，J会增大还是减小？变化有多快？它指明了方向，也包含了坡度的陡峭程度。</td>
+      </tr>
+      <tr>
+        <td style="font-family:var(--mono);font-size:1.2rem;color:var(--danger)">- (减号)</td>
+        <td><strong>负号</strong></td>
+        <td>因为梯度方向是上升方向，我们要下降，所以要取反，朝负梯度方向走。</td>
+      </tr>
+      <tr>
+        <td style="font-family:var(--mono);font-size:1.2rem;color:var(--success">=</td>
+        <td><strong>赋值更新</strong></td>
+        <td>用新计算出来的值，覆盖原来的w和b。这是一个迭代过程，每更新一次，就相当于"走了一步"。</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">13 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">为什么是减号？——负梯度=下降最快方向</h2>
+    <h3 class="sub">这是微积分严格证明的结论，不是拍脑袋决定的</h3>
+    <div class="body">
+      <p>想象你站在山坡上某点，你可以360度选择方向迈一小步。朝哪个方向走，高度下降得最多？</p>
+    </div>
+    <div class="formula">
+      $$\displaystyle 方向导数 = \nabla J \cdot u （u是单位方向向量）$$
+      <span class="desc">根据柯西不等式，方向导数的最小值，出现在u与∇J方向相反的时候——也就是u = -∇J / ||∇J|| 时，下降最快。</span>
+    </div>
+    <div class="two-col">
+      <div class="hbox danger">
+        <h4>❌ 如果用加号会怎样？</h4>
+        <p>w = w + α·∂J/∂w → 朝梯度方向（上山方向）走！J会越来越大，模型越训练越差，最后彻底发散——这叫"梯度上升"，是求函数最大值时用的。</p>
+      </div>
+      <div class="hbox success">
+        <h4>✅ 减号的物理意义</h4>
+        <p>减号保证了：<br>• 当∂J/∂w > 0时，w会减小（J随w增大而增大，所以要减小w）<br>• 当∂J/∂w < 0时，w会增大（J随w增大而减小，所以要增大w）<br>无论哪种情况，J都会往小的方向走！</p>
+      </div>
+    </div>
+    <div class="hbox purple">
+      <h4>💡 直觉记忆</h4>
+      <p>你不用记住数学证明，只要记住：<strong>梯度是上山方向，负梯度是下山方向</strong>，我们要下山（最小化J），所以用减号。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">14 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">α是什么？——学习率(Learning Rate)</h2>
+    <h3 class="sub">控制每一步走多远——梯度下降最重要的超参数</h3>
+    <div class="body">
+      <p>如果说<strong>负梯度方向</strong>告诉我们"该往哪走"，那么<strong>学习率α</strong>就告诉我们"该走多远"。</p>
+    </div>
+    <div class="card" style="margin:1.5rem 0">
+      <h4>🚶 用下山类比理解α</h4>
+      <p>α就是你每一步迈的步幅大小：<br>• α大 = 大步流星，一步跨很远<br>• α小 = 小碎步挪动，一点点往前蹭</p>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 超参数 vs 参数</h4>
+      <p>• <strong>参数（w,b）</strong>：是模型自己学出来的，不用人手动设置<br>• <strong>超参数（如α）</strong>：是需要人在训练前手动设置、手动调整的。学习率是最重要的超参数之一，调不好就学不出来！</p>
+    </div>
+    <div class="hbox">
+      <h4>🔍 α的典型取值</h4>
+      <p>α通常是一个很小的正数，常见取值范围：0.1, 0.03, 0.01, 0.003, 0.001, 0.0001……具体取多少要靠实验，但绝对不能太大（比如>1），也不能太小（比如<1e-7）。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">15 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">学习率α的重要性：步子不能太大也不能太小</h2>
+    <h3 class="sub">α是梯度下降里最需要调的超参数，直接决定收敛效果</h3>
+    <div class="three-col" style="margin:2rem 0">
+      <div class="card" style="border-color:rgba(248,113,111,0.3)">
+        <div class="card-icon" style="color:var(--danger)">🏃‍♂️💨</div>
+        <h4 style="color:var(--danger)">α太大</h4>
+        <p>步子迈太大，直接跨过最低点，来回震荡，甚至越走越高，最后发散。</p>
+      </div>
+      <div class="card accent" style="border-color:rgba(52,211,153,0.3)">
+        <div class="card-icon" style="color:var(--success)">🚶</div>
+        <h4 style="color:var(--success)">α合适</h4>
+        <p>步子大小适中，稳步向最低点靠近，平滑收敛，训练速度也快。</p>
+      </div>
+      <div class="card" style="border-color:rgba(251,191,36,0.3)">
+        <div class="card-icon" style="color:var(--warning)">🐌</div>
+        <h4 style="color:var(--warning)">α太小</h4>
+        <p>小碎步挪得太慢，虽然能收敛，但要走成千上万步才能到，训练时间极长。</p>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>🎯 这是一个trade-off</h4>
+      <p>学习率的选择是"收敛速度"和"收敛稳定性"之间的平衡。太大震荡不收敛，太慢训练时间长。实际中一般从0.01开始尝试，观察损失函数曲线再调整。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">16 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">α太大的问题：跨过最低点、震荡、发散</h2>
+    <h3 class="sub">步子太大容易"扯着蛋"——甚至直接从山上飞出去</h3>
+    <div class="vs">
+      <div class="vs-side vs-left">
+        <h3 style="color:var(--danger);margin-bottom:1rem">💥 α过大的后果</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul style="font-size:0.95rem">
+            <li><strong>震荡不收敛</strong>：在山谷两边来回跳，越跳越高</li>
+            <li><strong>跨过最低点</strong>：一步从左边山坡跨到右边山坡，错过最优点</li>
+            <li><strong>发散</strong>：J(w,b)越来越大，参数飞出去变成NaN</li>
+            <li><strong>训练失败</strong>：loss曲线不是下降，而是上下抖动甚至飙升</li>
+          </ul>
+        </div>
+      </div>
+      <div class="vs-divider">⚠️</div>
+      <div class="vs-side" style="background:rgba(248,113,111,0.06);border:1px solid rgba(248,113,111,0.2)">
+        <h4 style="color:var(--danger);margin-bottom:1rem">📉 典型loss曲线</h4>
+        <div id="chart-big-alpha" class="chart-container"></div>
+        <p style="color:var(--danger);margin-top:0.8rem;font-size:0.9rem">不下降反而震荡发散！</p>
+      </div>
+    </div>
+    <div class="hbox danger">
+      <h4>❌ 常见错误：学习率设成1、10甚至更大</h4>
+      <p>第一次写梯度下降代码时很多人会犯这个错。如果看到loss不下降反而飙升，第一反应就是：<strong>学习率是不是太大了？</strong>把α调小10倍试试。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">17 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">α太小的问题：收敛极慢、训练时间过长</h2>
+    <h3 class="sub">步子太小虽然稳，但等不起——训练一周都没结果</h3>
+    <div class="vs">
+      <div class="vs-side vs-left">
+        <h3 style="color:var(--warning);margin-bottom:1rem">🐢 α过小的后果</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul style="font-size:0.95rem">
+            <li><strong>收敛极慢</strong>：要迭代几万、几十万次才到最低点</li>
+            <li><strong>浪费算力</strong>：GPU空转，电费和时间都浪费了</li>
+            <li><strong>看起来在学习</strong>：loss确实在下降，但慢得让人绝望</li>
+            <li><strong>调参效率低</strong>：等一天才看到结果，实验周期太长</li>
+          </ul>
+        </div>
+      </div>
+      <div class="vs-divider">⚠️</div>
+      <div class="vs-side" style="background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.2)">
+        <h4 style="color:var(--warning);margin-bottom:1rem">📉 典型loss曲线</h4>
+        <div id="chart-small-alpha" class="chart-container"></div>
+        <p style="color:var(--warning);margin-top:0.8rem;font-size:0.9rem">下降非常缓慢！</p>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>🐌 典型症状</h4>
+      <p>loss每轮只降一点点，训练1000轮和100轮差别不大。这时候不要以为模型"收敛了"——它只是走得太慢了！把α调大5倍、10倍，你会发现loss下降速度立刻快起来。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">18 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">α合适时：平滑到达最低点</h2>
+    <h3 class="sub">理想状态——稳步下降，快速收敛</h3>
+    <div class="vs">
+      <div class="vs-side vs-right">
+        <h3 style="color:var(--success);margin-bottom:1rem">✅ α合适的表现</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul style="font-size:0.95rem">
+            <li><strong>loss单调下降</strong>：每一轮迭代J都在减小</li>
+            <li><strong>收敛速度快</strong>：几十、几百轮就接近最优</li>
+            <li><strong>稳定不震荡</strong>：没有大的跳变，曲线平滑</li>
+            <li><strong>最终收敛</strong>：到达最低点后loss不再明显变化</li>
+          </ul>
+        </div>
+      </div>
+      <div class="vs-divider">✅</div>
+      <div class="vs-side" style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2)">
+        <h4 style="color:var(--success);margin-bottom:1rem">📉 理想loss曲线</h4>
+        <div id="chart-good-alpha" class="chart-container"></div>
+        <p style="color:var(--success);margin-top:0.8rem;font-size:0.9rem">快速下降，然后趋于平稳！</p>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🎯 完美！这就是我们想要的</h4>
+      <p>一个好的学习率，应该让loss在前几轮快速下降，然后逐渐平缓，最终收敛到一个稳定值。训练模型时，画出loss曲线是判断α是否合适的最直观方法。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">19 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">学习率选择建议</h2>
+    <h3 class="sub">实践中怎么调α？给你一套实用套路</h3>
+    <div class="body">
+      <p>调学习率没有万能公式，但有一套经验方法：</p>
+    </div>
+    <div class="flow" style="flex-direction:column;gap:1rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;gap:1.5rem;align-items:flex-start">
+        <span class="tag g" style="white-space:nowrap">第1步</span>
+        <div>
+          <strong>从常见值开始尝试</strong><br>
+          <span style="color:var(--muted);font-size:0.95rem">通常从 <strong style="font-family:var(--mono);color:var(--accent)">0.01</strong> 或 <strong style="font-family:var(--mono);color:var(--accent)">0.001</strong> 开始。其他常用值：0.1, 0.03, 0.003, 0.0001。</span>
+        </div>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;gap:1.5rem;align-items:flex-start">
+        <span class="tag" style="white-space:nowrap">第2步</span>
+        <div>
+          <strong>观察loss曲线</strong><br>
+          <span style="color:var(--muted);font-size:0.95rem">跑几十轮看看loss：<br>• loss飙升/震荡 → α太大，除以3或10<br>• loss下降极慢 → α太小，乘以3或10<br>• loss平稳下降 → α合适！</span>
+        </div>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;gap:1.5rem;align-items:flex-start">
+        <span class="tag p" style="white-space:nowrap">进阶</span>
+        <div>
+          <strong>学习率衰减(Learning Rate Decay)</strong><br>
+          <span style="color:var(--muted);font-size:0.95rem">刚开始用大α快速接近，后期用小α精细调整。很多优化器（如Adam）会自动调整学习率。</span>
+        </div>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>💡 对数尺度搜索</h4>
+      <p>调α不要一点点试，按<strong>3倍或10倍</strong>的跨度来试：0.1 → 0.01 → 0.001 → 0.0001，快速锁定合适的量级，再在这个量级附近微调。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">20 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">梯度下降迭代过程可视化</h2>
+    <h3 class="sub">从等高线图看参数如何一步步走向最优点</h3>
+    <div class="card" style="text-align:center;padding:2rem;margin:1.5rem 0">
+      <div id="chart-contour" class="chart-container" style="height:350px"></div>
+      <p style="color:var(--muted);margin-top:1rem;font-size:0.9rem">（椭圆线是等高线，每走一步都垂直于等高线——因为这是最陡方向）</p>
+    </div>
+    <div class="body">
+      <p><strong>等高线图怎么看？</strong></p>
+      <ul>
+        <li>椭圆线是J(w,b)的等高线——同一条线上J值相同</li>
+        <li>越往中心，J值越小，中心★就是全局最优点(w*,b*)</li>
+        <li>每一步都<strong>垂直于等高线</strong>走（因为梯度方向垂直于等高线）</li>
+        <li>随着越来越靠近中心，因为坡度变缓，步子会自动变小（因为∂J/∂w变小了）</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">21 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">收敛判断：什么时候可以停下来？</h2>
+    <h3 class="sub">不需要无限迭代下去——判断收敛就可以停止了</h3>
+    <div class="two-col">
+      <div>
+        <div class="hbox">
+          <h4>📏 方法1：看损失变化量</h4>
+          <p>如果一次迭代后，J的减小量小于一个很小的阈值ε（比如1e-6），说明已经"走到平地"了，几乎不再下降，可以认为收敛了。</p>
+        </div>
+        <div class="hbox purple" style="margin-top:1rem">
+          <h4>🔢 方法2：固定迭代次数</h4>
+          <p>更简单的做法：提前设定迭代轮数（如1000轮、10000轮），跑完就停。实际中最常用，简单直接。</p>
+        </div>
+      </div>
+      <div>
+        <div class="hbox success">
+          <h4>👀 方法3：画loss曲线肉眼看</h4>
+          <p>把每轮的J画出来，当曲线变成一条几乎水平的直线时，就说明收敛了。这是最直观、最可靠的方法。</p>
+        </div>
+        <div class="hbox warn" style="margin-top:1rem">
+          <h4>⚠️ 注意：不要提前停！</h4>
+          <p>loss还在明显下降就停下来，模型还没学好，欠拟合。多观察loss曲线，确认它真的"平了"再停。</p>
+        </div>
+      </div>
+    </div>
+    <div class="formula">
+      $$|J_{\text{new}} - J_{\text{old}}| < \epsilon$$
+      <span class="desc">收敛判据：损失函数的变化量小于阈值\(\epsilon\)（通常取\(10^{-3}\)到\(10^{-7}\)）。实际工程中很少用，因为固定轮数+看loss曲线更简单。</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">22 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">三种梯度下降变体对比</h2>
+    <h3 class="sub">根据每次用多少数据算梯度，分成三大类</h3>
+    <div class="body">
+      <p>之前讲的是梯度下降的思想，但具体实现时，<strong>每一步用多少个样本来算梯度</strong>？这就有了三种变体：</p>
+    </div>
+    <table class="cmp">
+      <tr>
+        <th>变体</th>
+        <th>每次用样本数</th>
+        <th>速度</th>
+        <th>稳定性</th>
+        <th>内存需求</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--warning)">BGD 批量梯度下降</strong></td>
+        <td>全部 m 个样本</td>
+        <td><span class="tag w">慢</span></td>
+        <td><span class="tag g">很稳定</span></td>
+        <td>大（需加载全部数据）</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--danger)">SGD 随机梯度下降</strong></td>
+        <td>1 个样本</td>
+        <td><span class="tag g">快</span></td>
+        <td><span class="tag d">震荡大</span></td>
+        <td>小（每次只看1个）</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--success)">Mini-batch 小批量梯度下降</strong></td>
+        <td>32/64/128 个样本</td>
+        <td><span class="tag g">较快</span></td>
+        <td><span class="tag g">较稳定</span></td>
+        <td>适中</td>
+      </tr>
+    </table>
+    <div class="hbox success">
+      <h4>🏆 实际中用哪个？</h4>
+      <p><strong style="color:var(--accent)">Mini-batch小批量梯度下降</strong>是绝对的主流！32/64/128是最常用的batch size，兼顾了速度和稳定性。深度学习中几乎都用这个。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">23 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">BGD：批量梯度下降</h2>
+    <h3 class="sub">用全部样本算梯度——最"标准"但最慢的版本</h3>
+    <div class="formula">
+      $$\begin{aligned}
+      \frac{\partial J}{\partial w} &= \frac{1}{m} \sum_{i=1}^{m} \left( f(x^{(i)}) - y^{(i)} \right) \cdot x^{(i)} \\
+      \frac{\partial J}{\partial b} &= \frac{1}{m} \sum_{i=1}^{m} \left( f(x^{(i)}) - y^{(i)} \right)
+      \end{aligned}$$
+      <span class="desc">每走一步，都要把所有m个样本遍历一遍，算平均梯度。这就是"批量"的含义。</span>
+    </div>
+    <div class="two-col">
+      <div class="hbox success">
+        <h4>✅ 优点</h4>
+        <p>• 梯度估计最准确（用了全部数据）<br>• 收敛过程最稳定，不会震荡<br>• 理论分析简单，容易理解<br>• 一定能收敛到凸函数的全局最优</p>
+      </div>
+      <div class="hbox danger">
+        <h4>❌ 缺点</h4>
+        <p>• <strong>非常慢！</strong>每一步都要处理全部数据<br>• 大数据集（m=100万+）完全不现实<br>• 内存放不下整个数据集<br>• 无法在线学习（新数据来了要重算）</p>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>📌 适用场景</h4>
+      <p>小数据集（m<10000）或教学演示用。实际工程中几乎不用，因为大数据下太慢了。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">24 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">SGD：随机梯度下降</h2>
+    <h3 class="sub">每次只用1个样本算梯度——快但噪声大</h3>
+    <div class="formula">
+      $$\begin{aligned}
+      \frac{\partial J_i}{\partial w} &= \left( f(x^{(i)}) - y^{(i)} \right) \cdot x^{(i)} \\
+      \frac{\partial J_i}{\partial b} &= f(x^{(i)}) - y^{(i)}
+      \end{aligned}$$
+      <span class="desc">每次随机选一个样本i，只用这一个样本的梯度来更新参数。注意：这里算的不是J，而是单个样本的损失\(J_i\)。</span>
+    </div>
+    <div class="two-col">
+      <div class="hbox success">
+        <h4>✅ 优点</h4>
+        <p>• <strong>极快！</strong>每一步只需处理1个样本<br>• 内存需求极小<br>• 支持在线学习（来一个样本学一个）<br>• 有可能逃离局部最优（因为有噪声）</p>
+      </div>
+      <div class="hbox danger">
+        <h4>❌ 缺点</h4>
+        <p>• 梯度估计噪声很大，震荡剧烈<br>• loss曲线不是平稳下降，而是上下抖动<br>• 收敛不稳定，可能在最优点附近来回晃<br>• 不能精确收敛到最小值，只能在附近徘徊</p>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>💡 "随机"的含义</h4>
+      <p>"随机"是指每次随机选一个样本（或者打乱顺序遍历）。因为单个样本不能代表整体方向，所以每一步的方向可能不是真正最陡的方向，带来了随机性。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">25 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">Mini-batch：小批量梯度下降</h2>
+    <h3 class="sub">折中方案——每次用一小批样本，兼顾速度与稳定</h3>
+    <div class="formula">
+      $$\frac{\partial J_B}{\partial w} = \frac{1}{|B|} \sum_{i \in B} \left( f(x^{(i)}) - y^{(i)} \right) \cdot x^{(i)}$$
+      <span class="desc">B是一个小批量（batch），包含32/64/128个样本。用这一批样本的平均梯度来更新参数。</span>
+    </div>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card accent">
+        <div class="card-icon">⚖️</div>
+        <h4>完美折中</h4>
+        <p>比BGD快得多，比SGD稳定得多。既有速度，又不会震荡得太厉害。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚀</div>
+        <h4>GPU友好</h4>
+        <p>矩阵并行计算的特性，让批量计算几十上百个样本，和计算1个样本相比，耗时几乎一样！</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏆</div>
+        <h4>业界标准</h4>
+        <p>深度学习、神经网络训练中<strong>几乎100%用Mini-batch</strong>。batch size=32是个不错的默认选择。</p>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>📌 关于batch size的选择</h4>
+      <p>常用值：32, 64, 128, 256。batch size太小，震荡大；太大，内存不够，且每次更新慢。一般取2的幂次（32=2⁵, 64=2⁶），因为GPU对2的幂次计算有优化。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">26 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">梯度下降不仅用于线性回归</h2>
+    <h3 class="sub">它是所有机器学习模型训练的基础——通用性是最大优势</h3>
+    <div class="body">
+      <p>梯度下降是一个<strong>通用优化框架</strong>，不挑模型，不挑损失函数。只要能求梯度，就能用梯度下降优化！</p>
+    </div>
+    <div class="flow" style="margin:2rem 0;flex-wrap:wrap">
+      <div class="flow-node hl">📉 线性回归</div>
+      <div class="flow-node">📊 逻辑回归</div>
+      <div class="flow-node">🌳 （部分）决策树</div>
+      <div class="flow-node">🧠 神经网络</div>
+      <div class="flow-node">👁️ 计算机视觉CNN</div>
+      <div class="flow-node">💬 自然语言处理Transformer</div>
+      <div class="flow-node">🎮 强化学习</div>
+      <div class="flow-node">……</div>
+    </div>
+    <div class="two-col">
+      <div class="hbox purple">
+        <h4>🔑 关键原因</h4>
+        <p>深度学习模型动辄几百万、几千万、甚至上百亿个参数，根本没有解析解！如果没有梯度下降+反向传播，深度学习根本不可能发展起来。</p>
+      </div>
+      <div class="hbox">
+        <h4>💡 反向传播</h4>
+        <p>神经网络中，高效计算梯度的算法叫<strong style="color:var(--accent)">反向传播(Backpropagation)</strong>——本质就是微积分里的链式法则，我们后面讲神经网络时会详细讲。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">27 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">局部最优 vs 全局最优问题</h2>
+    <h3 class="sub">梯度下降一定能找到最低点吗？——不一定！</h3>
+    <div class="vs">
+      <div class="vs-side vs-left">
+        <h3 style="color:var(--danger);margin-bottom:1rem">🏔️ 局部最优</h3>
+        <p style="color:var(--muted);font-size:0.95rem">
+          "坑"——周围都比它高，但远处还有更低的地方。梯度下降走到这里，梯度变成0，以为到了终点，就停下来了——困在局部最优里出不来。
+        </p>
+        <p style="font-family:var(--mono);font-size:0.8rem;color:var(--muted);margin-top:1rem;text-align:left">
+          &nbsp;&nbsp;&nbsp;╱╲&nbsp;&nbsp;&nbsp;&nbsp;╱╲<br>
+          &nbsp;&nbsp;╱&nbsp;&nbsp;╲&nbsp;&nbsp;╱&nbsp;&nbsp;╲<br>
+          &nbsp;╱&nbsp;&nbsp;&nbsp;&nbsp;╲╱&nbsp;&nbsp;&nbsp;&nbsp;╲<br>
+          &nbsp;●&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;★<br>
+          局部&nbsp;&nbsp;&nbsp;&nbsp;全局最优
+        </p>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side vs-right">
+        <h3 style="color:var(--success);margin-bottom:1rem">🥣 全局最优</h3>
+        <p style="color:var(--muted);font-size:0.95rem">
+          整个函数的最低点，这才是我们真正想要的。对于凸函数（碗形），只有一个最低点，没有局部最优问题，梯度下降一定能走到全局最优。
+        </p>
+        <p style="font-family:var(--mono);font-size:0.8rem;color:var(--muted);margin-top:1rem;text-align:left">
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╱╲<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╱&nbsp;&nbsp;╲<br>
+          &nbsp;&nbsp;&nbsp;╱&nbsp;&nbsp;&nbsp;&nbsp;╲<br>
+          &nbsp;●&nbsp;→&nbsp;&nbsp;★<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;全局最优
+        </p>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>😰 深度学习中怎么办？</h4>
+      <p>虽然神经网络的损失函数不是凸函数，存在很多局部最优，但实践中发现：<strong>大多数局部最优其实已经足够好了</strong>，而且SGD的噪声反而能帮助逃离不好的局部最优。所以不用太担心这个问题。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">28 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">为什么线性回归的MSE是凸函数？</h2>
+    <h3 class="sub">碗形——只有一个最低点，梯度下降一定找到全局最优</h3>
+    <div class="body">
+      <p>好消息：<strong>线性回归的MSE损失函数J(w,b)是凸函数！</strong></p>
+    </div>
+    <div class="card" style="text-align:center;padding:2.5rem;margin:1.5rem 0">
+      <div style="font-family:var(--mono);font-size:1rem;line-height:1.3;display:inline-block;text-align:left">
+        <span style="color:var(--warning)">&nbsp;&nbsp;&nbsp;J(w,b)</span><br>
+        <span style="color:var(--warning)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↑</span><br>
+        <span style="color:var(--warning)">&nbsp;&nbsp;&nbsp;&nbsp;╱&nbsp;│&nbsp;╲</span><br>
+        <span style="color:var(--warning)">&nbsp;&nbsp;&nbsp;╱&nbsp;&nbsp;│&nbsp;&nbsp;╲</span><br>
+        <span style="color:var(--warning)">&nbsp;&nbsp;╱&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;╲</span><br>
+        <span style="color:var(--success)">&nbsp;╱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;★&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╲</span><br>
+        <span style="color:var(--warning)">╱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;╲</span><br>
+        <span style="color:var(--accent2)">─────────────────→ w,b</span><br><br>
+        <span style="color:var(--muted);font-size:0.9rem">完美的碗形——只有一个全局最低点★，没有任何"坑"</span>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="hbox success">
+        <h4>✅ 凸函数的好性质</h4>
+        <p>• 只有一个全局最优点<br>• 没有局部最优，不会被困<br>• 梯度下降一定能收敛到全局最优<br>• 不管初始位置在哪，最终都到同一个点</p>
+      </div>
+      <div class="hbox purple">
+        <h4>📐 数学证明思路</h4>
+        <p>MSE是关于w和b的二次函数，二次型的Hessian矩阵半正定，所以是凸函数。简单说：平方项的和，画出来一定是碗形，不会有波浪起伏。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第5集 · 梯度下降</div>
+  <div class="slide-number">29 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">本集小结</h2>
+    <h3 class="sub">恭喜你完成了第5集！来回顾核心知识点</h3>
+    <div class="body">
+      <div class="hbox">
+        <h4>📐 最小二乘法 vs 梯度下降</h4>
+        <p>最小二乘法能直接算解析解，但大数据下慢、适用范围窄；梯度下降迭代优化，通用、适合大数据，是ML的主流方法。</p>
+      </div>
+      <div class="hbox success">
+        <h4>🏔️ 梯度下降核心直觉</h4>
+        <p><strong>蒙着眼睛下山</strong>：找当前最陡下坡方向（负梯度），迈一小步（α），重复直到收敛。</p>
+      </div>
+      <div class="hbox warn">
+        <h4>⚙️ 参数更新公式</h4>
+        <p>w = w - α·∂J/∂w；b = b - α·∂J/∂b。记住：<strong>负梯度方向是下降最快方向</strong>，减号不能写错！</p>
+      </div>
+      <div class="hbox purple">
+        <h4>🎚️ 学习率α</h4>
+        <p>α太大会震荡发散，α太小收敛慢。从0.01/0.001开始试，观察loss曲线调整，按3倍/10倍跨度搜索。</p>
+      </div>
+      <div class="hbox pink">
+        <h4>🔀 三种变体</h4>
+        <p>BGD（全样本，稳但慢）、SGD（单样本，快但抖）、<strong>Mini-batch（32/64/128样本，业界主流！）</strong></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-content">
+    <h1>谢谢观看！</h1>
+    <p class="cover-sub">第5集 · 梯度下降 完<br><br>
+    <strong style="color:var(--accent)">下一集：多元线性回归与特征缩放</strong><br><br>
+    B站：机器学习入门教程系列 · BV1w5dYBtE2b</p>
+    <div style="margin-top:2rem;display:flex;gap:1rem;justify-content:center">
+      <a href="ppt-04.html" style="padding:12px 28px;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;color:var(--muted);text-decoration:none;transition:all .3s">← 上一集</a>
+      <a href="ppt-06.html" style="padding:12px 28px;background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.3);border-radius:12px;color:var(--accent);text-decoration:none;font-weight:600;transition:all .3s">下一集：多元线性回归 →</a>
+    </div>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag">梯度下降</span>
+      <span class="tag p">学习率</span>
+      <span class="tag g">Mini-batch</span>
+      <span class="tag pi">优化算法</span>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0;window.dispatchEvent(new CustomEvent('slidechange',{detail:{index:i}}))}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+setTimeout(function(){show(0)},50)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+
+  var charts = {};
+  var chartConfigs = {
+    'chart-good-alpha': { slideIndex: 17 },
+    'chart-small-alpha': { slideIndex: 16 },
+    'chart-big-alpha': { slideIndex: 15 },
+    'chart-contour': { slideIndex: 19 }
+  };
+
+  function getDarkAxis(){
+    return {
+      axisLine: {lineStyle: {color: 'rgba(255,255,255,0.2)'}},
+      axisTick: {lineStyle: {color: 'rgba(255,255,255,0.2)'}},
+      axisLabel: {color: '#94a3b8', fontSize: 11},
+      splitLine: {lineStyle: {color: 'rgba(255,255,255,0.06)'}}
+    };
+  }
+
+  function generateLossGood(n){
+    var data=[];
+    for(var i=0;i<=n;i++){var x=i/n;var y=5*Math.exp(-8*x)+0.3+(Math.random()-0.5)*0.05;data.push([i,Math.max(0.25,y)]);}
+    return data;
+  }
+  function generateLossSmall(n){
+    var data=[];
+    for(var i=0;i<=n;i++){var x=i/n;var y=5-4.2*x+(Math.random()-0.5)*0.03;data.push([i,Math.max(0.5,y)]);}
+    return data;
+  }
+  function generateLossBig(n){
+    var data=[];
+    for(var i=0;i<=n;i++){var x=i/n;var y;if(x<0.3){y=5-10*x+(Math.random()-0.5)*0.1;}else{y=2+8*(x-0.3)+Math.sin(x*40)*1.5+(Math.random()-0.5)*0.3;}data.push([i,Math.max(0,y)]);}
+    return data;
+  }
+
+  function createOption(color, dataGen, xName, yName){
+    var axis=getDarkAxis();
+    return {
+      backgroundColor:'transparent',
+      grid:{left:55,right:20,top:25,bottom:45},
+      xAxis:Object.assign({type:'value',name:xName,nameLocation:'middle',nameGap:30,nameTextStyle:{color:'#94a3b8',fontSize:11}},axis),
+      yAxis:Object.assign({type:'value',name:yName,nameLocation:'middle',nameGap:40,nameTextStyle:{color:'#94a3b8',fontSize:11}},axis),
+      series:[{
+        type:'line',data:dataGen(100),smooth:true,symbol:'none',
+        lineStyle:{color:color,width:3},
+        areaStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:color+'4D'},{offset:1,color:color+'05'}])}
+      }],
+      tooltip:{trigger:'axis',backgroundColor:'#1e293b',borderColor:color,textStyle:{color:'#f8fafc'}}
+    };
+  }
+
+  function initChart(id){
+    if(charts[id]){charts[id].resize();return;}
+    var el=document.getElementById(id);
+    if(!el)return;
+    var c=echarts.init(el);
+    charts[id]=c;
+    if(id==='chart-good-alpha'){c.setOption(createOption('#34d399',generateLossGood,'迭代次数','J (Loss)'));}
+    else if(id==='chart-small-alpha'){c.setOption(createOption('#fbbf24',generateLossSmall,'迭代次数','J (Loss)'));}
+    else if(id==='chart-big-alpha'){c.setOption(createOption('#f87171',generateLossBig,'迭代次数','J (Loss)'));}
+    else if(id==='chart-contour'){initContourChart(c);}
+  }
+
+  function initContourChart(c){
+    function ellipseData(cx,cy,a,b,theta,n){
+      var data=[];for(var i=0;i<=n;i++){var ang=(i/n)*Math.PI*2;var x0=a*Math.cos(ang);var y0=b*Math.sin(ang);var cosT=Math.cos(theta),sinT=Math.sin(theta);data.push([cx+x0*cosT-y0*sinT,cy+x0*sinT+y0*cosT]);}return data;
+    }
+    var pathData=[[-3.5,3.2],[-2.8,1.8],[-1.5,0.8],[-0.6,1.3],[0.2,0.5],[-0.3,-0.2],[0.3,0.1],[0.1,-0.3],[0.05,0.05],[0,0]];
+    var series=[];
+    var ellipses=[{a:4.5,b:3.8,c:'rgba(129,140,248,0.12)'},{a:3.5,b:3.0,c:'rgba(129,140,248,0.18)'},{a:2.5,b:2.2,c:'rgba(129,140,248,0.25)'},{a:1.6,b:1.4,c:'rgba(52,211,153,0.32)'},{a:0.8,b:0.7,c:'rgba(52,211,153,0.5)'}];
+    ellipses.forEach(function(e){series.push({type:'line',data:ellipseData(0,0,e.a,e.b,-0.3,100),smooth:false,symbol:'none',lineStyle:{color:e.c,width:2}});});
+    series.push({type:'line',data:pathData,smooth:true,symbol:'circle',symbolSize:9,itemStyle:{color:'#fbbf24'},lineStyle:{color:'#fbbf24',width:3},z:10});
+    series.push({type:'scatter',data:[[0,0]],symbol:'diamond',symbolSize:20,itemStyle:{color:'#34d399',shadowBlur:20,shadowColor:'rgba(52,211,153,0.6)'},z:20});
+    series.push({type:'scatter',data:[[-3.5,3.2]],symbol:'circle',symbolSize:14,itemStyle:{color:'#fbbf24',shadowBlur:15,shadowColor:'rgba(251,191,36,0.6)'},label:{show:true,formatter:'起点',position:'top',color:'#fbbf24',fontSize:12,fontWeight:'bold'},z:20});
+    series.push({type:'scatter',data:[[0.1,0.1]],symbol:'diamond',symbolSize:18,itemStyle:{color:'#34d399',shadowBlur:20,shadowColor:'rgba(52,211,153,0.6)'},label:{show:true,formatter:'最优点 w*,b*',position:'bottom',color:'#34d399',fontSize:11,fontWeight:'bold'},z:20});
+    var axis=getDarkAxis();
+    c.setOption({
+      backgroundColor:'transparent',
+      grid:{left:65,right:40,top:30,bottom:55},
+      xAxis:Object.assign({type:'value',name:'w',nameLocation:'middle',nameGap:35,nameTextStyle:{color:'#818cf8',fontSize:14,fontWeight:'bold'},min:-5,max:4},axis),
+      yAxis:Object.assign({type:'value',name:'b',nameLocation:'middle',nameGap:45,nameTextStyle:{color:'#818cf8',fontSize:14,fontWeight:'bold'},min:-4,max:4.5},axis),
+      series:series,tooltip:{show:false},animation:true
+    });
+  }
+
+  function onSlideChange(e){
+    var idx=e.detail.index;
+    setTimeout(function(){
+      Object.keys(chartConfigs).forEach(function(id){
+        if(chartConfigs[id].slideIndex===idx){initChart(id);}
+      });
+      Object.keys(charts).forEach(function(k){charts[k]&&charts[k].resize();});
+    },100);
+  }
+
+  window.addEventListener('slidechange',onSlideChange);
+  window.addEventListener('resize',function(){Object.keys(charts).forEach(function(k){charts[k]&&charts[k].resize();});});
+
+  function waitEcharts(){
+    if(typeof echarts==='undefined'){setTimeout(waitEcharts,100);return;}
+    setTimeout(function(){onSlideChange({detail:{index:0}});},200);
+  }
+  waitEcharts();
+});
+</script>
+</body></html>

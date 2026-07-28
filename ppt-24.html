@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>DL第8集 损失函数 - ML学习站PPT</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#f43f5e;--accent2:#e11d48;--accent3:#fb7185;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--accent3);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent3);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(251,113,133,0.15) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(225,29,72,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(251,113,133,0.1);border:1px solid rgba(251,113,133,0.25);border-radius:50px;font-size:1rem;color:var(--accent3);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:700px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(251,113,133,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:1.8rem 2rem;margin:1.5rem 0;text-align:center;font-size:clamp(1rem,1.8vw,1.25rem);line-height:2.2;overflow-x:auto}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:1rem;display:block;text-align:left;line-height:1.7}
+.katex{color:var(--accent3)}.katex .mord.text{color:var(--ink2)}
+.hbox{background:rgba(244,63,94,0.08);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1rem 0}
+.hbox h4{color:var(--accent);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(251,191,36,0.08);border-left-color:var(--warning)}.hbox.warn h4{color:var(--warning)}
+.hbox.danger{background:rgba(248,113,113,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.purple{background:rgba(225,29,72,0.08);border-left-color:var(--accent2)}.hbox.purple h4{color:var(--accent2)}
+.hbox.pink{background:rgba(251,113,133,0.08);border-left-color:var(--accent3)}.hbox.pink h4{color:var(--accent3)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.95rem}
+table.cmp th{background:var(--bg3);color:var(--accent3);padding:12px 14px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.9rem}
+table.cmp td{padding:10px 14px;border-bottom:1px solid var(--rule);color:var(--ink2);line-height:1.6}
+table.cmp tr:hover td{background:rgba(251,113,133,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent3);background:rgba(251,113,133,0.1);color:var(--accent3);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent)}
+.tag.p{color:var(--accent2)}.tag.pi{color:var(--accent3)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}.tag.d{color:var(--danger)}
+.code{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:1.5rem 2rem;margin:1.5rem 0;font-family:var(--mono);font-size:0.95rem;line-height:1.8;color:var(--ink2);overflow-x:auto}
+.code .kw{color:var(--accent3)}.code .fn{color:var(--accent)}.code .str{color:var(--success)}.code .cmt{color:var(--muted)}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent3),var(--accent2),var(--accent),var(--success));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent3);color:var(--accent3)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent3)}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.end-slide .end-buttons{display:flex;gap:1.5rem;justify-content:center;margin-top:2.5rem;flex-wrap:wrap}
+.end-slide .end-btn{padding:14px 32px;border-radius:12px;font-size:1.05rem;font-weight:600;text-decoration:none;transition:all .3s}
+.end-slide .end-btn.primary{background:linear-gradient(135deg,var(--accent3),var(--accent2));color:white}
+.end-slide .end-btn.secondary{background:var(--bg2);border:1px solid var(--rule);color:var(--ink2)}
+.end-slide .end-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(244,63,94,0.2)}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:1.5rem;align-items:center;margin:1.5rem 0}
+.vs-side{border-radius:16px;padding:1.5rem}
+.vs-divider{font-size:1.5rem;color:var(--muted);font-weight:700}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col{grid-template-columns:1fr}.hint{display:none}.vs{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="chapter6.html" style="font-weight:600;color:var(--accent3)">📊 深度学习入门</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="chapter6.html">回到视频页</a>
+    <a href="ppt-23.html">← 上一集</a>
+    <a href="ppt-25.html">下一集 →</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">🧠 深度学习入门 · 第8集</div>
+    <h1 class="cover-title">损失函数：告诉模型错了多少</h1>
+    <p class="cover-sub">没有损失函数，模型就不知道该往哪里优化<br>BV1jgGB6PE7S · 时长 15分50秒</p>
+    <div class="tags">
+      <span class="tag pi">损失函数</span>
+      <span class="tag p">MSE/MAE</span>
+      <span class="tag">交叉熵</span>
+      <span class="tag g">优化目标</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">2 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">本集内容导览</h1>
+    <h3 class="sub">损失函数是深度学习训练的"指挥棒"</h3>
+    <div class="body">
+      <ul>
+        <li><strong style="color:var(--accent3)">损失函数角色</strong>——量化预测值与真实值的差距，是优化的目标</li>
+        <li><strong style="color:var(--accent2)">Loss vs Cost vs Objective</strong>——三个易混淆概念的区别</li>
+        <li><strong style="color:var(--accent)">回归任务损失</strong>——MSE、MAE、Huber Loss及代码实现</li>
+        <li><strong style="color:var(--success)">分类任务损失</strong>——BCE、CrossEntropy及为什么分类不用MSE</li>
+        <li><strong style="color:var(--warning)">其他损失函数</strong>——Focal Loss、Triplet Loss、对比损失</li>
+        <li><strong style="color:var(--danger)">实践指南</strong>——损失函数选择、设计原则、Loss曲线解读</li>
+      </ul>
+    </div>
+    <div class="hbox pink">
+      <h4>🎯 本集核心问题</h4>
+      <p>模型怎么知道自己预测得好不好？又该怎么调整参数？答案就是损失函数——它告诉模型"你错了多少"，然后梯度下降告诉模型"该怎么改"。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">3 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">损失函数的核心角色</h1>
+    <h3 class="sub">神经网络训练的"指南针"和"评分标准"</h3>
+    <div class="flow">
+      <div class="flow-node">📥 输入数据</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">🧠 模型预测</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl">📏 损失函数<br><small>计算误差</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">🔄 反向传播<br><small>更新参数</small></div>
+    </div>
+    <div class="three-col" style="margin-top:1.5rem">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">📏</div>
+        <h4>量化误差</h4>
+        <p>把"预测得好不好"这个模糊问题，变成一个具体的数字——损失值Loss，越小说明预测越准。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">🧭</div>
+        <h4>指导优化</h4>
+        <p>通过反向传播计算梯度，告诉每个参数应该往哪个方向调整、调整多少，才能让Loss变小。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">🎯</div>
+        <h4>训练目标</h4>
+        <p>整个训练过程就是在最小化损失函数。Loss收敛了，训练就完成了。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">4 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">Loss vs Cost vs Objective</h2>
+    <h3 class="sub">三个经常被混用但略有区别的概念</h3>
+    <table class="cmp">
+      <tr>
+        <th>术语</th>
+        <th>英文</th>
+        <th>含义</th>
+        <th>计算范围</th>
+        <th>例子</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">Loss 损失</strong></td>
+        <td>Loss</td>
+        <td><strong>单个样本</strong>的预测误差</td>
+        <td>1个样本</td>
+        <td>一张图片预测错了多少</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">Cost 代价</strong></td>
+        <td>Cost</td>
+        <td>整个训练集上的<strong>总损失/平均损失</strong></td>
+        <td>所有样本</td>
+        <td>整个batch/epoch的平均误差</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent3)">Objective 目标</strong></td>
+        <td>Objective</td>
+        <td>更广义的概念，包含Cost+正则化项等</td>
+        <td>整体优化目标</td>
+        <td>最小化 损失 + L2正则化</td>
+      </tr>
+    </table>
+    <div class="hbox warn">
+      <h4>💡 实际使用中</h4>
+      <p>在深度学习日常交流和论文中，这三个词经常被混用。当大家说"loss"的时候，通常指的就是Cost Function（代价函数）——整个batch上的平均损失，不用太纠结严格区分。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">5 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">回归任务 vs 分类任务</h1>
+    <h3 class="sub">不同任务类型，需要不同的损失函数</h3>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">📈</div>
+        <h4>回归任务 Regression</h4>
+        <p style="margin-bottom:1rem"><strong>预测连续值</strong>：房价、温度、销量、年龄……输出是一个实数。</p>
+        <div class="tags">
+          <span class="tag">MSE/L2</span>
+          <span class="tag p">MAE/L1</span>
+          <span class="tag pi">Huber</span>
+        </div>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">🔍</div>
+        <h4>分类任务 Classification</h4>
+        <p style="margin-bottom:1rem"><strong>预测离散类别</strong>：猫狗分类、手写数字、垃圾邮件检测……输出是类别概率。</p>
+        <div class="tags">
+          <span class="tag">BCE</span>
+          <span class="tag p">CrossEntropy</span>
+          <span class="tag g">Focal Loss</span>
+        </div>
+      </div>
+    </div>
+    <div class="hbox pink">
+      <h4>⚠️ 关键提醒</h4>
+      <p>损失函数必须和输出层激活函数、任务类型匹配！比如用Sigmoid输出就配BCE Loss，用Softmax输出就配CrossEntropy Loss。配错了会导致训练不收敛或效果极差。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">6 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">MSE / L2 Loss（均方误差）</h2>
+    <h3 class="sub">回归任务最常用的损失函数</h3>
+    <div class="formula">
+      $$\displaystyle MSE = (1/n) \sum (\hat{y}_i - y_i)²$$
+      <span class="desc">
+        ŷ：模型预测值 &nbsp;&nbsp; y：真实标签 &nbsp;&nbsp; n：样本数量<br>
+        对每个样本计算预测值和真实值之差的平方，再取平均。
+      </span>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="hbox success">
+          <h4>✅ 优点</h4>
+          <p>
+            • <strong>处处可导</strong>，方便梯度下降优化<br>
+            • <strong>凸函数</strong>，理论上有全局最优解<br>
+            • 对大误差<strong>惩罚更重</strong>（平方放大），梯度稳定
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="hbox danger">
+          <h4>❌ 缺点</h4>
+          <p>
+            • 对<strong>异常值非常敏感</strong>（一个离群点的误差平方后可能主导整个loss）<br>
+            • 如果数据中有很多outlier，MSE会被带偏
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">7 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">MAE / L1 Loss（平均绝对误差）</h2>
+    <h3 class="sub">对异常值更鲁棒的回归损失</h3>
+    <div class="formula">
+      $$\displaystyle MAE = (1/n) \sum |\hat{y}_i - y_i|$$
+      <span class="desc">
+        计算预测值和真实值之差的绝对值，再取平均。
+      </span>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="hbox success">
+          <h4>✅ 优点</h4>
+          <p>
+            • 对<strong>异常值鲁棒</strong>，不管误差多大，惩罚都是线性的<br>
+            • 适合数据中有很多离群点的场景
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="hbox danger">
+          <h4>❌ 缺点</h4>
+          <p>
+            • 在<strong>零点不可导</strong>（误差为0处有折点），梯度在0点处会震荡<br>
+            • 梯度大小恒定，即使误差很小梯度也一样大，可能在最小值附近震荡不收敛
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>🤔 MSE还是MAE？</h4>
+      <p>如果数据干净、异常值少，用MSE（收敛更快更稳）；如果异常值多，用MAE（更鲁棒）；想要两者优点结合——看Huber Loss！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">8 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">Huber Loss / Smooth L1 Loss</h2>
+    <h3 class="sub">MSE和MAE的"集大成者"，结合两者优点</h3>
+    <div class="formula">
+      $$\displaystyle L \delta (y, \hat{y}) = { ½(\hat{y}-y)² &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 当 |\hat{y}-y| \leq \delta \ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; \delta |\hat{y}-y| - ½ \delta ² &nbsp;&nbsp; 当 |\hat{y}-y| > \delta }$$
+      <span class="desc">
+        误差小的时候用MSE（可导、梯度平滑），误差大的时候用MAE（对异常值鲁棒）。δ是超参数，通常取1.0。
+      </span>
+    </div>
+    <div class="three-col" style="margin-top:1rem">
+      <div class="card">
+        <h4 style="color:var(--success)">✅ 误差小时</h4>
+        <p>类似MSE：平方损失，梯度随误差减小而减小，收敛稳定，在最优点附近不会震荡。</p>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--warning)">✅ 误差大时</h4>
+        <p>类似MAE：线性损失，梯度恒定为δ，不会被异常值的大梯度带飞。</p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--accent3)">🎯 应用场景</h4>
+        <p>目标检测中的 bounding box 回归（Faster R-CNN、SSD等都用Smooth L1）。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">9 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">回归损失函数对比</h2>
+    <h3 class="sub">一张表看懂MSE、MAE、Huber的区别</h3>
+    <table class="cmp">
+      <tr>
+        <th>特性</th>
+        <th style="color:var(--accent)">MSE / L2</th>
+        <th style="color:var(--accent2)">MAE / L1</th>
+        <th style="color:var(--success)">Huber / Smooth L1</th>
+      </tr>
+      <tr>
+        <td>公式</td>
+        <td>(ŷ-y)²</td>
+        <td>|ŷ-y|</td>
+        <td>分段：小误差MSE，大误差MAE</td>
+      </tr>
+      <tr>
+        <td>对异常值</td>
+        <td style="color:var(--danger)">敏感（平方放大）</td>
+        <td style="color:var(--success)">鲁棒（线性惩罚）</td>
+        <td style="color:var(--success)">鲁棒</td>
+      </tr>
+      <tr>
+        <td>零点可导</td>
+        <td style="color:var(--success)">✅ 处处可导</td>
+        <td style="color:var(--danger)">❌ 零点不可导</td>
+        <td style="color:var(--success)">✅ 处处可导</td>
+      </tr>
+      <tr>
+        <td>梯度</td>
+        <td>随误差变化</td>
+        <td>恒定</td>
+        <td>小误差变化，大误差恒定</td>
+      </tr>
+      <tr>
+        <td>收敛稳定性</td>
+        <td>稳定但易被异常值带偏</td>
+        <td>最小值附近可能震荡</td>
+        <td style="color:var(--success)">稳定且鲁棒</td>
+      </tr>
+      <tr>
+        <td>PyTorch</td>
+        <td>nn.MSELoss()</td>
+        <td>nn.L1Loss()</td>
+        <td>nn.SmoothL1Loss()</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">10 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">回归损失：PyTorch代码示例</h2>
+    <h3 class="sub">三种回归损失函数的实际用法</h3>
+    <div class="code">
+<span class="kw">import</span> torch<br>
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn<br><br>
+<span class="cmt"># 假设：预测值 predictions，真实值 targets（都是形状为 [batch_size] 的张量）</span><br>
+predictions = torch.tensor([2.5, 0.0, 2.1, 1.8])<br>
+targets = torch.tensor([3.0, -0.5, 2.0, 1.7])<br><br>
+<span class="cmt"># 1. MSE Loss（均方误差）</span><br>
+mse_loss = nn.<span class="fn">MSELoss</span>()<br>
+loss_mse = mse_loss(predictions, targets)<br>
+<span class="fn">print</span>(f<span class="str">"MSE Loss: {loss_mse.item():.4f}"</span>)<br><br>
+<span class="cmt"># 2. MAE / L1 Loss（平均绝对误差）</span><br>
+l1_loss = nn.<span class="fn">L1Loss</span>()<br>
+loss_l1 = l1_loss(predictions, targets)<br>
+<span class="fn">print</span>(f<span class="str">"L1 Loss: {loss_l1.item():.4f}"</span>)<br><br>
+<span class="cmt"># 3. Smooth L1 / Huber Loss（平滑L1）</span><br>
+smooth_l1 = nn.<span class="fn">SmoothL1Loss</span>(beta=1.0)  <span class="cmt"># beta就是公式里的δ</span><br>
+loss_huber = smooth_l1(predictions, targets)<br>
+<span class="fn">print</span>(f<span class="str">"Smooth L1 Loss: {loss_huber.item():.4f}"</span>)
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">11 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">分类任务损失函数</h1>
+    <h3 class="sub">分类问题为什么不能直接用MSE？</h3>
+    <div class="hbox danger">
+      <h4>⚠️ 分类用MSE的两个严重问题</h4>
+      <p>
+        <strong>1. 非凸问题</strong>：MSE配合Sigmoid/Softmax，损失函数是非凸的，有很多局部最小值，梯度下降容易陷入局部最优。<br><br>
+        <strong>2. 梯度消失（饱和区问题）</strong>：当预测概率接近0或1时，Sigmoid/Softmax的梯度趋近于0，导致参数更新极慢，模型学不动。
+      </p>
+    </div>
+    <div class="hbox success">
+      <h4>✅ 解决方案：交叉熵损失 Cross-Entropy Loss</h4>
+      <p>
+        交叉熵损失是凸函数（配合Softmax时有全局最优解），而且梯度更大、更稳定，不会出现饱和区梯度消失的问题，是分类任务的标准选择。
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">12 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">二分类交叉熵 BCE Loss</h2>
+    <h3 class="sub">Binary Cross-Entropy——二分类任务的标准损失</h3>
+    <div class="formula">
+      $$\displaystyle BCE = - [ y \cdot log(\hat{y}) + (1-y) \cdot log(1-\hat{y}) ]$$
+      <span class="desc">
+        y：真实标签（0或1）&nbsp;&nbsp; ŷ：模型预测的正类概率（0到1之间，由Sigmoid输出）<br>
+        当y=1时，只看 -log(ŷ)，预测越接近1损失越小；当y=0时，只看 -log(1-ŷ)，预测越接近0损失越小。
+      </span>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--accent)">📌 使用场景</h4>
+        <p>二分类问题：垃圾邮件检测、疾病诊断、情感分析（正面/负面）、是否点击等。</p>
+        <p style="margin-top:0.8rem"><strong style="color:var(--accent3)">输出层激活函数</strong>：必须是 Sigmoid，把输出压缩到0-1概率区间。</p>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent2)">🔑 直观理解</h4>
+        <p>如果真实标签是1（正例），但模型预测0.01（非常确信是负例），loss会非常大（log(0.01)≈-4.6），会给模型一个很大的惩罚！</p>
+        <p style="margin-top:0.8rem">这就是"置信度越高但预测错了，惩罚越重"。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">13 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">多分类交叉熵 Cross-Entropy Loss</h2>
+    <h3 class="sub">多分类任务（如10分类）的标准损失</h3>
+    <div class="formula">
+      $$\displaystyle CrossEntropy = - \sum y_i \cdot log(\hat{y}_i)$$
+      <span class="desc">
+        yᵢ：真实标签的one-hot编码（正确类别是1，其他是0）<br>
+        ŷᵢ：模型预测每个类别的概率（由Softmax输出，所有类别概率和为1）<br>
+        由于y是one-hot，实际上只计算正确类别的 -log(ŷ)，其他项都是0。
+      </span>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ PyTorch重要注意事项</h4>
+      <p>
+        <strong>nn.CrossEntropyLoss 内置了 LogSoftmax + NLLLoss！</strong><br><br>
+        这意味着：
+        <br>• 网络最后一层 <strong>不要</strong> 加 Softmax！直接输出原始logits即可
+        <br>• 真实标签 y 直接传类别索引（0-9这样的整数），<strong>不要</strong> 转one-hot
+        <br>• 如果你不小心最后加了Softmax，再用CrossEntropyLoss，相当于算了两次，效果会变差！
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">14 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">分类损失：PyTorch代码示例</h2>
+    <h3 class="sub">BCE和CrossEntropy的正确用法</h3>
+    <div class="code">
+<span class="kw">import</span> torch<br>
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn<br><br>
+<span class="cmt"># ========== 二分类：BCE With Logits Loss（推荐） ==========</span><br>
+<span class="cmt"># BCEWithLogitsLoss = Sigmoid + BCELoss 合二为一，数值更稳定！</span><br>
+bce_loss = nn.<span class="fn">BCEWithLogitsLoss</span>()  <span class="cmt"># 不需要自己加Sigmoid！</span><br>
+logits = torch.tensor([1.5, -2.0, 0.8])  <span class="cmt"># 原始输出，不是0-1概率</span><br>
+labels = torch.tensor([1.0, 0.0, 1.0])  <span class="cmt"># 0或1</span><br>
+loss_bce = bce_loss(logits, labels)<br><br>
+<span class="cmt"># ========== 多分类：CrossEntropyLoss ==========</span><br>
+ce_loss = nn.<span class="fn">CrossEntropyLoss</span>()  <span class="cmt"># 内置了LogSoftmax，不要自己加Softmax！</span><br>
+logits = torch.tensor([[2.0, 1.0, 0.1],  <span class="cmt"># batch=3, 类别=3</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.5, 2.5, 0.3],<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0.2, 0.4, 3.0]])<br>
+labels = torch.tensor([0, 1, 2])  <span class="cmt"># 直接传类别索引，不是one-hot！</span><br>
+loss_ce = ce_loss(logits, labels)
+    </div>
+    <div class="hbox pink">
+      <h4>💡 最佳实践</h4>
+      <p>二分类用 <strong>BCEWithLogitsLoss</strong>，多分类用 <strong>CrossEntropyLoss</strong>，这两个都内置了激活函数，数值稳定性更好，不容易出NaN。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">15 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">为什么交叉熵比MSE更适合分类？</h1>
+    <h3 class="sub">从梯度角度看根本原因</h3>
+    <div class="formula">
+      $$\displaystyle MSE + Sigmoid 梯度： \partial L/ \partial w = (\hat{y}-y) \cdot \hat{y}(1-\hat{y}) \cdot x \ CrossEntropy + Sigmoid 梯度： \partial L/ \partial w = (\hat{y}-y) \cdot x$$
+      <span class="desc">
+        注意MSE的梯度多乘了一个 ŷ(1-ŷ)！当ŷ接近0或1（也就是模型非常确信自己的预测时），ŷ(1-ŷ)趋近于0，梯度消失！<br><br>
+        而交叉熵的梯度就是(ŷ-y)，误差越大梯度越大，误差越小梯度越小——完美符合直觉！
+      </span>
+    </div>
+    <div class="hbox danger">
+      <h4>😱 MSE的"信心悖论"</h4>
+      <p>当模型预测错了但非常自信时（比如y=1但ŷ=0.01），恰恰是最需要大梯度纠正的时候，但ŷ(1-ŷ)≈0，梯度几乎为0——模型"知错不改"！</p>
+    </div>
+    <div class="hbox success">
+      <h4>😎 交叉熵的"赏罚分明"</h4>
+      <p>预测错了且越自信，梯度越大，惩罚越重；预测对了且越自信，梯度越小，越稳定。这正是我们想要的！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">16 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">Focal Loss：解决类别不平衡</h2>
+    <h3 class="sub">让模型专注于"难分样本"，降低简单样本权重</h3>
+    <div class="formula">
+      $$\displaystyle FL(pₜ) = - \alpha ₜ \cdot (1-pₜ)ᵞ \cdot log(pₜ)$$
+      <span class="desc">
+        pₜ：模型对正确类别的预测概率<br>
+        γ (gamma)：聚焦参数，通常取2。样本越容易分（pₜ接近1），(1-pₜ)ᵞ越小，权重被降低<br>
+        α (alpha)：类别平衡因子，给少数类更高权重
+      </span>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--warning)">🎯 解决的问题</h4>
+        <p>在类别不平衡场景下（比如目标检测中大部分区域是背景），大量简单负样本的loss会主导梯度，导致模型学不好难样本。</p>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent3)">💡 核心思想</h4>
+        <p>降低易分样本（预测概率>0.9）的权重，让模型把"注意力"集中在那些预测错了的、难分的样本上。</p>
+      </div>
+    </div>
+    <div class="hbox pink">
+      <h4>📌 典型应用</h4>
+      <p>目标检测（RetinaNet提出Focal Loss，一阶段检测器精度首次超过二阶段）、稀有类别检测、正负样本极不平衡的场景。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">17 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">Triplet Loss：度量学习</h2>
+    <h3 class="sub">学习样本间的距离/相似度，用于人脸识别、检索</h3>
+    <div class="flow">
+      <div class="flow-node" style="border-color:var(--success)">👤 Anchor<br><small>基准样本</small></div>
+      <div class="flow-arrow"></div>
+      <div class="flow-node hl">📏 Triplet Loss<br><small>拉近同类，推远离类</small></div>
+      <div class="flow-arrow"></div>
+      <div class="flow-node" style="border-color:var(--success)">✅ Positive<br><small>同类样本（要近）</small></div>
+    </div>
+    <div class="flow" style="margin-top:1rem">
+      <div class="flow-arrow"></div>
+      <div class="flow-node" style="border-color:var(--danger)">❌ Negative<br><small>异类样本（要远）</small></div>
+    </div>
+    <div class="formula">
+      $$\displaystyle L = max(0, d(a,p) - d(a,n) + margin)$$
+      <span class="desc">
+        d(a,p)：Anchor和Positive的距离 &nbsp;&nbsp; d(a,n)：Anchor和Negative的距离<br>
+        margin：间隔，通常取0.2-1.0。目标是让 d(a,p) + margin < d(a,n)，即同类距离至少比异类近margin
+      </span>
+    </div>
+    <div class="hbox purple">
+      <h4>📌 应用场景</h4>
+      <p>人脸识别（FaceNet）、图像检索、人脸验证（判断两张脸是不是同一个人）、推荐系统、表征学习。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">18 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">其他常见损失函数</h2>
+    <h3 class="sub">根据任务类型选择合适的损失</h3>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">🔄</div>
+        <h4>对比损失 Contrastive Loss</h4>
+        <p>和Triplet Loss类似，但用成对样本。同类样本拉近距离，异类样本推远到超过margin。常用于Siamese网络。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">📊</div>
+        <h4>KL散度 / JS散度</h4>
+        <p>衡量两个概率分布的差异。常用于生成模型（VAE、GAN）、知识蒸馏（让学生模型学习老师模型的输出分布）。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">🎯</div>
+        <h4>Hinge Loss 合页损失</h4>
+        <p>SVM的经典损失，也用于某些分类场景。最大化类别间隔，要求正确类别的得分比其他类别高至少margin。</p>
+      </div>
+    </div>
+    <div class="hbox warn" style="margin-top:1rem">
+      <h4>📚 还有很多</h4>
+      <p>Dice Loss（医学图像分割）、IOU Loss（目标检测）、CTC Loss（语音识别/文字识别）、Center Loss（人脸）……不同任务有专门设计的损失函数，需要的时候再学即可。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">19 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">损失函数选择指南</h1>
+    <h3 class="sub">面对具体问题，该选哪个损失函数？</h3>
+    <table class="cmp">
+      <tr>
+        <th>任务类型</th>
+        <th>首选损失函数</th>
+        <th>输出层激活</th>
+        <th>PyTorch API</th>
+      </tr>
+      <tr>
+        <td>回归（数据干净，异常值少）</td>
+        <td><strong style="color:var(--accent)">MSE / L2 Loss</strong></td>
+        <td>无（直接输出）</td>
+        <td>nn.MSELoss()</td>
+      </tr>
+      <tr>
+        <td>回归（异常值多）</td>
+        <td><strong style="color:var(--accent2)">Huber / Smooth L1</strong></td>
+        <td>无</td>
+        <td>nn.SmoothL1Loss()</td>
+      </tr>
+      <tr>
+        <td>二分类</td>
+        <td><strong style="color:var(--success)">BCE With Logits</strong></td>
+        <td>内置（不需要Sigmoid）</td>
+        <td>nn.BCEWithLogitsLoss()</td>
+      </tr>
+      <tr>
+        <td>多分类</td>
+        <td><strong style="color:var(--accent3)">CrossEntropy</strong></td>
+        <td>内置（不需要Softmax）</td>
+        <td>nn.CrossEntropyLoss()</td>
+      </tr>
+      <tr>
+        <td>多标签分类</td>
+        <td><strong style="color:var(--warning)">BCE With Logits</strong></td>
+        <td>内置Sigmoid</td>
+        <td>nn.BCEWithLogitsLoss()</td>
+      </tr>
+      <tr>
+        <td>类别极度不平衡</td>
+        <td><strong style="color:var(--danger)">Focal Loss</strong></td>
+        <td>视情况</td>
+        <td>需自行实现或用第三方库</td>
+      </tr>
+      <tr>
+        <td>度量学习/检索</td>
+        <td><strong style="color:var(--accent)">Triplet/Contrastive</strong></td>
+        <td>归一化</td>
+        <td>需自行实现</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">20 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">损失函数设计原则</h2>
+    <h3 class="sub">设计一个好的损失函数需要满足什么条件？</h3>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--success)">📐</div>
+        <h4>1. 可导（几乎处处）</h4>
+        <p>损失函数必须能求梯度，否则反向传播无法进行。允许在有限个点不可导（如MAE在0点），其他点必须可导。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">🎯</div>
+        <h4>2. 与评估指标相关</h4>
+        <p>损失函数要和你真正关心的指标（准确率、IOU、F1等）一致。Loss下降但指标不升，说明损失设计得不对。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">🛡️</div>
+        <h4>3. 鲁棒性（视情况）</h4>
+        <p>如果数据中有噪声/异常值，损失不能对outlier太敏感（Huber比MSE鲁棒）。干净数据则不用太担心。</p>
+      </div>
+    </div>
+    <div class="hbox pink" style="margin-top:1.5rem">
+      <h4>💡 进阶技巧：多任务损失</h4>
+      <p>如果一个模型要做多个任务（比如目标检测既要分类又要定位），可以把多个损失加权相加：Loss = λ₁·L_cls + λ₂·L_box。权重λ需要调整，保证各任务损失量级相当。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">21 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">训练中Loss曲线解读</h1>
+    <h3 class="sub">看懂Loss曲线，诊断训练问题</h3>
+    <div class="three-col">
+      <div class="card" style="border-color:var(--success)">
+        <div class="card-icon" style="color:var(--success)">✅</div>
+        <h4>理想情况</h4>
+        <p><strong>Train Loss ↓ 稳定下降</strong><br><strong>Val Loss ↓ 也稳定下降</strong><br>最后两者都收敛到较低值，差距不大——模型训练健康，泛化良好。</p>
+      </div>
+      <div class="card" style="border-color:var(--danger)">
+        <div class="card-icon" style="color:var(--danger)">⚠️</div>
+        <h4>过拟合</h4>
+        <p><strong>Train Loss ↓ 持续下降</strong><br><strong>Val Loss 先↓后↑</strong><br>验证集loss上升是过拟合信号！模型在死记硬背训练集，泛化能力变差。</p>
+      </div>
+      <div class="card" style="border-color:var(--warning)">
+        <div class="card-icon" style="color:var(--warning)">❌</div>
+        <h4>训练不动</h4>
+        <p><strong>Train Loss 几乎不下降</strong><br><strong>Val Loss 也不动</strong><br>可能原因：学习率不对、模型容量不够、梯度消失/爆炸、数据/标签有问题。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">22 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">常见Loss问题与解决方案</h2>
+    <h3 class="sub">训练中遇到Loss异常，看看是不是这些问题</h3>
+    <table class="cmp">
+      <tr>
+        <th>现象</th>
+        <th>可能原因</th>
+        <th>解决方案</th>
+      </tr>
+      <tr>
+        <td style="color:var(--danger)">Loss = NaN</td>
+        <td>梯度爆炸；学习率太大；除以0；log(0)</td>
+        <td>降低学习率；梯度裁剪；检查数据是否有异常值；用BCEWithLogits代替手动Sigmoid+BCE</td>
+      </tr>
+      <tr>
+        <td style="color:var(--warning)">Loss完全不下降</td>
+        <td>学习率太小/太大；初始化不好；忘记zero_grad；标签错了；Softmax重复计算</td>
+        <td>调整学习率；检查初始化；检查代码逻辑；确认数据/标签正确</td>
+      </tr>
+      <tr>
+        <td style="color:var(--accent)">Loss震荡剧烈</td>
+        <td>学习率太大；batch size太小；数据有噪声</td>
+        <td>降低学习率；增大batch size；加学习率衰减；加优化器momentum</td>
+      </tr>
+      <tr>
+        <td style="color:var(--accent2)">Train Loss降Val Loss不降</td>
+        <td>过拟合；数据集分布不一致；数据泄露</td>
+        <td>加正则化/早停；增加数据；检查train/val数据划分；加Dropout/BN</td>
+      </tr>
+      <tr>
+        <td style="color:var(--accent3)">Loss一开始下降后来卡住</td>
+        <td>陷入局部最优；学习率后期太大</td>
+        <td>学习率衰减；用更好的优化器（Adam）；LR Finder找合适lr</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">23 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">正则化与损失函数</h2>
+    <h3 class="sub">在损失函数中加入正则化项，防止过拟合</h3>
+    <div class="formula">
+      $$\displaystyle Loss_total = Loss_data + \lambda \cdot Loss_reg$$
+      <span class="desc">
+        总目标函数 = 数据拟合损失（预测错多少） + 正则化项（惩罚模型复杂度）<br>
+        λ 是正则化强度超参数，越大正则化越强。
+      </span>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--accent)">L2正则化（权重衰减）</h4>
+        <p><strong>公式：</strong> λ·Σw²</p>
+        <p style="margin-top:0.5rem">让权重趋向于0但不为0，防止权重过大，模型更平滑。</p>
+        <p style="margin-top:0.5rem"><strong>PyTorch：</strong>optimizer中设置weight_decay参数（如Adam的weight_decay=1e-4）</p>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent2)">L1正则化</h4>
+        <p><strong>公式：</strong> λ·Σ|w|</p>
+        <p style="margin-top:0.5rem">让一部分权重变为0，产生稀疏解，相当于做特征选择。</p>
+        <p style="margin-top:0.5rem"><strong>PyTorch：</strong>需要手动计算加到loss上</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">24 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">损失函数 vs 评估指标</h2>
+    <h3 class="sub">这两个不是一回事！别混淆了</h3>
+    <div class="vs">
+      <div class="vs-side" style="background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.2)">
+        <h3 style="color:var(--accent);margin-bottom:1rem">📏 损失函数 Loss</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul>
+            <li><strong>用于训练</strong>：可导，用来计算梯度更新参数</li>
+            <li>必须处处可导（或几乎处处）</li>
+            <li>是优化过程的"代理目标"</li>
+            <li>例子：CrossEntropy、MSE</li>
+            <li>关注的是"能不能优化"</li>
+          </ul>
+        </div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side" style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2)">
+        <h3 style="color:var(--success);margin-bottom:1rem">🎯 评估指标 Metric</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul>
+            <li><strong>用于评估</strong>：衡量模型最终好坏</li>
+            <li>不需要可导，可以是不可微的</li>
+            <li>是真正关心的业务目标</li>
+            <li>例子：准确率、F1、IOU、AUC</li>
+            <li>关注的是"业务上好不好"</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 常见误区</h4>
+      <p>分类任务的损失是CrossEntropy，但评估指标是准确率。Loss越低不代表准确率越高（尤其是类别不平衡时）。选模型看验证集指标，而不是只看train loss。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">25 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">本集知识点总结</h1>
+    <h3 class="sub">损失函数核心要点回顾</h3>
+    <div class="two-col">
+      <div>
+        <div class="hbox pink">
+          <h4>📌 核心概念</h4>
+          <p>损失函数量化预测与真实的差距，是优化的目标。Loss（单样本）、Cost（整体平均）、Objective（广义目标）。</p>
+        </div>
+        <div class="hbox">
+          <h4>📈 回归损失</h4>
+          <p><strong>MSE</strong>：凸函数可导，但对异常值敏感<br><strong>MAE</strong>：鲁棒，但零点不可导<br><strong>Huber/Smooth L1</strong>：结合两者优点</p>
+        </div>
+        <div class="hbox purple">
+          <h4>🔍 分类损失</h4>
+          <p><strong>BCE</strong>：二分类，配Sigmoid<br><strong>CrossEntropy</strong>：多分类，配Softmax<br>分类不要用MSE（梯度消失+非凸）</p>
+        </div>
+      </div>
+      <div>
+        <div class="hbox success">
+          <h4>⚠️ PyTorch重要提醒</h4>
+          <p>nn.CrossEntropyLoss 和 nn.BCEWithLogitsLoss 内置了激活函数！最后一层不需要加Softmax/Sigmoid，标签格式也要注意。</p>
+        </div>
+        <div class="hbox warn">
+          <h4>🎯 进阶损失</h4>
+          <p><strong>Focal Loss</strong>：类别不平衡，聚焦难样本<br><strong>Triplet Loss</strong>：度量学习、人脸识别<br>多任务：加权组合多个损失</p>
+        </div>
+        <div class="hbox danger">
+          <h4>📊 Loss曲线解读</h4>
+          <p>Train降Val升→过拟合<br>都不降→学习率/容量问题<br>Loss=NaN→梯度爆炸</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-chapter">DL第8集 · 损失函数</div>
+  <div class="slide-number">26 / 27</div>
+  <div class="slide-content">
+    <h1>🎯 损失函数关键记住</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      回归MSE/Huber，二分类BCE，多分类CrossEntropy<br><br>
+      <strong style="color:var(--accent3)">PyTorch的CrossEntropyLoss内置Softmax，别重复加！</strong><br><br>
+      损失函数必须可导，要和评估指标相关<br>
+      Loss曲线是诊断训练问题的最好工具<br><br>
+      BV1jgGB6PE7S · 时长 15分50秒
+    </p>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag pi">✅ 损失函数</span>
+      <span class="tag p">🧠 MSE/MAE/Huber</span>
+      <span class="tag">🔍 BCE/CrossEntropy</span>
+      <span class="tag g">💻 PyTorch</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-number">27 / 27</div>
+  <div class="slide-content">
+    <h1>下集预告：PyTorch实战</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      理论学完了，该动手写代码了！<br><br>
+      <strong style="color:var(--accent2)">DL第9集：PyTorch手写数字识别MNIST</strong><br>
+      从数据加载、定义网络到训练测试完整流程<br>
+      跑通你的第一个深度学习程序！
+    </p>
+    <div class="end-buttons">
+      <a href="chapter6.html" class="end-btn secondary">📺 回到视频页</a>
+      <a href="ppt-25.html" class="end-btn primary">下一集：PyTorch MNIST →</a>
+    </div>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag g">🔥 实战来啦</span>
+      <span class="tag pi">💻 PyTorch</span>
+      <span class="tag p">🔢 MNIST</span>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+});
+</script>
+</body></html>

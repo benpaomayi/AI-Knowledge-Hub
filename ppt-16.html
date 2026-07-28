@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>第16集 深度学习第一课 - ML学习站PPT</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#f97316;--accent2:#fb923c;--accent3:#f59e0b;--accent-glow:rgba(249,115,22,0.25);--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--accent3);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent3);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(249,115,22,0.15) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(245,158,11,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.25);border-radius:50px;font-size:1rem;color:var(--accent);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--success),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:700px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(249,115,22,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:1.8rem 2rem;margin:1.5rem 0;text-align:center;font-size:clamp(1rem,1.8vw,1.25rem);line-height:2.2;overflow-x:auto}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:1rem;display:block;text-align:left;line-height:1.7}
+.katex{color:var(--accent3)}.katex .mord.text{color:var(--ink2)}
+.hbox{background:rgba(249,115,22,0.08);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1rem 0}
+.hbox h4{color:var(--accent);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(251,191,36,0.08);border-left-color:var(--warning)}.hbox.warn h4{color:var(--warning)}
+.hbox.danger{background:rgba(248,113,113,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.orange{background:rgba(251,146,60,0.08);border-left-color:var(--accent2)}.hbox.orange h4{color:var(--accent2)}
+.hbox.amber{background:rgba(245,158,11,0.08);border-left-color:var(--accent3)}.hbox.amber h4{color:var(--accent3)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.95rem}
+table.cmp th{background:var(--bg3);color:var(--accent3);padding:12px 14px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.9rem}
+table.cmp td{padding:10px 14px;border-bottom:1px solid var(--rule);color:var(--ink2);line-height:1.6}
+table.cmp tr:hover td{background:rgba(249,115,22,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent3);background:rgba(249,115,22,0.1);color:var(--accent3);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent)}
+.tag.o{color:var(--accent2)}.tag.a{color:var(--accent3)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}.tag.d{color:var(--danger)}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent3),var(--accent2),var(--accent),var(--success));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent3);color:var(--accent3)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent3)}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.end-slide .end-buttons{display:flex;gap:1.5rem;justify-content:center;margin-top:2.5rem;flex-wrap:wrap}
+.end-slide .end-btn{padding:14px 32px;border-radius:12px;font-size:1.05rem;font-weight:600;text-decoration:none;transition:all .3s}
+.end-slide .end-btn.primary{background:linear-gradient(135deg,var(--accent3),var(--accent2));color:white}
+.end-slide .end-btn.secondary{background:var(--bg2);border:1px solid var(--rule);color:var(--ink2)}
+.end-slide .end-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(249,115,22,0.2)}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col{grid-template-columns:1fr}.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="slides.html" style="font-weight:600;color:var(--accent3)">📊 PPT课件</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="chapter5.html">回到视频页</a>
+    <a href="ppt-15.html">← 上一集</a>
+    <a href="ppt-17.html" style="color:var(--accent);font-weight:600">下一集 →</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">🔥 深度学习入门教程 · 第1集</div>
+    <h1 class="cover-title">深度学习第一课：AI发展简史</h1>
+    <p class="cover-sub">欢迎来到深度学习的世界！从AI的起源讲起，了解三次浪潮，理解深度学习为什么这么强大<br>BV1rARgBYE3J · 时长 23分44秒</p>
+    <div class="tags">
+      <span class="tag a">AI历史</span>
+      <span class="tag o">三次浪潮</span>
+      <span class="tag">深度学习入门</span>
+      <span class="tag g">学习路径</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">2 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">本集内容导览</h1>
+    <h3 class="sub">深度学习系列第一集，我们从零开始认识AI</h3>
+    <div class="body">
+      <ul>
+        <li><strong style="color:var(--accent)">什么是人工智能</strong>——AI的定义与核心目标</li>
+        <li><strong style="color:var(--accent2)">AI发展三次浪潮</strong>——从符号主义到连接主义再到深度学习</li>
+        <li><strong style="color:var(--accent3)">为什么叫"深度学习"</strong>——理解"深度"的真正含义</li>
+        <li><strong style="color:var(--success)">ML vs DL的关系</strong>——AI、机器学习、深度学习的包含关系</li>
+        <li><strong style="color:var(--warning)">深度学习成功三要素</strong>——大数据、强算力、好算法</li>
+        <li><strong style="color:var(--danger)">深度学习主要应用</strong>——计算机视觉、NLP、语音、推荐等</li>
+        <li><strong>DL vs 传统ML对比</strong>及深度学习学习路径</li>
+      </ul>
+    </div>
+    <div class="hbox amber">
+      <h4>🚀 新的旅程开始</h4>
+      <p>学完机器学习基础后，让我们一起进入更激动人心的深度学习世界！这是过去10年AI革命的核心驱动力。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">3 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">什么是人工智能（AI）？</h1>
+    <h3 class="sub">让机器展现出人类智能的技术</h3>
+    <div class="hbox">
+      <h4>🧠 AI的核心定义</h4>
+      <p><strong>人工智能（Artificial Intelligence）</strong>是研究、开发用于模拟、延伸和扩展人的智能的理论、方法、技术及应用系统的一门技术科学。简单说，就是<strong style="color:var(--accent)">让机器能够像人一样"思考"和"行动"</strong>。</p>
+    </div>
+    <div class="three-col" style="margin-top:1.5rem">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">👁️</div>
+        <h4>感知能力</h4>
+        <p>看懂图像、听懂语音、识别文字——让机器获得"感官"</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">💭</div>
+        <h4>推理决策</h4>
+        <p>逻辑推理、判断决策、解决问题——让机器学会"思考"</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">✍️</div>
+        <h4>创造生成</h4>
+        <p>生成文本、图像、音频、视频——让机器能够"创造"</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">4 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">AI的理想 vs 现实</h1>
+    <h3 class="sub">弱人工智能已经普及，强人工智能还在远方</h3>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--success)">✅ 弱人工智能（Narrow AI）</h4>
+        <p style="margin-bottom:1rem">专注于特定任务的AI，也是我们今天拥有的AI</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>人脸识别、语音助手</li>
+          <li>推荐算法、搜索引擎</li>
+          <li>AlphaGo下围棋</li>
+          <li>ChatGPT对话、AI绘画</li>
+          <li>自动驾驶（特定场景）</li>
+          <li><strong style="color:var(--success)">你正在学的就是这个！</strong></li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--danger)">🔮 强人工智能（AGI）</h4>
+        <p style="margin-bottom:1rem">像人一样思考、有自我意识、能胜任任何智力任务</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>真正理解语言含义</li>
+          <li>拥有常识和推理能力</li>
+          <li>能学习任何新任务</li>
+          <li>有情感和自我意识</li>
+          <li>科幻电影里的AI</li>
+          <li><strong style="color:var(--danger)">目前还不存在！</strong></li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox warn" style="margin-top:1rem">
+      <h4>💡 记住</h4>
+      <p>我们现在说的"AI革命"、"深度学习"，都还属于<strong>弱人工智能</strong>范畴，但它已经足够强大，正在深刻改变世界。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">5 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">AI发展的第一次浪潮：符号主义</h1>
+    <h3 class="sub">1950s-1960s：AI诞生与早期狂热</h3>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node hl" style="min-width:140px">1950<br>图灵测试</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:140px">1956<br>达特茅斯会议</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:140px">1960s<br>专家系统</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:140px;border-color:var(--danger);color:var(--danger)">1970s<br>第一次AI冬天</div>
+    </div>
+    <div class="hbox">
+      <h4>🏛️ 达特茅斯会议（1956）</h4>
+      <p>John McCarthy、Marvin Minsky等科学家在达特茅斯学院开会，正式提出"Artificial Intelligence"这个词，标志着AI作为一门学科诞生。当时他们极度乐观："二十年内机器将能做到人能做的一切工作"。</p>
+    </div>
+    <div class="hbox orange">
+      <h4>💻 符号主义核心思想</h4>
+      <p>认为智能基于<strong>符号运算和逻辑推理</strong>——把知识用规则编码进去，机器根据规则推理。代表成果是"专家系统"，把专家知识写成一条条if-then规则。</p>
+    </div>
+    <div class="hbox danger">
+      <h4>❄️ 为什么失败了？</h4>
+      <p>知识太多、规则太复杂，不可能人工编码所有规则；常识和直觉无法用规则描述；算力也远远不够。承诺无法兑现，研究经费被砍，进入第一次"AI冬天"。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">6 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">AI发展的第二次浪潮：连接主义</h1>
+    <h3 class="sub">1980s-1990s：神经网络的兴起与寒冬</h3>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node" style="min-width:140px">1958<br>感知机发明</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:140px">1986<br>反向传播</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:140px">1989<br>LeNet手写识别</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:140px;border-color:var(--danger);color:var(--danger)">1990s中<br>第二次AI冬天</div>
+    </div>
+    <div class="hbox amber">
+      <h4>🧠 连接主义核心思想</h4>
+      <p>不再人工写规则，而是模拟人脑神经元连接——让机器<strong>从数据中自动学习</strong>。1986年Hinton等人重新发明反向传播算法（BP），让多层神经网络训练成为可能。</p>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 瓶颈在哪里？</h4>
+      <p>当时有两个致命问题：<strong>（1）数据不够</strong>——互联网还没普及，没有海量标注数据；<strong>（2）算力不足</strong>——训练深层网络太慢，CPU根本跑不动。网络稍微深一点就会梯度消失，根本训不动。</p>
+    </div>
+    <div class="hbox danger">
+      <h4>❄️ 第二次AI冬天</h4>
+      <p>神经网络效果不如传统机器学习（SVM、随机森林等），研究再次陷入低谷。甚至连Hinton的论文都没人看，AI专业学生找工作都要隐瞒自己做神经网络。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">7 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">AI发展的第三次浪潮：深度学习革命</h1>
+    <h3 class="sub">2012年至今——AlexNet引爆，深度学习时代到来</h3>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node" style="min-width:120px">2006<br>Hinton深度信念网络</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:120px">2012<br>AlexNet</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:120px">2016<br>AlphaGo</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:120px">2017<br>Transformer</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:140px;border-color:var(--success);color:var(--success)">2022至今<br>ChatGPT/LLM</div>
+    </div>
+    <div class="hbox success">
+      <h4>🔥 2012：ImageNet挑战赛的奇迹</h4>
+      <p>Hinton和他的学生Alex Krizhevsky用<strong>AlexNet</strong>（8层卷积神经网络）在ImageNet图像识别比赛中，把Top-5错误率从26%直接打到15.3%，碾压第二名（传统方法26.2%）！整个学术界和工业界都震惊了——深度学习真的这么强？</p>
+    </div>
+    <div class="hbox">
+      <h4>⚡ 为什么这次成功了？</h4>
+      <p>三大条件成熟：<strong style="color:var(--accent)">（1）大数据</strong>——互联网时代海量标注数据（ImageNet有1400万张图）；<strong style="color:var(--accent2)">（2）强算力</strong>——GPU并行计算，训练速度提升几十上百倍；<strong style="color:var(--accent3)">（3）好算法</strong>——ReLU激活、更好的初始化、优化器等，解决了深层网络训练难题。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">8 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">AI三次浪潮对比总结</h1>
+    <h3 class="sub">从符号到连接再到深度学习，一条螺旋上升的道路</h3>
+    <table class="cmp">
+      <tr>
+        <th>浪潮</th>
+        <th>时间</th>
+        <th>范式</th>
+        <th>核心思想</th>
+        <th>代表成果</th>
+        <th>局限</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--warning)">第一次</strong></td>
+        <td>1950s-60s</td>
+        <td>符号主义</td>
+        <td>人工编码规则，逻辑推理</td>
+        <td>专家系统</td>
+        <td>规则无法穷举，没有学习能力</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">第二次</strong></td>
+        <td>1980s-90s</td>
+        <td>连接主义</td>
+        <td>神经网络，反向传播</td>
+        <td>浅层神经网络、LeNet</td>
+        <td>缺数据缺算力，深层网络训不动</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">第三次</strong></td>
+        <td>2012至今</td>
+        <td>深度学习</td>
+        <td>深层网络，端到端学习</td>
+        <td>AlexNet、ResNet、GPT、AlphaGo</td>
+        <td>可解释性差，需要大量数据算力</td>
+      </tr>
+    </table>
+    <div class="hbox amber">
+      <h4>📈 历史的启示</h4>
+      <p>AI的发展不是一帆风顺的，经历了两次"寒冬"。但每一次复兴都站在更高的起点上。深度学习这次浪潮已经持续了10多年，而且还在加速——LLM的爆发只是开始。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">9 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">为什么叫"深度学习"？</h1>
+    <h3 class="sub">"深度"不是指理解深，而是指网络层数多</h3>
+    <div class="formula">
+      <strong>深度学习 = 深层的神经网络</strong>
+      <span class="desc">这里的"深度"（Deep），指的是神经网络中<strong>隐藏层的数量多</strong>，也就是网络的"层数深"。传统机器学习（包括早期的神经网络）可以理解为"浅层学习"。</span>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="card">
+        <h4 style="color:var(--muted)">📊 浅层学习（Shallow Learning）</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.5rem">
+          <li>隐藏层0-1层</li>
+          <li>需要人工设计特征</li>
+          <li>例子：逻辑回归、SVM、随机森林、单层感知机</li>
+          <li>对简单问题有效</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent)">🧠 深度学习（Deep Learning）</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.5rem">
+          <li>隐藏层≥2层（甚至成百上千层）</li>
+          <li>自动学习多层次特征</li>
+          <li>例子：CNN、RNN、Transformer、GPT</li>
+          <li>能解决复杂问题（图像、语言等）</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox orange">
+      <h4>💡 直观理解</h4>
+      <p>就像大脑处理视觉信息：先看边缘→再看纹理→再看形状→最后识别物体。多层网络就是这样一层一层抽象、提取特征，<strong>层次越深，学到的特征越抽象、越高级</strong>。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">10 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">AI > ML > DL：三者的包含关系</h1>
+    <h3 class="sub">搞清楚这三个概念的关系，别再混淆了</h3>
+    <div class="flow" style="flex-direction:column;gap:1.2rem;margin:2rem 0;align-items:center">
+      <div style="width:80%;padding:2rem;background:rgba(245,158,11,0.1);border:2px solid var(--accent3);border-radius:16px;text-align:center">
+        <h3 style="color:var(--accent3);font-size:1.5rem">🤖 人工智能 AI</h3>
+        <p style="color:var(--muted);margin-top:0.5rem">最宽泛的概念：所有让机器展现智能的技术</p>
+      </div>
+      <div style="font-size:2rem;color:var(--muted)">⊃</div>
+      <div style="width:65%;padding:1.5rem;background:rgba(251,146,60,0.1);border:2px solid var(--accent2);border-radius:14px;text-align:center">
+        <h3 style="color:var(--accent2);font-size:1.3rem">📊 机器学习 ML</h3>
+        <p style="color:var(--muted);margin-top:0.5rem">AI的一个分支：从数据中学习，不用显式编程</p>
+      </div>
+      <div style="font-size:2rem;color:var(--muted)">⊃</div>
+      <div style="width:50%;padding:1.2rem;background:rgba(249,115,22,0.15);border:2px solid var(--accent);border-radius:12px;text-align:center">
+        <h3 style="color:var(--accent);font-size:1.1rem">🧠 深度学习 DL</h3>
+        <p style="color:var(--muted);margin-top:0.3rem;font-size:0.95rem">ML的一个分支：用深层神经网络学习</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">11 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">用一张图理清三者关系</h2>
+    <h3 class="sub">还有哪些AI方法不属于机器学习？</h3>
+    <div class="card" style="margin-bottom:1rem">
+      <h4 style="color:var(--accent3)">🤖 AI包含两大部分</h4>
+      <div class="two-col" style="margin-top:1rem">
+        <div>
+          <h5 style="color:var(--accent);margin-bottom:0.5rem">1. 基于规则的AI（非ML）</h5>
+          <p style="color:var(--muted);font-size:0.95rem">早期专家系统、搜索算法（A*）、知识图谱推理、游戏树搜索（Alpha-Beta剪枝）等——人工写好规则，机器照着执行，不需要"学习"。</p>
+        </div>
+        <div>
+          <h5 style="color:var(--accent2);margin-bottom:0.5rem">2. 机器学习（ML）</h5>
+          <p style="color:var(--muted);font-size:0.95rem">让机器从数据中自动学习规律，不用人工写死规则。包括传统ML和深度学习。</p>
+        </div>
+      </div>
+    </div>
+    <div class="card accent">
+      <h4 style="color:var(--accent)">📊 ML包含两大部分</h4>
+      <div class="two-col" style="margin-top:1rem">
+        <div>
+          <h5 style="color:var(--accent2);margin-bottom:0.5rem">1. 传统机器学习</h5>
+          <p style="color:var(--muted);font-size:0.95rem">线性回归、逻辑回归、决策树、随机森林、SVM、K-Means、PCA等——你在前面课程已经学过的这些。需要人工做特征工程。</p>
+        </div>
+        <div>
+          <h5 style="color:var(--accent);margin-bottom:0.5rem">2. 深度学习（DL）</h5>
+          <p style="color:var(--muted);font-size:0.95rem">用深层神经网络，自动学习特征，端到端训练。CNN、RNN、Transformer、GPT都属于这一类。——我们这个系列要讲的！</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">12 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">深度学习为什么这么强？成功三要素</h1>
+    <h3 class="sub">大数据+强算力+好算法，缺一不可</h3>
+    <div class="three-col" style="margin:2rem 0">
+      <div class="card" style="text-align:center">
+        <div class="big-num" style="font-size:3.5rem">📊</div>
+        <h4 style="justify-content:center;color:var(--accent)">大数据</h4>
+        <p>互联网时代积累了海量标注数据——ImageNet上千万张图片、互联网上万亿字文本、海量语音视频。数据是深度学习的"燃料"。</p>
+      </div>
+      <div class="card accent" style="text-align:center">
+        <div class="big-num" style="font-size:3.5rem">⚡</div>
+        <h4 style="justify-content:center;color:var(--accent2)">强算力</h4>
+        <p>GPU（显卡）的并行计算能力让训练速度提升几十上百倍。以前训练几个月的网络，现在几天甚至几小时就能跑完。</p>
+      </div>
+      <div class="card" style="text-align:center">
+        <div class="big-num" style="font-size:3.5rem">🧠</div>
+        <h4 style="justify-content:center;color:var(--accent3)">好算法</h4>
+        <p>ReLU激活函数解决梯度消失、BatchNorm加速训练、残差连接让网络能做深、Adam优化器让训练更稳定——算法创新让深层网络真正能训好。</p>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🔑 三者缺一不可</h4>
+      <p>90年代连接主义失败不是因为思想错了，而是数据和算力条件不成熟。就像火箭：<strong>算法是引擎，数据是燃料，算力是氧气</strong>——三者齐备，深度学习才能一飞冲天。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">13 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">要素1：大数据——深度学习的燃料</h2>
+    <h3 class="sub">为什么深度学习这么"吃数据"？</h3>
+    <div class="hbox">
+      <h4>📈 数据量与模型性能的关系</h4>
+      <p>传统ML算法在数据量达到一定规模后性能就会趋于饱和（平台期）；而<strong>深度学习的性能几乎可以随着数据量增加而持续增长</strong>——数据越多，DL优势越明显。这是深度学习最独特的优势！</p>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="card">
+        <h4>🌐 大数据从哪里来？</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.5rem">
+          <li>互联网普及：用户每天产生海量数据</li>
+          <li>智能手机：人人都有相机、麦克风</li>
+          <li>社交网络：文字、图片、视频爆炸式增长</li>
+          <li>传感器/IoT：各种设备持续产生数据</li>
+          <li>众包标注：Amazon Mechanical Turk等</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <h4>📊 经典大数据集</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.5rem">
+          <li><strong>ImageNet</strong>：1400万张标注图像，1000类</li>
+          <li><strong>COCO</strong>：33万张图像，目标检测/分割</li>
+          <li><strong>Wikipedia</strong>：英文600万+篇文章</li>
+          <li><strong>Common Crawl</strong>：PB级网页文本数据</li>
+          <li><strong>LibriSpeech</strong>：1000小时语音数据</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">14 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">要素2：强算力——GPU让深度学习起飞</h2>
+    <h3 class="sub">为什么游戏显卡成了AI研究的核心硬件？</h3>
+    <div class="two-col">
+      <div>
+        <div class="hbox orange">
+          <h4>💻 CPU vs GPU</h4>
+          <p><strong>CPU</strong>：几个强大的核心，擅长复杂逻辑控制、串行计算，像"几个教授"。<br><br>
+          <strong>GPU</strong>：成千上万个小核心，擅长简单运算<strong>并行执行</strong>，像"成千上万小学生"。神经网络训练刚好是大量简单的矩阵乘法，完美适合GPU并行！</p>
+        </div>
+        <div class="hbox warn">
+          <h4>⏱️ 速度差距有多大？</h4>
+          <p>训练同样的深度网络，GPU比CPU快<strong>10-100倍</strong>。一个在CPU上要训练几个月的模型，在GPU上几天就能跑完。没有GPU，深度学习根本不可能实用。</p>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--accent3)">🚀 关键历史时刻</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.5rem">
+          <li><strong>2007年</strong>：NVIDIA推出CUDA，让GPU通用计算成为可能</li>
+          <li><strong>2012年</strong>：AlexNet用两块GTX 580 GPU训练，引爆深度学习</li>
+          <li><strong>2016年</strong>：NVIDIA P100/V100专门为AI设计</li>
+          <li><strong>2022年</strong>：H100算力达到PFlops级别</li>
+          <li>NVIDIA因此成为AI时代最大赢家</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox amber">
+      <h4>☁️ 云计算让普通人也能用GPU</h4>
+      <p>Google Colab、Kaggle Kernels、阿里云/腾讯云都提供GPU云服务，按小时付费。你不需要自己买贵的显卡，也能做深度学习实验！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">15 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">要素3：好算法——让深层网络真正能训</h2>
+    <h3 class="sub">算法创新解决了深层网络的训练难题</h3>
+    <div class="three-col" style="margin-top:1rem">
+      <div class="card">
+        <h4 style="color:var(--accent)">✅ ReLU激活函数</h4>
+        <p>以前用Sigmoid/Tanh，深层会梯度消失（梯度乘来乘去变成0）。ReLU(x)=max(0,x)在正区间梯度恒为1，有效缓解梯度消失问题，让深层网络能训动。</p>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent2)">✅ Batch Normalization</h4>
+        <p>2015年提出，在每一层输入做标准化，让训练更稳定、更快，可以用更大学习率。还自带一点正则化效果。现在是网络标配。</p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--accent3)">✅ 残差连接（ResNet）</h4>
+        <p>2015年何恺明提出ResNet，用"跳跃连接"让梯度可以直接传到底层，成功训练了<strong>152层</strong>的超深网络（之前最多20多层）。深度CNN的里程碑！</p>
+      </div>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="hbox success">
+        <h4>✅ 更好的优化器</h4>
+        <p>从SGD→Momentum→RMSprop→<strong>Adam</strong>，优化器越来越智能，能自适应调整学习率，让收敛更快更稳定。Adam是现在最常用的优化器之一。</p>
+      </div>
+      <div class="hbox">
+        <h4>✅ 更好的初始化</h4>
+        <p>Xavier初始化、He初始化等，让权重初始值处在合适范围，避免一开始就梯度消失/爆炸，训练从起跑线就更稳。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">16 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">深度学习主要应用领域</h1>
+    <h3 class="sub">DL已经渗透到我们生活的方方面面</h3>
+    <div class="three-col" style="margin-top:1rem">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">🖼️</div>
+        <h4>计算机视觉</h4>
+        <p>图像分类、目标检测、图像分割、人脸识别、医学影像分析、自动驾驶、OCR、图像生成（Stable Diffusion、Midjourney）</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">💬</div>
+        <h4>自然语言处理</h4>
+        <p>机器翻译、智能问答、文本摘要、情感分析、聊天机器人、大语言模型（GPT、BERT、Claude）——ChatGPT就是NLP的巅峰之作</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">🎤</div>
+        <h4>语音识别与合成</h4>
+        <p>语音转文字（ASR）、文字转语音（TTS）、声纹识别、语音助手（Siri、小爱同学）、AI配音、歌声合成</p>
+      </div>
+    </div>
+    <div class="three-col" style="margin-top:1rem">
+      <div class="card">
+        <div class="card-icon" style="color:var(--success)">🎯</div>
+        <h4>推荐系统</h4>
+        <p>抖音/快手推荐、淘宝/京东商品推荐、Netflix影视推荐、音乐推荐、广告点击率预估——深度学习让推荐更精准</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--warning)">🚗</div>
+        <h4>自动驾驶</h4>
+        <p>感知（识别行人车辆）、预测（他车要怎么走）、决策（加速刹车转向）——端到端自动驾驶是DL热门方向</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--danger)">♟️</div>
+        <h4>游戏AI</h4>
+        <p>AlphaGo（围棋）、AlphaStar（星际争霸）、OpenAI Five（Dota2）、王者荣耀绝悟——AI在游戏中超越人类顶尖选手</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">17 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">DL vs 传统ML：全方位对比</h2>
+    <h3 class="sub">什么时候用传统ML，什么时候用深度学习？</h3>
+    <table class="cmp">
+      <tr>
+        <th>对比维度</th>
+        <th>传统机器学习</th>
+        <th>深度学习</th>
+      </tr>
+      <tr>
+        <td><strong>特征工程</strong></td>
+        <td style="color:var(--warning)">需要人工设计特征</td>
+        <td style="color:var(--success)">自动学习多层次特征</td>
+      </tr>
+      <tr>
+        <td><strong>数据量需求</strong></td>
+        <td>小数据也能工作（千级即可）</td>
+        <td style="color:var(--danger)">需要大量数据（万级起步，百万级更好）</td>
+      </tr>
+      <tr>
+        <td><strong>算力需求</strong></td>
+        <td style="color:var(--success)">CPU就够，训练快</td>
+        <td>通常需要GPU，训练时间长</td>
+      </tr>
+      <tr>
+        <td><strong>可解释性</strong></td>
+        <td style="color:var(--success)">较强（决策树、LR可解释）</td>
+        <td style="color:var(--danger)">弱，"黑盒"模型</td>
+      </tr>
+      <tr>
+        <td><strong>适合数据类型</strong></td>
+        <td>结构化表格数据</td>
+        <td>非结构化数据（图像、文本、语音、视频）</td>
+      </tr>
+      <tr>
+        <td><strong>调参难度</strong></td>
+        <td>相对少，调参简单</td>
+        <td>超参数多，调参复杂</td>
+      </tr>
+      <tr>
+        <td><strong>典型算法</strong></td>
+        <td>LR、SVM、RF、XGBoost</td>
+        <td>CNN、RNN、Transformer、GPT</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">18 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">特征工程：人工 vs 自动</h2>
+    <h3 class="sub">这是DL和传统ML最本质的区别之一</h3>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--accent2)">👨‍💻 传统ML：人工特征工程</h4>
+        <p style="margin-bottom:1rem">对于图像分类，你需要手工设计什么特征？</p>
+        <ul style="font-size:0.9rem;color:var(--muted)">
+          <li>边缘检测算子（Sobel、Canny）</li>
+          <li>SIFT/SURF/HOG特征提取</li>
+          <li>颜色直方图、纹理特征</li>
+          <li>形状描述符</li>
+          <li>然后把这些特征喂给SVM分类</li>
+        </ul>
+        <div class="hbox warn" style="margin-top:1rem;padding:1rem">
+          <p style="font-size:0.9rem">⚠️ 问题：特征怎么设计全靠人，换个任务就要重新设计；对复杂问题（如ImageNet千分类），人工特征根本不够用。</p>
+        </div>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent)">🤖 深度学习：自动学习特征</h4>
+        <p style="margin-bottom:1rem">CNN自动分层学习特征：</p>
+        <ul style="font-size:0.9rem;color:var(--muted)">
+          <li><strong>第1层</strong>：边缘、颜色、纹理</li>
+          <li><strong>第2-3层</strong>：简单形状、部件（眼睛、轮子）</li>
+          <li><strong>第4-5层</strong>：更复杂的模式</li>
+          <li><strong>最后几层</strong>：完整物体（猫、汽车、人脸）</li>
+          <li>端到端训练，原始像素进，结果出</li>
+        </ul>
+        <div class="hbox success" style="margin-top:1rem;padding:1rem">
+          <p style="font-size:0.9rem">✅ 优势：不用人手工设计特征，网络自己学；特征层次化、更强大；能处理极其复杂的任务。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">19 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">深度学习不是万能的！</h1>
+    <h3 class="sub">理性认识DL的优势与局限</h3>
+    <div class="two-col">
+      <div>
+        <div class="hbox success">
+          <h4>✅ DL擅长的场景</h4>
+          <p>
+          • 图像、文本、语音、视频等非结构化数据<br>
+          • 数据量非常大的场景<br>
+          • 精度要求高于可解释性（如推荐、广告）<br>
+          • 复杂模式识别任务（人脸、语音、翻译）
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="hbox danger">
+          <h4>❌ DL不适合的场景</h4>
+          <p>
+          • 小数据集（几千样本以下）<br>
+          • 表格数据（XGBoost往往更强）<br>
+          • 高可解释性要求（金融风控、医疗诊断）<br>
+          • 计算资源/延迟受限的场景（端侧简单任务）
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="hbox warn" style="margin-top:1.5rem">
+      <h4>💡 重要提醒</h4>
+      <p>不要什么问题都上深度学习！<strong>传统ML在很多场景仍然是首选</strong>——尤其是表格数据、小数据、需要解释的场景。你在前面学的XGBoost等算法，现在依然是工业界的主力。工具没有高低，适合的才是最好的。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">20 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">深度学习学习路径规划</h1>
+    <h3 class="sub">从零基础到能做项目，一步一个脚印</h3>
+    <div class="flow" style="flex-direction:column;gap:1rem;align-items:stretch;margin:2rem 0">
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--success);padding-left:1.5rem">
+        <strong style="color:var(--success)">📐 第一步：数学基础</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">线性代数（向量矩阵乘法）、微积分（导数、梯度、链式法则）、概率统计（概率分布、期望）——不用学太深，够用就行</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent);padding-left:1.5rem">
+        <strong style="color:var(--accent)">🐍 第二步：Python与PyTorch基础</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">Python基础语法、NumPy数值计算、PyTorch框架（张量、自动求导、nn.Module）——下集就教你装环境！</span>
+      </div>
+      <div class="flow-node hl" style="text-align:left;min-width:auto;border-left:4px solid var(--accent2);padding-left:1.5rem">
+        <strong style="color:var(--accent2)">🧠 第三步：神经网络基础</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">感知机、MLP、激活函数、损失函数、反向传播、梯度下降、优化器——这是DL的核心基础</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent3);padding-left:1.5rem">
+        <strong style="color:var(--accent3)">🖼️ 第四步：CNN卷积神经网络</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">卷积、池化、经典网络（LeNet/AlexNet/VGG/ResNet）、图像分类/检测/分割实战</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">21 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">学习路径（续）：进阶方向</h2>
+    <h3 class="sub">打好基础后，可以选择感兴趣的方向深入</h3>
+    <div class="flow" style="flex-direction:column;gap:1rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--warning);padding-left:1.5rem">
+        <strong style="color:var(--warning)">📜 第五步：RNN/LSTM与序列模型</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">循环神经网络、处理时间序列/文本数据、LSTM/GRU解决长程依赖——Transformer出现前的NLP标配</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--danger);padding-left:1.5rem">
+        <strong style="color:var(--danger)">⚡ 第六步：Transformer与注意力机制</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">2017年革命性架构！Self-Attention、多头注意力、位置编码——这是GPT/BERT等所有大模型的基础</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--success);padding-left:1.5rem">
+        <strong style="color:var(--success)">🚀 第七步：实战与前沿</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">做实际项目（图像分类、文本分类等）、学大模型微调、了解AIGC、跟进前沿论文——在实践中成长</span>
+      </div>
+    </div>
+    <div class="hbox orange">
+      <h4>🎯 这个课程会覆盖哪些内容？</h4>
+      <p>我们这个DL系列会从<strong>感知机→MLP→CNN→RNN→Transformer</strong>一路讲下去，帮你打下坚实基础。学完后你就能看懂大模型的基本原理了！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">22 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">本课程（DL系列）19集内容预览</h1>
+    <h3 class="sub">19集视频，带你从0入门深度学习</h3>
+    <div class="two-col">
+      <div>
+        <div class="card" style="margin-bottom:0.8rem">
+          <p style="font-size:0.9rem;color:var(--muted)"><strong style="color:var(--accent)">第1-2集</strong>：入门与环境搭建（你正在看！）</p>
+        </div>
+        <div class="card" style="margin-bottom:0.8rem">
+          <p style="font-size:0.9rem;color:var(--muted)"><strong style="color:var(--accent)">第3-4集</strong>：感知机、MLP与神经网络基础</p>
+        </div>
+        <div class="card" style="margin-bottom:0.8rem">
+          <p style="font-size:0.9rem;color:var(--muted)"><strong style="color:var(--accent2)">第5-7集</strong>：PyTorch实战、反向传播与优化</p>
+        </div>
+        <div class="card" style="margin-bottom:0.8rem">
+          <p style="font-size:0.9rem;color:var(--muted)"><strong style="color:var(--accent2)">第8-10集</strong>：CNN基础、经典网络与图像分类</p>
+        </div>
+        <div class="card" style="margin-bottom:0.8rem">
+          <p style="font-size:0.9rem;color:var(--muted)"><strong style="color:var(--accent3)">第11-12集</strong>：RNN/LSTM与序列模型</p>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:0.8rem">
+          <p style="font-size:0.9rem;color:var(--muted)"><strong style="color:var(--accent3)">第13-15集</strong>：注意力机制与Transformer</p>
+        </div>
+        <div class="card" style="margin-bottom:0.8rem">
+          <p style="font-size:0.9rem;color:var(--muted)"><strong style="color:var(--warning)">第16集</strong>：迁移学习与模型微调</p>
+        </div>
+        <div class="card" style="margin-bottom:0.8rem">
+          <p style="font-size:0.9rem;color:var(--muted)"><strong style="color:var(--success)">第17集</strong>：生成模型与GAN入门</p>
+        </div>
+        <div class="card" style="margin-bottom:0.8rem">
+          <p style="font-size:0.9rem;color:var(--muted)"><strong style="color:var(--danger)">第18集</strong>：大语言模型LLM简介</p>
+        </div>
+        <div class="card accent" style="margin-bottom:0.8rem">
+          <p style="font-size:0.9rem;color:var(--muted)"><strong style="color:var(--accent)">第19集</strong>：课程总结与进阶指南</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">23 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">给初学者的几个建议</h1>
+    <h3 class="sub">这些经验能帮你少走很多弯路</h3>
+    <div class="hbox success">
+      <h4>💻 动手！动手！动手！</h4>
+      <p>看视频觉得"我懂了"是错觉！一定要跟着写代码，跑notebook，改参数看效果。看懂不是真懂，能写出来、能调通、能解释，才是真懂。</p>
+    </div>
+    <div class="hbox">
+      <h4>📐 数学不用怕，但不能跳过</h4>
+      <p>不用像数学系那样推公式证明，但线性代数、微积分、概率的基本概念要理解。先直觉理解，再数学推导——知道"为什么这样"比记公式更重要。</p>
+    </div>
+    <div class="hbox warn">
+      <h4>🔨 先跑通，再优化</h4>
+      <p>不要一开始就追求完美。先让最简单的模型跑通整个pipeline（数据→训练→评估），看到结果，建立信心，再慢慢改进。快速迭代！</p>
+    </div>
+    <div class="hbox orange">
+      <h4>🌱 接受"暂时不懂"，带着疑问往前走</h4>
+      <p>有些概念第一次接触会觉得抽象、不理解，这很正常。继续往后学，多做几个实验，见得多了，某一天突然就"顿悟"了。不要在一个点卡太久。</p>
+    </div>
+    <div class="hbox amber">
+      <h4>📚 不要当"资料收藏家"</h4>
+      <p>选这一门课跟着学完，比收藏100G网盘教程有用100倍。少看多做！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">24 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">常见误区澄清</h1>
+    <h3 class="sub">刚开始学DL容易有的误解</h3>
+    <div class="hbox danger">
+      <h4>❌ 误区1：深度学习就是调参，不用懂原理</h4>
+      <p>大错特错！不懂原理，你都不知道调什么参数、为什么这样调、出了问题怎么解决。调库调参谁都会，但遇到问题能分析、能改进、能创新，才是真正的竞争力。</p>
+    </div>
+    <div class="hbox warn">
+      <h4>❌ 误区2：一定要买贵的GPU才能学</h4>
+      <p>入门阶段根本不需要！Google Colab免费提供GPU，Kaggle也有免费GPU，跑小模型完全够用。等你做大项目了再考虑买显卡不迟。</p>
+    </div>
+    <div class="hbox">
+      <h4>❌ 误区3：数学一定要非常好才能学</h4>
+      <p>不需要数学系水平！掌握基本的线性代数（矩阵乘法）、微积分（导数、梯度）、概率就够了。我们课程会在需要的时候讲，不用先单独啃完数学书再来。</p>
+    </div>
+    <div class="hbox success">
+      <h4>❌ 误区4：DL已经很成熟了，现在学晚了</h4>
+      <p>恰恰相反！ChatGPT引爆的AI革命才刚刚开始，未来10年都是AI的黄金时代。现在正是最好的入场时机——与其担心晚了，不如现在就开始。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">25 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">本集知识点总结</h1>
+    <h3 class="sub">回顾一下这集学了什么</h3>
+    <div class="card" style="margin-bottom:1rem">
+      <h4 style="color:var(--accent)">📚 核心知识点回顾</h4>
+      <div class="body" style="margin-top:1rem">
+        <ul>
+          <li><strong>AI定义</strong>：让机器展现人类智能（感知、推理、创造）</li>
+          <li><strong>AI三次浪潮</strong>：符号主义（规则）→连接主义（神经网络）→深度学习（深层网络+大数据+GPU）</li>
+          <li><strong>2012年AlexNet</strong>是深度学习引爆的标志事件</li>
+          <li><strong>"深度学习"</strong>的"深度"指隐藏层层数多（≥2层）</li>
+          <li><strong>包含关系</strong>：AI ⊃ ML ⊃ DL</li>
+          <li><strong>DL成功三要素</strong>：大数据（燃料）+强算力（GPU，引擎）+好算法（ReLU/BN/ResNet/Adam）</li>
+          <li><strong>DL vs 传统ML</strong>：自动特征学习、需要更多数据算力、黑盒、适合非结构化数据</li>
+          <li><strong>主要应用</strong>：CV、NLP、语音、推荐、自动驾驶、游戏AI</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox amber">
+      <h4>🎯 下集预告</h4>
+      <p>工欲善其事，必先利其器。下一集我们就来<strong>搭建深度学习环境</strong>——安装Anaconda和PyTorch，为后续写代码做好准备！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">26 / 28</div>
+  <div class="slide-content">
+    <h1>🎉 第一集完成！</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      恭喜你正式踏入深度学习的大门！<br><br>
+      <strong style="color:var(--accent)">你已经了解了AI的发展历史和深度学习的基本概念</strong><br><br>
+      记住：这只是开始，真正的乐趣在动手实践中！
+    </p>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag a">✅ 完成第1集</span>
+      <span class="tag o">🧠 DL入门</span>
+      <span class="tag">🚀 继续前进</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-chapter">第16集 · 深度学习第一课</div>
+  <div class="slide-number">27 / 28</div>
+  <div class="slide-content">
+    <h1 style="font-size:clamp(2.2rem,4vw,3.5rem)">🔧 下集准备</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      请确保你的电脑准备好了
+    </p>
+    <div class="three-col" style="margin-top:2rem;text-align:left">
+      <div class="card">
+        <div class="card-icon">💻</div>
+        <h4>电脑一台</h4>
+        <p>Windows/Mac/Linux都可以，入门阶段不需要独立显卡，用CPU也能跑小模型。有NVIDIA显卡更好。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon">🌐</div>
+        <h4>网络环境</h4>
+        <p>能访问外网最好（下载PyTorch更快），没有的话我们会讲国内镜像源配置。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">✊</div>
+        <h4>动手的决心</h4>
+        <p>光看不动手是学不会深度学习的。准备好跟着敲代码、调试、踩坑——这就是学习本身。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-number">28 / 28</div>
+  <div class="slide-content">
+    <h1>🔥 下集更精彩</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      深度学习环境搭建：Anaconda+PyTorch<br><br>
+      配置好你的第一个DL开发环境，开始写代码！<br><br>
+      <strong style="color:var(--accent3)">工欲善其事，必先利其器</strong>
+    </p>
+    <div class="end-buttons">
+      <a href="slides.html" class="end-btn secondary">📊 PPT目录</a>
+      <a href="chapter5.html" class="end-btn secondary">🎬 回到视频页</a>
+      <a href="ppt-17.html" class="end-btn primary">第2集：环境搭建 →</a>
+    </div>
+    <div class="tags" style="justify-content:center;margin-top:3rem">
+      <span class="tag a">🔥 深度学习入门</span>
+      <span class="tag o">💪 继续加油</span>
+      <span class="tag g">🌟 未来可期</span>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+});
+</script>
+</body></html>

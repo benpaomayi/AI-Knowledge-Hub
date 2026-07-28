@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第5章 神经网络基础 - ML学习站</title>
+  <style>
+    :root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--bg4:#334155;--ink:#f8fafc;--ink-muted:#cbd5e1;--muted:#94a3b8;--rule:rgba(249,115,22,0.15);--accent:#f97316;--accent2:#fb923c;--accent3:#f59e0b;--accent-glow:rgba(249,115,22,0.25);--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace;--max:1100px;--radius:12px;--radius-lg:20px}
+    *{box-sizing:border-box;margin:0;padding:0}html{font-size:16px;scroll-behavior:smooth}
+    body{font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.7;overflow-x:hidden}a{text-decoration:none;color:inherit}
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,14,26,0.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--rule);padding:0 2rem}
+    .navbar-inner{max-width:var(--max);margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+    .logo{display:flex;align-items:center;gap:10px;font-size:1.2rem;font-weight:700;color:var(--accent)}
+    .logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent3),var(--accent));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .nav-links{display:flex;gap:1.2rem;list-style:none;align-items:center}
+    .nav-links a{color:var(--muted);font-weight:500;font-size:0.85rem;transition:color .3s}
+    .nav-links a:hover,.nav-links a.active{color:var(--accent)}
+    .back-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:var(--bg3);border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;color:var(--ink-muted);transition:all .3s}
+    .back-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .chapter-hero{padding-top:100px;padding-bottom:3rem;background:linear-gradient(180deg,rgba(249,115,22,0.06) 0%,transparent 100%)}
+    .chapter-hero-inner{max-width:var(--max);margin:0 auto;padding:0 2rem}
+    .breadcrumb{font-size:0.85rem;color:var(--muted);margin-bottom:1.5rem;display:flex;gap:8px;align-items:center}
+    .breadcrumb a{color:var(--accent)}
+    .chapter-badge{display:inline-flex;padding:6px 14px;background:rgba(249,115,22,0.12);color:var(--accent);border-radius:20px;font-size:0.8rem;font-weight:600;margin-bottom:1rem;border:1px solid rgba(249,115,22,0.2)}
+    .chapter-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.2;margin-bottom:1rem}
+    .chapter-subtitle{font-size:1.1rem;color:var(--muted);max-width:700px;line-height:1.8}
+    .chapter-meta{display:flex;gap:2rem;margin-top:1.5rem;flex-wrap:wrap}
+    .meta-item{display:flex;align-items:center;gap:6px;font-size:0.9rem;color:var(--ink-muted)}
+    .video-nav{display:flex;gap:0.5rem;margin-top:2rem;flex-wrap:wrap}
+    .vnav-item{padding:8px 14px;background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius);font-size:0.82rem;color:var(--muted);cursor:pointer;transition:all .3s;font-family:var(--font);text-align:left}
+    .vnav-item:hover,.vnav-item.active{border-color:var(--accent);color:var(--accent);background:rgba(249,115,22,0.08)}
+    .vnav-item strong{display:block;color:var(--ink);font-size:0.8rem;margin-bottom:1px}
+    .vnav-item span{font-size:0.72rem}
+    .main{max-width:var(--max);margin:0 auto;padding:0 2rem}
+    .lesson{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+    .lesson:last-child{border-bottom:none}
+    .lesson-header{display:flex;align-items:flex-start;gap:1rem;margin-bottom:2rem}
+    .lesson-num{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;flex-shrink:0;color:var(--bg);background:linear-gradient(135deg,var(--accent),var(--accent2))}
+    .lesson-num.dl2{background:linear-gradient(135deg,var(--accent),#ea580c)}
+    .lesson-num.dl3{background:linear-gradient(135deg,#ea580c,var(--accent3))}
+    .lesson-num.dl4{background:linear-gradient(135deg,var(--accent3),#d97706)}
+    .lesson-num.dl5{background:linear-gradient(135deg,#d97706,#b45309)}
+    .lesson-num.dl6{background:linear-gradient(135deg,#b45309,var(--accent2))}
+    .lesson-num.dl7{background:linear-gradient(135deg,var(--accent2),var(--accent))}
+    .lesson-info h2{font-size:1.4rem;font-weight:700;margin-bottom:4px;line-height:1.3}
+    .lesson-info .lesson-dur{font-size:0.85rem;color:var(--muted)}
+    .video-wrapper{position:relative;width:100%;padding-bottom:56.25%;margin-bottom:2.5rem;background:var(--bg2);border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--rule)}
+    .video-wrapper iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+    .content-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem}
+    .content-card{background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius-lg);padding:1.75rem;transition:border-color .3s}
+    .content-card:hover{border-color:var(--accent)}
+    .content-card.full{grid-column:1/-1}
+    .card-tag{display:inline-block;padding:3px 10px;background:rgba(249,115,22,0.1);color:var(--accent);border-radius:6px;font-size:0.75rem;font-weight:600;margin-bottom:1rem}
+    .content-card h3{font-size:1.1rem;margin-bottom:1rem}
+    .content-card p{font-size:0.92rem;color:var(--ink-muted);line-height:1.8;margin-bottom:0.8rem}
+    .content-card ul{list-style:none;padding:0}
+    .content-card li{padding:0.4rem 0;font-size:0.9rem;color:var(--ink-muted);display:flex;gap:10px;align-items:flex-start;line-height:1.7}
+    .content-card li::before{content:'▸';color:var(--accent);flex-shrink:0;margin-top:1px}
+    .key-point{background:rgba(249,115,22,0.06);border-left:3px solid var(--accent);border-radius:0 var(--radius) var(--radius) 0;padding:1.25rem 1.5rem;margin:1.5rem 0}
+    .key-point h4{color:var(--accent);font-size:0.95rem;margin-bottom:0.5rem}
+    .key-point p{font-size:0.9rem;color:var(--ink-muted);line-height:1.8}
+    .formula-box{background:var(--bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1.25rem 1.5rem;margin:1rem 0;font-family:var(--mono);font-size:0.9rem;color:var(--accent);text-align:center;letter-spacing:0.02em;overflow-x:auto;line-height:2}
+    .formula-box .comment{color:var(--muted);font-family:var(--font);font-size:0.82rem;display:block;margin-top:0.3rem}
+    .code-block{background:var(--bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1.25rem 1.5rem;margin:1rem 0;overflow-x:auto;font-family:var(--mono);font-size:0.86rem;line-height:1.7;color:var(--ink-muted)}
+    .code-block .kw{color:var(--accent2)}.code-block .fn{color:var(--accent3)}.code-block .str{color:var(--success)}.code-block .cm{color:var(--muted);font-style:italic}.code-block .num{color:var(--warning)}
+    .chapter-nav{display:flex;justify-content:space-between;align-items:center;padding:2rem 0;margin-top:2rem;border-top:1px solid var(--rule)}
+    .chapter-nav .prev,.chapter-nav .next{display:flex;align-items:center;gap:8px;padding:12px 20px;background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius);color:var(--ink-muted);font-size:0.9rem;transition:all .3s}
+    .chapter-nav .next{margin-left:auto;text-align:right}
+    .chapter-nav .prev:hover{border-color:var(--accent2);color:var(--accent2)}
+    .chapter-nav .next:hover{border-color:var(--accent);color:var(--accent)}
+    .nav-label{font-size:0.75rem;color:var(--muted);display:block}.nav-title{font-weight:600;color:var(--ink)}
+    footer{background:var(--bg2);border-top:1px solid var(--rule);padding:3rem 2rem 2rem;margin-top:3rem}
+    .footer-inner{max-width:var(--max);margin:0 auto;text-align:center;color:var(--muted);font-size:0.82rem}
+    @media(max-width:768px){.content-grid{grid-template-columns:1fr!important}.nav-links{display:none}}
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="ml-learning-site.html" class="logo"><div class="logo-icon">🧠</div><span>ML学习站</span></a>
+      <ul class="nav-links">
+        <li><a href="ml-learning-site.html">首页</a></li>
+        <li><a href="slides.html">📊 PPT版</a></li>
+        <li><a href="chapter1.html">第1章</a></li>
+        <li><a href="chapter2.html">第2章</a></li>
+        <li><a href="chapter3.html">第3章</a></li>
+        <li><a href="chapter4.html">第4章</a></li>
+        <li><a href="#lessonD1" class="active">深度学习</a></li>
+      </ul>
+      <a href="ml-learning-site.html" class="back-btn">← 返回首页</a>
+    </div>
+  </nav>
+
+  <div class="chapter-hero">
+    <div class="chapter-hero-inner">
+      <div class="breadcrumb"><a href="ml-learning-site.html">首页</a> / <span>第5章 神经网络基础</span></div>
+      <span class="chapter-badge">🧠 深度学习篇 · 第1-7集</span>
+      <h1 class="chapter-title">神经网络基础</h1>
+      <p class="chapter-subtitle">从AI发展简史开始，搭建深度学习环境，理解感知机、多层感知机、反向传播、激活函数与梯度下降优化器——深度学习核心基础全掌握。</p>
+      <div class="chapter-meta">
+        <span class="meta-item">📺 7集视频</span><span class="meta-item">⏱ 约162分钟</span><span class="meta-item">🧠 神经网络</span><span class="meta-item">🔄 反向传播</span>
+      </div>
+      <div class="video-nav">
+        <a href="#lessonD1" class="vnav-item active"><strong>DL1</strong><span>AI发展简史 (23:44)</span></a>
+        <a href="#lessonD2" class="vnav-item"><strong>DL2</strong><span>环境安装 (11:14)</span></a>
+        <a href="#lessonD3" class="vnav-item"><strong>DL3</strong><span>感知机 (20:00)</span></a>
+        <a href="#lessonD4" class="vnav-item"><strong>DL4</strong><span>MLP到神经网络 (16:18)</span></a>
+        <a href="#lessonD5" class="vnav-item"><strong>DL5</strong><span>反向传播 (35:47)</span></a>
+        <a href="#lessonD6" class="vnav-item"><strong>DL6</strong><span>激活函数 (29:04)</span></a>
+        <a href="#lessonD7" class="vnav-item"><strong>DL7</strong><span>梯度下降 (26:40)</span></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="lesson" id="lessonD1">
+      <div class="lesson-header">
+        <div class="lesson-num dl1">DL1</div>
+        <div class="lesson-info">
+          <h2>深度学习第一课：人工智能发展简史</h2>
+          <div class="lesson-dur">⏱ 23分44秒 · BV1rARgBYE3J</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1rARgBYE3J&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 从规则到学习：AI的三次浪潮</h4>
+        <p>人工智能的发展并非一帆风顺，经历了多次起伏。理解AI的历史能帮助我们看清深度学习为什么在今天爆发，以及未来的发展方向。</p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">发展历程</span>
+          <h3>🌊 AI发展的三次浪潮</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">第一次浪潮（1950s-1970s）：符号主义</strong>——基于规则的专家系统，认为智能可以通过逻辑规则实现，最终因"常识问题"瓶颈进入AI冬天</li>
+            <li><strong style="color:var(--ink)">第二次浪潮（1980s-1990s）：连接主义</strong>——神经网络兴起，反向传播算法发明，但受限于数据和算力，再次进入低谷</li>
+            <li><strong style="color:var(--ink)">第三次浪潮（2012至今）：深度学习</strong>——ImageNet竞赛AlexNet大胜，大数据+GPU算力+算法突破引爆深度学习革命</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">演进关系</span>
+          <h3>📈 从规则到机器学习到深度学习</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">规则系统</strong>：人工编写if-else规则，简单场景有效但无法扩展</li>
+            <li><strong style="color:var(--ink)">传统机器学习</strong>：人工设计特征+模型学习权重（如SIFT特征+SVM分类器）</li>
+            <li><strong style="color:var(--ink)">深度学习</strong>：神经网络自动学习层次化特征表示，端到端训练</li>
+            <li>深度学习是机器学习的一个子领域，基于多层神经网络</li>
+          </ul>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">成功要素</span>
+          <h3>🔥 为什么深度学习现在成功？</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">数据（Data）</strong>：互联网时代产生海量标注数据，ImageNet有1400万张图片</li>
+            <li><strong style="color:var(--ink)">算力（Compute）</strong>：GPU并行计算大幅加速训练，从CPU到GPU到TPU</li>
+            <li><strong style="color:var(--ink)">算法（Algorithm）</strong>：更好的激活函数（ReLU）、初始化方法、优化器（Adam）、网络架构（ResNet、Transformer）</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">应用领域</span>
+          <h3>🌍 深度学习主要应用</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">计算机视觉（CV）</strong>：图像分类、目标检测、人脸识别、自动驾驶</li>
+            <li><strong style="color:var(--ink)">自然语言处理（NLP）</strong>：机器翻译、文本生成、情感分析、大语言模型</li>
+            <li><strong style="color:var(--ink)">语音处理</strong>：语音识别、语音合成、声纹识别</li>
+            <li><strong style="color:var(--ink)">推荐系统</strong>：电商、短视频、音乐个性化推荐</li>
+            <li><strong style="color:var(--ink)">其他</strong>：游戏AI（AlphaGo）、药物发现、蛋白质结构预测</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson" id="lessonD2">
+      <div class="lesson-header">
+        <div class="lesson-num dl2">DL2</div>
+        <div class="lesson-info">
+          <h2>深度学习环境安装：Anaconda与PyTorch</h2>
+          <div class="lesson-dur">⏱ 11分14秒 · BV1db9dBEETc</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1db9dBEETc&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 工欲善其事，必先利其器</h4>
+        <p>搭建一个稳定的深度学习环境是第一步。Anaconda管理Python环境，PyTorch是目前最流行的深度学习框架，Jupyter Notebook是交互式学习和实验的利器。</p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">环境管理</span>
+          <h3>🐍 Anaconda与Conda环境</h3>
+          <p>Anaconda是一个Python数据科学发行版，内置了conda包管理器和虚拟环境管理工具。</p>
+          <ul>
+            <li><strong style="color:var(--ink)">创建环境</strong>：conda create -n dl python=3.10</li>
+            <li><strong style="color:var(--ink)">激活环境</strong>：conda activate dl</li>
+            <li><strong style="color:var(--ink)">退出环境</strong>：conda deactivate</li>
+            <li><strong style="color:var(--ink)">查看环境</strong>：conda env list</li>
+          </ul>
+          <div class="formula-box" style="font-size:0.82rem;text-align:left;margin-top:1rem">
+            pip vs conda：<br>
+            <span class="comment">• pip: Python官方包管理器，包最多<br>• conda: 可管理非Python依赖（如CUDA），环境隔离更好<br>• 两者可以混用，优先用conda装大型包</span>
+          </div>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">框架安装</span>
+          <h3>🔥 PyTorch安装（CPU/GPU）</h3>
+          <p>PyTorch是Facebook开源的深度学习框架，动态计算图、Pythonic风格、研究社区首选。</p>
+          <ul>
+            <li><strong style="color:var(--ink)">CPU版本</strong>：适合没有NVIDIA显卡的电脑，学习够用</li>
+            <li><strong style="color:var(--ink)">GPU版本</strong>：需要NVIDIA显卡+CUDA+cuDNN，训练速度快10-100倍</li>
+            <li><strong style="color:var(--ink)">CUDA</strong>：NVIDIA的并行计算平台，让GPU执行通用计算</li>
+            <li><strong style="color:var(--ink)">cuDNN</strong>：NVIDIA为深度学习优化的GPU加速库</li>
+          </ul>
+        </div>
+      </div>
+      <div class="code-block">
+        <span class="cm"># 验证PyTorch安装是否成功</span><br>
+        <span class="kw">import</span> torch<br><br>
+        <span class="cm"># 查看PyTorch版本</span><br>
+        <span class="fn">print</span>(torch.__version__)<br><br>
+        <span class="cm"># 检查CUDA是否可用</span><br>
+        <span class="fn">print</span>(torch.cuda.is_available())<br>
+        <span class="fn">print</span>(torch.cuda.device_count())<br>
+        <span class="fn">print</span>(torch.cuda.get_device_name(<span class="num">0</span>))<br><br>
+        <span class="cm"># 创建一个张量并在GPU上运算</span><br>
+        x = torch.tensor([<span class="num">1.0</span>, <span class="num">2.0</span>, <span class="num">3.0</span>])<br>
+        <span class="kw">if</span> torch.cuda.is_available():<br>
+        &nbsp;&nbsp;x = x.cuda()<br>
+        &nbsp;&nbsp;<span class="fn">print</span>(x)
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">开发工具</span>
+        <h3>📓 Jupyter Notebook使用</h3>
+        <p>Jupyter Notebook是基于网页的交互式计算环境，支持代码、可视化、Markdown文本混合，是学习和实验的最佳工具。</p>
+        <ul>
+          <li><strong style="color:var(--ink)">启动</strong>：在终端输入 jupyter notebook</li>
+          <li><strong style="color:var(--ink)">Cell</strong>：代码单元，Shift+Enter运行当前cell并跳到下一个</li>
+          <li><strong style="color:var(--ink)">模式</strong>：编辑模式（绿色边框）写代码，命令模式（蓝色边框）用快捷键</li>
+          <li><strong style="color:var(--ink)">常用快捷键</strong>：A/B上方/下方插入cell，DD删除cell，M切换Markdown</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="lesson" id="lessonD3">
+      <div class="lesson-header">
+        <div class="lesson-num dl3">DL3</div>
+        <div class="lesson-info">
+          <h2>感知机：深度学习的Hello World</h2>
+          <div class="lesson-dur">⏱ 20分00秒 · BV1FW9ZBhEEN</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1FW9ZBhEEN&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 感知机：神经网络的基本单元</h4>
+        <p>感知机（Perceptron）由Frank Rosenblatt于1957年提出，是最简单的人工神经网络模型，也是理解现代深度学习的起点。它模拟了生物神经元接收输入信号、加权求和、激活输出的过程。</p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">模型结构</span>
+          <h3>⚙️ 感知机模型</h3>
+          <p>感知机接收多个输入信号，每个输入有对应的权重，加权求和后加上偏置，经过阶跃激活函数输出0或1。</p>
+          <div class="formula-box">
+            y = f(w₁x₁ + w₂x₂ + b)<br>
+            f(z) = { 1  if z > 0; 0  otherwise }<br>
+            <span class="comment">w: 权重(weight), b: 偏置(bias), f: 阶跃激活函数</span>
+          </div>
+          <ul>
+            <li>输入x乘以权重w，反映各输入的重要性</li>
+            <li>偏置b控制神经元被激活的难易程度</li>
+            <li>阶跃函数：超过阈值输出1（激活），否则输出0（不激活）</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">逻辑门实现</span>
+          <h3>🔢 与/或/非门的实现</h3>
+          <p>感知机可以实现基本的逻辑运算，这是它具有计算能力的证明：</p>
+          <ul>
+            <li><strong style="color:var(--ink)">与门(AND)</strong>：两个输入都为1才输出1。例：w1=0.5, w2=0.5, b=-0.7</li>
+            <li><strong style="color:var(--ink)">或门(OR)</strong>：有一个输入为1就输出1。例：w1=0.5, w2=0.5, b=-0.2</li>
+            <li><strong style="color:var(--ink)">非门(NOT)</strong>：输入为0输出1，输入为1输出0。单输入即可实现</li>
+            <li>这些都是线性可分问题，感知机可以找到正确的分离超平面</li>
+          </ul>
+        </div>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">局限性</span>
+        <h3>❌ 感知机的局限：异或问题（XOR）</h3>
+        <p>感知机的致命缺陷——<strong style="color:var(--ink)">无法解决异或问题</strong>。异或（XOR）是两个输入相同时输出0，不同时输出1，这是一个非线性可分问题。单层感知机只能学习线性可分的模式，无法表示非线性的决策边界。</p>
+        <div class="key-point" style="margin-top:1rem">
+          <h4>🧩 解决方案：多层感知机</h4>
+          <p>虽然单层感知机不能解决XOR，但<strong style="color:var(--ink)">叠加多层</strong>就可以！在输入层和输出层之间加入隐藏层，通过组合多个线性分界来表示非线性边界。两层感知机（一个隐藏层）就可以完美解决XOR问题。这就是多层感知机（MLP），也是深度神经网络的雏形。</p>
+        </div>
+        <p style="margin-top:1rem">感知机的重要意义：尽管简单，但它展示了神经网络的基本工作原理——<strong style="color:var(--ink)">加权求和+非线性激活</strong>，这个核心机制延续到了今天所有的深度学习模型中。</p>
+      </div>
+    </div>
+
+    <div class="lesson" id="lessonD4">
+      <div class="lesson-header">
+        <div class="lesson-num dl4">DL4</div>
+        <div class="lesson-info">
+          <h2>从MLP到神经网络：深度学习架构演进</h2>
+          <div class="lesson-dur">⏱ 16分18秒 · BV1XoRJB7ERe</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1XoRJB7ERe&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 深度的力量：层次化特征表示</h4>
+        <p>多层感知机（MLP）通过堆叠隐藏层获得了强大的表示能力。网络越深，能学习的特征越抽象——这是深度学习的核心思想。</p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">网络结构</span>
+          <h3>🏗️ 多层感知机（MLP）</h3>
+          <p>MLP由三种层组成：</p>
+          <ul>
+            <li><strong style="color:var(--ink)">输入层（Input Layer）</strong>：接收原始数据特征，神经元个数=特征维度</li>
+            <li><strong style="color:var(--ink)">隐藏层（Hidden Layer）</strong>：中间层，进行特征变换和提取，可以有多层</li>
+            <li><strong style="color:var(--ink)">输出层（Output Layer）</strong>：产生最终预测结果</li>
+            <li><strong style="color:var(--ink)">全连接（Dense/Fully Connected）</strong>：层与层之间每个神经元都和下一层所有神经元相连</li>
+          </ul>
+          <div class="formula-box" style="font-size:0.82rem;text-align:left;margin-top:1rem">
+            网络深度 = 隐藏层的数量<br>
+            <span class="comment">• 浅层网络：1-2个隐藏层<br>• 深度网络：≥3个隐藏层<br>• 现代网络：几十到上千层（ResNet、Transformer）</span>
+          </div>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">理论基础</span>
+          <h3>🎯 万能近似定理</h3>
+          <p>为什么神经网络如此强大？因为有理论保证：</p>
+          <div class="key-point" style="margin:0.5rem 0">
+            <h4>📜 万能近似定理（Universal Approximation Theorem）</h4>
+            <p>一个包含<strong style="color:var(--ink)">足够多神经元的单隐藏层</strong>的MLP，只要激活函数是非线性的，就可以以任意精度逼近任意定义在紧集上的连续函数。</p>
+          </div>
+          <p style="margin-top:0.8rem">但定理没说需要多少神经元，也没说如何训练。<strong style="color:var(--ink)">为什么还需要深度网络？</strong></p>
+          <ul>
+            <li>单隐藏层可能需要指数级数量的神经元</li>
+            <li>深层网络可以用更少的参数实现更高效的表示</li>
+            <li>深层网络能学习层次化特征（底层→中层→高层）</li>
+          </ul>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">层次化表示</span>
+          <h3>🔍 为什么需要深度？</h3>
+          <p>深度网络自动学习层次化特征表示，以图像识别为例：</p>
+          <ul>
+            <li><strong style="color:var(--ink)">第1层（底层）</strong>：学习边缘、颜色、简单纹理</li>
+            <li><strong style="color:var(--ink)">第2-3层（中层）</strong>：学习纹理组合、简单形状（如眼睛、轮子）</li>
+            <li><strong style="color:var(--ink)">深层（高层）</strong>：学习物体部件、整体物体（如人脸、汽车）</li>
+            <li>这种层次化表示与人类视觉系统的信息处理方式相似</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">基本组件</span>
+          <h3>🧱 神经网络四大组件</h3>
+          <p>训练一个神经网络需要四个核心部分：</p>
+          <ul>
+            <li><strong style="color:var(--ink)">层（Layers）</strong>：网络的基本构建块，对数据进行变换</li>
+            <li><strong style="color:var(--ink)">激活函数（Activation）</strong>：引入非线性，让网络能学习复杂模式</li>
+            <li><strong style="color:var(--ink)">损失函数（Loss）</strong>：衡量预测值与真实值的差距</li>
+            <li><strong style="color:var(--ink)">优化器（Optimizer）</strong>：根据损失更新网络参数（权重）</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson" id="lessonD5">
+      <div class="lesson-header">
+        <div class="lesson-num dl5">DL5</div>
+        <div class="lesson-info">
+          <h2>反向传播：海量参数如何训练</h2>
+          <div class="lesson-dur">⏱ 35分47秒 · BV1Lg5T6SEmP</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1Lg5T6SEmP&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 反向传播：深度学习的基石算法</h4>
+        <p>神经网络可能有几百万甚至几十亿个参数，如何高效计算每个参数的梯度？反向传播（Backpropagation）算法利用链式法则，从输出层向输入层逐层计算梯度，是训练神经网络的核心引擎。</p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">问题</span>
+          <h3>❓ 为什么不能直接求导？</h3>
+          <p>梯度下降需要知道损失函数对每个参数的梯度，但神经网络的问题是：</p>
+          <ul>
+            <li><strong style="color:var(--ink)">参数太多</strong>：现代模型有百万到千亿级参数</li>
+            <li><strong style="color:var(--ink)">复合函数嵌套</strong>：每层都是一个函数，多层嵌套后直接求导极其复杂</li>
+            <li><strong style="color:var(--ink)">计算冗余</strong>：直接对每个参数单独求导会重复计算大量中间结果</li>
+          </ul>
+          <p style="margin-top:0.8rem">反向传播用<strong style="color:var(--ink)">动态规划</strong>思想：前向传播计算所有中间值，反向传播利用链式法则从后往前计算梯度，避免重复计算。</p>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">第一步</span>
+          <h3>➡️ 前向传播（Forward Pass）</h3>
+          <p>前向传播是数据从输入层流向输出层的过程：</p>
+          <ul>
+            <li>输入数据送入输入层</li>
+            <li>逐层计算：z = Wx + b，a = σ(z)（线性变换+激活）</li>
+            <li>每一层的中间结果（激活值a、预激活值z）都保存下来</li>
+            <li>最终输出层得到预测值ŷ</li>
+            <li>计算损失：L = Loss(ŷ, y)（预测值与真实值的差距）</li>
+          </ul>
+        </div>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">核心算法</span>
+        <h3>⬅️ 反向传播（Backward Pass）</h3>
+        <p>反向传播从输出层开始，利用<strong style="color:var(--ink)">链式法则（Chain Rule）</strong>逐层向输入层计算每个参数的梯度：</p>
+        <div class="formula-box">
+          ∂L/∂w = ∂L/∂a · ∂a/∂z · ∂z/∂w<br>
+          <span class="comment">链式法则：复合函数的导数 = 各层导数的乘积</span>
+        </div>
+        <div class="content-grid" style="margin-top:1rem">
+          <div>
+            <h4 style="color:var(--accent);margin-bottom:0.5rem">反向传播步骤：</h4>
+            <ul>
+              <li>计算输出层的误差：∂L/∂ŷ</li>
+              <li>从输出层→隐藏层→输入层反向传递误差</li>
+              <li>利用链式法则计算每个权重w和偏置b的梯度</li>
+              <li>关键：后一层的梯度已知，可以用来计算前一层的梯度</li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="color:var(--accent);margin-bottom:0.5rem">参数更新：</h4>
+            <ul>
+              <li>获得所有参数的梯度后，用梯度下降更新：w = w - lr × ∂L/∂w</li>
+              <li>梯度告诉我们"增加w会让损失变大还是变小"</li>
+              <li>沿着梯度反方向更新，减小损失</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">计算图</span>
+          <h3>📊 计算图与自动微分</h3>
+          <p>现代深度学习框架（PyTorch、TensorFlow）使用计算图来自动计算梯度：</p>
+          <ul>
+            <li><strong style="color:var(--ink)">计算图</strong>：将运算表示为有向无环图（DAG），节点是张量，边是运算</li>
+            <li><strong style="color:var(--ink)">自动微分（Autograd）</strong>：框架按照计算图自动执行反向传播</li>
+            <li>开发者只需写前向传播代码，框架自动构建反向传播逻辑</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">PyTorch实现</span>
+          <h3>🔥 PyTorch Autograd机制</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">requires_grad=True</strong>：标记需要计算梯度的张量</li>
+            <li><strong style="color:var(--ink)">loss.backward()</strong>：自动执行反向传播，计算所有梯度</li>
+            <li><strong style="color:var(--ink)">w.grad</strong>：访问权重w的梯度值∂L/∂w</li>
+            <li><strong style="color:var(--ink)">torch.no_grad()</strong>：推理时不需要梯度，节省内存和计算</li>
+          </ul>
+        </div>
+      </div>
+      <div class="code-block">
+        <span class="cm"># PyTorch反向传播示例</span><br>
+        <span class="kw">import</span> torch<br>
+        <span class="kw">import</span> torch.nn <span class="kw">as</span> nn<br><br>
+        <span class="cm"># 定义模型和损失</span><br>
+        model = nn.Linear(<span class="num">2</span>, <span class="num">1</span>)<br>
+        criterion = nn.MSELoss()<br>
+        optimizer = torch.optim.SGD(model.parameters(), lr=<span class="num">0.01</span>)<br><br>
+        <span class="cm"># 训练步骤</span><br>
+        x = torch.tensor([[<span class="num">1.0</span>, <span class="num">2.0</span>]])<br>
+        y = torch.tensor([[<span class="num">1.0</span>]])<br><br>
+        <span class="cm"># 1. 前向传播</span><br>
+        y_pred = model(x)<br>
+        loss = criterion(y_pred, y)<br><br>
+        <span class="cm"># 2. 反向传播 - 一行代码自动求导！</span><br>
+        optimizer.zero_grad()<br>
+        loss.backward()<br><br>
+        <span class="cm"># 3. 更新参数</span><br>
+        optimizer.step()
+      </div>
+    </div>
+
+    <div class="lesson" id="lessonD6">
+      <div class="lesson-header">
+        <div class="lesson-num dl6">DL6</div>
+        <div class="lesson-info">
+          <h2>激活函数：为神经网络注入非线性</h2>
+          <div class="lesson-dur">⏱ 29分04秒 · BV1RQL36cELq</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1RQL36cELq&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 没有激活函数，深度网络毫无意义</h4>
+        <p>如果没有非线性激活函数，无论堆叠多少层神经网络，都等价于一个单层线性变换（因为线性变换的复合还是线性变换）。激活函数是神经网络学习复杂、非线性模式的关键。</p>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">为什么需要</span>
+        <h3>🚫 没有激活函数的问题</h3>
+        <p>假设网络有两层，没有激活函数：</p>
+        <div class="formula-box">
+          h = W₁x + b₁<br>
+          y = W₂h + b₂ = W₂(W₁x + b₁) + b₂ = (W₂W₁)x + (W₂b₁ + b₂) = Wx + b<br>
+          <span class="comment">两层线性变换 = 一层线性变换！再多层也没用</span>
+        </div>
+        <p style="margin-top:1rem">加入非线性激活函数σ后：</p>
+        <div class="formula-box">
+          h = σ(W₁x + b₁)<br>
+          y = W₂h + b₂ = W₂σ(W₁x + b₁) + b₂<br>
+          <span class="comment">σ引入了非线性，多层网络才能表示复杂函数！</span>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">经典激活函数</span>
+          <h3>📉 Sigmoid与Tanh</h3>
+          <div class="formula-box" style="font-size:0.82rem;text-align:left">
+            Sigmoid: σ(z) = 1/(1+e⁻ᶻ)<br>
+            Tanh: tanh(z) = (eᶻ-e⁻ᶻ)/(eᶻ+e⁻ᶻ)
+          </div>
+          <ul>
+            <li><strong style="color:var(--ink)">Sigmoid</strong>：输出范围(0,1)，历史上常用作概率输出，但有严重问题</li>
+            <li><strong style="color:var(--ink)">Tanh</strong>：输出范围(-1,1)，零中心化，比Sigmoid稍好</li>
+          </ul>
+          <div class="key-point" style="margin-top:1rem">
+            <h4>⚠️ 梯度消失问题</h4>
+            <p>Sigmoid/Tanh在输入很大或很小时，导数趋近于0（饱和区）。反向传播时梯度从后往前层层相乘，越往前梯度越小，导致前面的层几乎不学习——这就是<strong style="color:var(--ink)">梯度消失（Vanishing Gradient）</strong>。</p>
+          </div>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">现代主流</span>
+          <h3>⚡ ReLU及其变体</h3>
+          <div class="formula-box" style="font-size:0.82rem;text-align:left">
+            ReLU: f(z) = max(0, z)<br>
+            Leaky ReLU: f(z) = max(αz, z), α=0.01<br>
+            ELU: f(z) = {z if z>0; α(eᶻ-1) if z≤0}
+          </div>
+          <ul>
+            <li><strong style="color:var(--ink)">ReLU</strong>：正区间梯度恒为1，不衰减；计算极快（只是比较）；目前最常用</li>
+            <li><strong style="color:var(--ink)">死亡ReLU问题</strong>：负区间梯度为0，某些神经元可能永远输出0（"死亡"），不再更新</li>
+            <li><strong style="color:var(--ink)">LeakyReLU/PReLU</strong>：负区间给一个很小的斜率，缓解死亡ReLU问题</li>
+            <li><strong style="color:var(--ink)">ELU</strong>：负区间有平滑的非线性，输出更接近零均值</li>
+          </ul>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">输出层激活</span>
+          <h3>🎯 Softmax：多分类输出</h3>
+          <p>Softmax用于多分类问题的输出层，将输出转换为概率分布：</p>
+          <div class="formula-box">
+            Softmax(zᵢ) = eᶻⁱ / Σⱼeᶻʲ<br>
+            <span class="comment">所有输出之和为1，每个值代表属于该类的概率</span>
+          </div>
+          <ul>
+            <li>二分类：输出层用Sigmoid（1个神经元，输出正类概率）</li>
+            <li>多分类：输出层用Softmax（N个神经元，输出各类概率）</li>
+            <li>回归：输出层不用激活函数（直接输出实数值）</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">选择建议</span>
+          <h3>✅ 如何选择激活函数？</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">隐藏层默认</strong>：优先用ReLU，简单高效</li>
+            <li><strong style="color:var(--ink)">遇到死亡ReLU</strong>：换用LeakyReLU或ELU</li>
+            <li><strong style="color:var(--ink)">不要用Sigmoid/Tanh</strong>（除了特殊场景如门控机制），梯度消失严重</li>
+            <li><strong style="color:var(--ink)">输出层</strong>：根据任务类型选择（Sigmoid/Softmax/无激活）</li>
+            <li><strong style="color:var(--ink)">Swish/GELU</strong>：新的激活函数，在Transformer等模型中表现更好</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson" id="lessonD7">
+      <div class="lesson-header">
+        <div class="lesson-num dl7">DL7</div>
+        <div class="lesson-info">
+          <h2>神经网络中的梯度下降</h2>
+          <div class="lesson-dur">⏱ 26分40秒 · BV1XbLh6mEru</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1XbLh6mEru&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 优化算法：让网络更快更好地学习</h4>
+        <p>梯度下降有不同的变体，从Batch GD到SGD到Adam，优化算法的发展让深度网络训练更快、更稳定。理解不同优化器的原理和差异，是调参的基础。</p>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">梯度下降变体</span>
+        <h3>📦 Batch GD / SGD / Mini-batch GD</h3>
+        <p>根据每次更新使用多少数据，梯度下降分为三种：</p>
+        <div class="content-grid" style="margin-top:1rem">
+          <div>
+            <h4 style="color:var(--accent);margin-bottom:0.5rem">Batch GD（批量梯度下降）</h4>
+            <ul>
+              <li>每次用<strong style="color:var(--ink)">全部训练数据</strong>计算梯度</li>
+              <li>梯度估计准确，但每次更新很慢</li>
+              <li>大数据集上内存可能放不下</li>
+              <li>无法在线学习，不适合超大数据</li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="color:var(--accent);margin-bottom:0.5rem">SGD（随机梯度下降）</h4>
+            <ul>
+              <li>每次用<strong style="color:var(--ink)">1个样本</strong>计算梯度并更新</li>
+              <li>更新快，但梯度估计噪声大</li>
+              <li>噪声有助于逃离局部最优</li>
+              <li>无法充分利用GPU并行计算</li>
+            </ul>
+          </div>
+        </div>
+        <div class="key-point" style="margin-top:1rem">
+          <h4>⭐ Mini-batch GD（小批量梯度下降）—— 实际最常用</h4>
+          <p>每次用一小批样本（batch size通常为32/64/128/256）计算梯度。兼顾了两者优点：</p>
+          <ul style="margin-top:0.5rem">
+            <li>梯度估计比单样本稳定，比全量数据快</li>
+            <li>可以充分利用GPU矩阵并行加速</li>
+            <li>适当的噪声帮助逃离局部最优和鞍点</li>
+          </ul>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">Batch Size</span>
+          <h3>📏 Batch Size的影响</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">小batch size（如32）</strong>：噪声大，泛化可能更好，但训练不稳定，需要更小的学习率</li>
+            <li><strong style="color:var(--ink)">大batch size（如1024）</strong>：梯度估计准确，训练稳定，但可能陷入尖锐局部最优，泛化较差</li>
+            <li><strong style="color:var(--ink)">常用值</strong>：32、64、128是最常见的选择，2的幂次便于GPU计算</li>
+            <li>batch size与学习率通常需要配合调整</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">动量法</span>
+          <h3>💨 Momentum：加速收敛</h3>
+          <p>SGD在沟壑（一个方向陡、另一个方向缓）地形中震荡前进，收敛很慢。Momentum引入物理中动量的概念：</p>
+          <ul>
+            <li>积累之前的梯度方向作为"速度"</li>
+            <li>一致方向的梯度被加速，震荡方向被抵消</li>
+            <li>像小球滚下山坡，累积动量越过局部小坑</li>
+            <li>通常设置momentum=0.9效果良好</li>
+          </ul>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">自适应优化器</span>
+          <h3>👑 Adam：自适应学习率+动量</h3>
+          <p>Adam（Adaptive Moment Estimation）是目前最常用的优化器，结合了：</p>
+          <ul>
+            <li><strong style="color:var(--ink)">动量（Momentum）</strong>：梯度的一阶矩估计（类似速度）</li>
+            <li><strong style="color:var(--ink)">自适应学习率</strong>：梯度的二阶矩估计（类似RMSprop），对每个参数调整学习率</li>
+            <li><strong style="color:var(--ink)">偏置修正</strong>：修正初始时刻的偏差</li>
+            <li>默认参数lr=0.001, betas=(0.9, 0.999)通常效果不错</li>
+            <li>收敛快、调参少，是入门首选</li>
+          </ul>
+          <div class="key-point" style="margin-top:1rem">
+            <h4>📌 优化器选择建议</h4>
+            <p>新手/快速实验用<strong style="color:var(--ink)">Adam</strong>；追求最优性能可尝试<strong style="color:var(--ink)">SGD+Momentum</strong>+学习率调度，往往最终精度更高。</p>
+          </div>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">学习率策略</span>
+          <h3>📉 学习率调度</h3>
+          <p>学习率是最重要的超参数。固定学习率不是最优选择：</p>
+          <ul>
+            <li><strong style="color:var(--ink)">学习率太大</strong>：损失震荡甚至发散，不收敛</li>
+            <li><strong style="color:var(--ink)">学习率太小</strong>：收敛极慢，可能卡在局部最优</li>
+            <li><strong style="color:var(--ink)">StepLR</strong>：每隔一定epoch乘以衰减因子</li>
+            <li><strong style="color:var(--ink)">CosineAnnealingLR</strong>：余弦退火，平滑降低学习率</li>
+            <li><strong style="color:var(--ink)">Warmup</strong>：训练开始时先从小学习率线性增大，防止初期不稳定</li>
+          </ul>
+        </div>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">优化挑战</span>
+        <h3>🗻 神经网络优化的困难</h3>
+        <div class="content-grid" style="margin-top:1rem">
+          <div>
+            <ul>
+              <li><strong style="color:var(--ink)">局部最优</strong>：损失曲面有很多极小值点，可能卡在非全局最优。但实际上高维空间中大部分局部最优都接近全局最优</li>
+              <li><strong style="color:var(--ink)">鞍点（Saddle Point）</strong>：梯度为0但不是极值点，在高维空间中鞍点比局部最优更常见，也更难逃脱</li>
+            </ul>
+          </div>
+          <div>
+            <ul>
+              <li><strong style="color:var(--ink)">梯度消失</strong>：深层网络中梯度反向传播时逐层衰减，前面层学不到东西（ReLU、残差连接、BatchNorm缓解）</li>
+              <li><strong style="color:var(--ink)">梯度爆炸</strong>：梯度层层相乘变得极大，导致参数更新发散（梯度裁剪、合适的初始化缓解）</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chapter-nav">
+      <a href="chapter4.html" class="prev">
+        <span>←</span><span><span class="nav-label">上一章</span><span class="nav-title">第4章 无监督学习</span></span>
+      </a>
+      <a href="chapter6.html" class="next">
+        <span><span class="nav-label">下一章</span><span class="nav-title">第6章 训练技巧实战 →</span></span>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <p>🧠 深度学习篇 · 神经网络基础 | © 2026 ML学习站</p>
+      <p style="margin-top:0.5rem"><a href="https://space.bilibili.com/291215958/lists/7984530?type=season" target="_blank" style="color:var(--accent)">前往B站观看原视频 →</a></p>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('a[href^="#"]').forEach(function(a){a.addEventListener('click',function(e){var h=this.getAttribute('href');if(h==='#')return;e.preventDefault();var t=document.querySelector(h);if(t)t.scrollIntoView({behavior:'smooth',block:'start'})})});
+    var vnavs=document.querySelectorAll('.vnav-item');var lessons=document.querySelectorAll('.lesson');window.addEventListener('scroll',function(){var cur=0;lessons.forEach(function(l,i){if(window.scrollY>=l.offsetTop-120)cur=i});vnavs.forEach(function(n,i){n.classList.toggle('active',i===cur)})});
+  </script>
+</body>
+</html>

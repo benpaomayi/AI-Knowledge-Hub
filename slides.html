@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PPT课件 - 机器学习入门教程</title>
+  <style>
+    :root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--bg4:#334155;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#38bdf8;--accent2:#818cf8;--accent3:#c084fc;--dl1:#f97316;--dl2:#f43f5e;--dl3:#fbbf24;--txf:#8b5cf6;--txf2:#6366f1;--txf3:#a78bfa;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif}
+    *{box-sizing:border-box;margin:0;padding:0}html,body{font-family:var(--font);background:var(--bg);color:var(--ink);min-height:100%}
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,14,26,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);padding:0 2rem;height:64px;display:flex;align-items:center}
+    .navbar-inner{max-width:1200px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+    .logo{display:flex;align-items:center;gap:10px;font-size:1.2rem;font-weight:700;color:var(--accent3)}
+    .logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent3),var(--accent));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .back-btn{padding:8px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:8px;color:var(--ink-muted);text-decoration:none;font-size:0.85rem;transition:all .3s}
+    .back-btn:hover{border-color:var(--accent3);color:var(--accent3)}
+    .hero{padding:100px 2rem 3rem;text-align:center;background:radial-gradient(ellipse at 50% 0%,rgba(192,132,252,0.08) 0%,transparent 60%)}
+    .hero h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;margin-bottom:1rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero p{color:var(--muted);font-size:1.1rem;max-width:600px;margin:0 auto 2rem;line-height:1.8}
+    .hero-meta{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;font-size:0.9rem;color:var(--muted)}
+    .main{max-width:1200px;margin:0 auto;padding:2rem}
+    .chapter-section{margin-bottom:3rem}
+    .chapter-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--rule)}
+    .chapter-num{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;color:var(--bg);flex-shrink:0}
+    .ch1 .chapter-num{background:linear-gradient(135deg,var(--success),var(--accent))}
+    .ch2 .chapter-num{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+    .ch3 .chapter-num{background:linear-gradient(135deg,var(--accent2),var(--accent3))}
+    .ch4 .chapter-num{background:linear-gradient(135deg,var(--accent3),var(--warning))}
+    .ch5 .chapter-num{background:linear-gradient(135deg,var(--dl1),var(--warning))}
+    .ch6 .chapter-num{background:linear-gradient(135deg,var(--dl2),var(--dl1))}
+    .ch7 .chapter-num{background:linear-gradient(135deg,var(--dl3),var(--dl1))}
+    .dl-divider{grid-column:1/-1;display:flex;align-items:center;gap:1.5rem;margin:1rem 0 0.5rem}
+    .dl-divider-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--dl1),transparent)}
+    .dl-divider-label{padding:8px 24px;background:linear-gradient(135deg,rgba(249,115,22,0.15),rgba(244,63,94,0.1));border:1px solid rgba(249,115,22,0.3);border-radius:50px;font-size:0.95rem;font-weight:700;color:var(--dl1);white-space:nowrap;letter-spacing:0.05em}
+    .chapter-title h2{font-size:1.4rem;font-weight:700}
+    .chapter-title p{font-size:0.85rem;color:var(--muted);margin-top:2px}
+    .ppt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem}
+    .ppt-card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:1.5rem;text-decoration:none;color:inherit;transition:all .3s;display:flex;flex-direction:column;gap:0.75rem;position:relative;overflow:hidden}
+    .ppt-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));opacity:0;transition:opacity .3s}
+    .ppt-card:hover{border-color:rgba(192,132,252,0.3);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.3)}
+    .ppt-card:hover::before{opacity:1}
+    .ppt-lesson-num{font-size:2.5rem;font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+    .ppt-card h3{font-size:1.05rem;font-weight:600;line-height:1.4}
+    .ppt-card .ppt-dur{font-size:0.82rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+    .ppt-card .ppt-slides{font-size:0.78rem;color:var(--accent);background:rgba(56,189,248,0.08);padding:3px 10px;border-radius:20px;display:inline-block;width:fit-content}
+    .ppt-card .ppt-bvid{font-size:0.72rem;color:var(--bg4);font-family:monospace}
+    .ppt-arrow{position:absolute;bottom:1.25rem;right:1.5rem;color:var(--accent3);font-size:1.2rem;opacity:0;transform:translateX(-4px);transition:all .3s}
+    .ppt-card:hover .ppt-arrow{opacity:1;transform:translateX(0)}
+    .ch5 .ppt-card::before{background:linear-gradient(90deg,var(--dl1),var(--warning))}
+    .ch5 .ppt-card:hover{border-color:rgba(249,115,22,0.3);box-shadow:0 12px 40px rgba(249,115,22,0.12)}
+    .ch5 .ppt-lesson-num{background:linear-gradient(135deg,var(--dl1),var(--warning));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .ch5 .ppt-slides{color:var(--dl1);background:rgba(249,115,22,0.08)}
+    .ch5 .ppt-arrow{color:var(--dl1)}
+    .ch6 .ppt-card::before{background:linear-gradient(90deg,var(--dl2),var(--dl1))}
+    .ch6 .ppt-card:hover{border-color:rgba(244,63,94,0.3);box-shadow:0 12px 40px rgba(244,63,94,0.12)}
+    .ch6 .ppt-lesson-num{background:linear-gradient(135deg,var(--dl2),var(--dl1));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .ch6 .ppt-slides{color:var(--dl2);background:rgba(244,63,94,0.08)}
+    .ch6 .ppt-arrow{color:var(--dl2)}
+    .ch7 .ppt-card::before{background:linear-gradient(90deg,var(--dl3),var(--dl1))}
+    .ch7 .ppt-card:hover{border-color:rgba(251,191,36,0.3);box-shadow:0 12px 40px rgba(251,191,36,0.12)}
+    .ch7 .ppt-lesson-num{background:linear-gradient(135deg,var(--dl3),var(--dl1));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .ch7 .ppt-slides{color:var(--dl3);background:rgba(251,191,36,0.08)}
+    .ch7 .ppt-arrow{color:var(--dl3)}
+    .summary-card{border-color:rgba(251,191,36,0.2)!important;background:linear-gradient(135deg,rgba(251,191,36,0.05),transparent)!important}
+    .summary-card .ppt-lesson-num{background:linear-gradient(135deg,var(--warning),var(--dl1))!important;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text!important}
+    .view-all{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:linear-gradient(135deg,var(--accent3),var(--accent2));color:var(--bg);border-radius:10px;text-decoration:none;font-weight:600;font-size:0.9rem;margin-top:1rem;transition:all .3s}
+    .view-all:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(129,140,248,0.3)}
+    footer{background:var(--bg2);border-top:1px solid var(--rule);padding:2rem;margin-top:2rem;text-align:center;color:var(--muted);font-size:0.82rem}
+    @media(max-width:768px){.ppt-grid{grid-template-columns:1fr}.navbar{padding:0 1rem}.hero{padding:90px 1rem 2rem}.main{padding:1rem}}
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="ml-learning-site.html" class="logo"><div class="logo-icon">📊</div><span>PPT课件</span></a>
+      <a href="ml-learning-site.html" class="back-btn">← 返回学习站</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <h1>📊 课程PPT课件</h1>
+    <p>34集视频每集一份独立详细PPT，幻灯片式讲解，支持键盘左右键翻页，适合复习和演示</p>
+    <div class="hero-meta">
+      <span>📺 34份PPT</span><span>📄 每集25-35页幻灯片</span><span>⌨️ 键盘翻页</span><span>🔥 含深度学习篇</span>
+    </div>
+  </section>
+
+  <div class="main">
+    <div class="chapter-section ch1">
+      <div class="chapter-header">
+        <div class="chapter-num">1</div>
+        <div class="chapter-title"><h2>机器学习基础概念</h2><p>第1-3集 · 入门篇</p></div>
+      </div>
+      <div class="ppt-grid">
+        <a href="ppt-01.html" class="ppt-card">
+          <div class="ppt-lesson-num">01</div>
+          <h3>什么是智能</h3>
+          <div class="ppt-dur">⏱ 12分59秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV13bZYBREgr</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-02.html" class="ppt-card">
+          <div class="ppt-lesson-num">02</div>
+          <h3>机器学习正式定义</h3>
+          <div class="ppt-dur">⏱ 18分10秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1uPdBZYEfq</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-03.html" class="ppt-card">
+          <div class="ppt-lesson-num">03</div>
+          <h3>机器学习的三大类型</h3>
+          <div class="ppt-dur">⏱ 21分22秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV13e41167ZS</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="chapter-section ch2">
+      <div class="chapter-header">
+        <div class="chapter-num">2</div>
+        <div class="chapter-title"><h2>线性回归与优化</h2><p>第4-8集 · 核心篇</p></div>
+      </div>
+      <div class="ppt-grid">
+        <a href="ppt-04.html" class="ppt-card">
+          <div class="ppt-lesson-num">04</div>
+          <h3>线性回归——机器学习的第一个模型</h3>
+          <div class="ppt-dur">⏱ 22分06秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1G6d2B8Emg</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-05.html" class="ppt-card">
+          <div class="ppt-lesson-num">05</div>
+          <h3>梯度下降——模型自己学会找最优参数</h3>
+          <div class="ppt-dur">⏱ 24分32秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1w5dYBtE2b</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-06.html" class="ppt-card">
+          <div class="ppt-lesson-num">06</div>
+          <h3>数据预处理</h3>
+          <div class="ppt-dur">⏱ 22分35秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1bLdYBkEvW</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-07.html" class="ppt-card">
+          <div class="ppt-lesson-num">07</div>
+          <h3>线性回归模型评估</h3>
+          <div class="ppt-dur">⏱ 24分18秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1QddYBcE7w</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-08.html" class="ppt-card">
+          <div class="ppt-lesson-num">08</div>
+          <h3>欠拟合与过拟合</h3>
+          <div class="ppt-dur">⏱ 26分38秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1r9dYBiEjA</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="chapter-section ch3">
+      <div class="chapter-header">
+        <div class="chapter-num">3</div>
+        <div class="chapter-title"><h2>分类算法与集成学习</h2><p>第9-12集 · 进阶篇</p></div>
+      </div>
+      <div class="ppt-grid">
+        <a href="ppt-09.html" class="ppt-card">
+          <div class="ppt-lesson-num">09</div>
+          <h3>逻辑回归——最常用的分类模型</h3>
+          <div class="ppt-dur">⏱ 24分45秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1j1dYBaEeA</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-10.html" class="ppt-card">
+          <div class="ppt-lesson-num">10</div>
+          <h3>决策树——if...else就能懂的算法</h3>
+          <div class="ppt-dur">⏱ 18分25秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1vddYBcEAD</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-11.html" class="ppt-card">
+          <div class="ppt-lesson-num">11</div>
+          <h3>随机森林——决策树模型升级版</h3>
+          <div class="ppt-dur">⏱ 16分22秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1wBdYBmE6Y</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-12.html" class="ppt-card">
+          <div class="ppt-lesson-num">12</div>
+          <h3>集成学习Boosting——XGBoost/LightGBM/CatBoost</h3>
+          <div class="ppt-dur">⏱ 23分50秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1QdQJBTEGV</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="chapter-section ch4">
+      <div class="chapter-header">
+        <div class="chapter-num">4</div>
+        <div class="chapter-title"><h2>无监督学习与课程总结</h2><p>第13-15集 · 总结篇</p></div>
+      </div>
+      <div class="ppt-grid">
+        <a href="ppt-13.html" class="ppt-card">
+          <div class="ppt-lesson-num">13</div>
+          <h3>K-Means聚类</h3>
+          <div class="ppt-dur">⏱ 17分26秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV17Nd5BrEQS</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-14.html" class="ppt-card">
+          <div class="ppt-lesson-num">14</div>
+          <h3>PCA主成分分析——降维与可视化</h3>
+          <div class="ppt-dur">⏱ 22分19秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1YMoDBuEm2</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-15.html" class="ppt-card">
+          <div class="ppt-lesson-num">15</div>
+          <h3>课程总结与深度学习展望</h3>
+          <div class="ppt-dur">⏱ 22分34秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1GsofB8Eej</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:1.5rem;margin:2rem 0">
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--dl1),transparent)"></div>
+      <div style="padding:8px 24px;background:linear-gradient(135deg,rgba(249,115,22,0.15),rgba(244,63,94,0.1));border:1px solid rgba(249,115,22,0.3);border-radius:50px;font-size:0.95rem;font-weight:700;color:var(--dl1);white-space:nowrap;letter-spacing:0.05em">🔥 深度学习篇 🔥</div>
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--dl1),transparent)"></div>
+    </div>
+
+    <div class="chapter-section ch5">
+      <div class="chapter-header">
+        <div class="chapter-num">5</div>
+        <div class="chapter-title"><h2>神经网络基础</h2><p>DL第1-7集 · 深度学习入门</p></div>
+      </div>
+      <div class="ppt-grid">
+        <a href="ppt-16.html" class="ppt-card">
+          <div class="ppt-lesson-num">16</div>
+          <h3>深度学习第一课：AI发展简史</h3>
+          <div class="ppt-dur">⏱ 23分44秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1rARgBYE3J</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-17.html" class="ppt-card">
+          <div class="ppt-lesson-num">17</div>
+          <h3>深度学习环境安装</h3>
+          <div class="ppt-dur">⏱ 11分14秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1db9dBEETc</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-18.html" class="ppt-card">
+          <div class="ppt-lesson-num">18</div>
+          <h3>感知机：深度学习的Hello World</h3>
+          <div class="ppt-dur">⏱ 20分00秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1FW9ZBhEEN</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-19.html" class="ppt-card">
+          <div class="ppt-lesson-num">19</div>
+          <h3>从MLP到神经网络架构</h3>
+          <div class="ppt-dur">⏱ 16分18秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1XoRJB7ERe</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-20.html" class="ppt-card">
+          <div class="ppt-lesson-num">20</div>
+          <h3>反向传播：海量参数如何训练</h3>
+          <div class="ppt-dur">⏱ 35分47秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1Lg5T6SEmP</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-21.html" class="ppt-card">
+          <div class="ppt-lesson-num">21</div>
+          <h3>激活函数：为神经网络注入灵魂</h3>
+          <div class="ppt-dur">⏱ 29分04秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1RQL36cELq</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-22.html" class="ppt-card">
+          <div class="ppt-lesson-num">22</div>
+          <h3>梯度下降：神经网络优化算法</h3>
+          <div class="ppt-dur">⏱ 26分40秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1XbLh6mEru</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-23.html" class="ppt-card" style="border-color:rgba(251,191,36,0.25);background:linear-gradient(135deg,rgba(251,191,36,0.05),var(--bg2))">
+          <div class="ppt-lesson-num" style="background:linear-gradient(135deg,var(--warning),var(--dl1));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">★</div>
+          <h3>第5章知识点总结</h3>
+          <div class="ppt-dur">⏱ 章节复习</div>
+          <span class="ppt-slides" style="color:var(--warning);background:rgba(251,191,36,0.1)">📋 复习总结</span>
+          <span class="ppt-bvid">神经网络基础</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="chapter-section ch6">
+      <div class="chapter-header">
+        <div class="chapter-num">6</div>
+        <div class="chapter-title"><h2>训练技巧与PyTorch实战</h2><p>DL第8-14集 · 训练实战篇</p></div>
+      </div>
+      <div class="ppt-grid">
+        <a href="ppt-24.html" class="ppt-card">
+          <div class="ppt-lesson-num">24</div>
+          <h3>损失函数：告诉模型错了多少</h3>
+          <div class="ppt-dur">⏱ 15分50秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1jgGB6PE7S</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-25.html" class="ppt-card">
+          <div class="ppt-lesson-num">25</div>
+          <h3>PyTorch实战：识别手写数字MNIST</h3>
+          <div class="ppt-dur">⏱ 24分10秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1uPGj6fEQh</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-26.html" class="ppt-card">
+          <div class="ppt-lesson-num">26</div>
+          <h3>学习率：小小参数大影响</h3>
+          <div class="ppt-dur">⏱ 24分16秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1NMVn6vE7o</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-27.html" class="ppt-card">
+          <div class="ppt-lesson-num">27</div>
+          <h3>参数初始化：调参高手的秘诀</h3>
+          <div class="ppt-dur">⏱ 17分14秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV17i7Q6HEFt</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-28.html" class="ppt-card">
+          <div class="ppt-lesson-num">28</div>
+          <h3>归一化：Transformer都在用的技巧</h3>
+          <div class="ppt-dur">⏱ 16分49秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1X2Ex6rEu9</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-29.html" class="ppt-card">
+          <div class="ppt-lesson-num">29</div>
+          <h3>过拟合克星：深度学习正则化</h3>
+          <div class="ppt-dur">⏱ 19分13秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1DHJ76SEmj</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-30.html" class="ppt-card">
+          <div class="ppt-lesson-num">30</div>
+          <h3>如何训练一个深度学习模型</h3>
+          <div class="ppt-dur">⏱ 26分28秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1FmJJ6rEqS</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-31.html" class="ppt-card" style="border-color:rgba(251,191,36,0.25);background:linear-gradient(135deg,rgba(251,191,36,0.05),var(--bg2))">
+          <div class="ppt-lesson-num" style="background:linear-gradient(135deg,var(--warning),var(--dl2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">★</div>
+          <h3>第6章知识点总结</h3>
+          <div class="ppt-dur">⏱ 章节复习</div>
+          <span class="ppt-slides" style="color:var(--warning);background:rgba(251,191,36,0.1)">📋 复习总结</span>
+          <span class="ppt-bvid">训练技巧实战</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="chapter-section ch7">
+      <div class="chapter-header">
+        <div class="chapter-num">7</div>
+        <div class="chapter-title"><h2>CNN计算机视觉与NLP大模型</h2><p>DL第15-19集 · 前沿方向</p></div>
+      </div>
+      <div class="ppt-grid">
+        <a href="ppt-32.html" class="ppt-card">
+          <div class="ppt-lesson-num">32</div>
+          <h3>CNN第一课：CV为什么需要CNN</h3>
+          <div class="ppt-dur">⏱ 21分45秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1TtjJ6CEbe</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-33.html" class="ppt-card">
+          <div class="ppt-lesson-num">33</div>
+          <h3>卷积层：如何提取图像特征</h3>
+          <div class="ppt-dur">⏱ 18分32秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1NR7L6YEiF</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-34.html" class="ppt-card">
+          <div class="ppt-lesson-num">34</div>
+          <h3>CNN：池化层、分类与代码示例</h3>
+          <div class="ppt-dur">⏱ 15分07秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1fW7L6XEiv</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-35.html" class="ppt-card">
+          <div class="ppt-lesson-num">35</div>
+          <h3>残差连接：CNN和Transformer的捷径</h3>
+          <div class="ppt-dur">⏱ 33分26秒</div>
+          <span class="ppt-slides">📄 详细课件</span>
+          <span class="ppt-bvid">BV1LGMw6HEEB</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-36.html" class="ppt-card" style="border-color:rgba(251,191,36,0.3);background:linear-gradient(135deg,rgba(251,191,36,0.06),var(--bg2))">
+          <div class="ppt-lesson-num" style="background:linear-gradient(135deg,var(--dl3),var(--dl2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">36</div>
+          <h3>🎉 NLP概述：从规则到Transformer与大模型</h3>
+          <div class="ppt-dur">⏱ 25分58秒 · 最终集</div>
+          <span class="ppt-slides" style="color:var(--dl3);background:rgba(251,191,36,0.1)">🏆 完结课件</span>
+          <span class="ppt-bvid">BV1RMMu6TEpu</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:1.5rem;margin:3rem 0 2rem">
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--txf),transparent)"></div>
+      <div style="padding:8px 24px;background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(99,102,241,0.1));border:1px solid rgba(139,92,246,0.3);border-radius:50px;font-size:0.95rem;font-weight:700;color:var(--txf);white-space:nowrap;letter-spacing:0.05em">👑 专题精讲 👑</div>
+      <div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--txf),transparent)"></div>
+    </div>
+
+    <div class="chapter-section">
+      <div class="chapter-header">
+        <div class="chapter-num" style="background:linear-gradient(135deg,var(--txf),var(--txf2))">★</div>
+        <div><h3 style="font-size:1.3rem">Transformer架构深度解析</h3><p style="color:var(--muted);font-size:0.9rem;margin-top:4px">41页幻灯片 · 从RNN瓶颈到Self-Attention到BERT/GPT家族，大模型基石的完整剖析</p></div>
+      </div>
+      <div class="ppt-grid">
+        <a href="ppt-transformer.html" class="ppt-card" style="border-color:rgba(139,92,246,0.35);background:linear-gradient(135deg,rgba(139,92,246,0.08),var(--bg2));position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;right:0;width:80px;height:80px;background:radial-gradient(circle,rgba(139,92,246,0.2),transparent 70%);pointer-events:none"></div>
+          <div class="ppt-lesson-num" style="background:linear-gradient(135deg,var(--txf),var(--txf3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:2.5rem">👑</div>
+          <h3>Transformer：Attention Is All You Need</h3>
+          <div class="ppt-dur">⏱ 专题精讲 · 41页幻灯片</div>
+          <span class="ppt-slides" style="color:var(--txf);background:rgba(139,92,246,0.15)">🔥 深度专题</span>
+          <span class="ppt-bvid">Self-Attention · Multi-Head · Encoder-Decoder · BERT/GPT</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+        <a href="ppt-deepseek.html" class="ppt-card" style="border-color:rgba(6,182,212,0.35);background:linear-gradient(135deg,rgba(6,182,212,0.08),var(--bg2));position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;right:0;width:80px;height:80px;background:radial-gradient(circle,rgba(6,182,212,0.2),transparent 70%);pointer-events:none"></div>
+          <div class="ppt-lesson-num" style="background:linear-gradient(135deg,#06b6d4,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:2.5rem">🐋</div>
+          <h3>DeepSeek-V3.2-Exp 架构深度解析</h3>
+          <div class="ppt-dur">⏱ 论文精读 · 49页幻灯片</div>
+          <span class="ppt-slides" style="color:#06b6d4;background:rgba(6,182,212,0.15)">📄 论文深解</span>
+          <span class="ppt-bvid">MLA推导 · MoE架构 · MTP · FP8训练 · Aux-Loss-Free</span>
+          <span class="ppt-arrow">→</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2026 ML学习站 · 本站仅作学习整理用途</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>第6章总结 - 训练技巧与PyTorch实战</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#f43f5e;--accent2:#e11d48;--accent3:#fb7185;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide{position:absolute;top:0;left:0;width:100%;height:100%;padding:4rem 5rem;display:none;flex-direction:column;overflow-y:auto;background:var(--bg)}
+.slide.active{display:flex}
+.slide.prev{display:none}
+.topnav{position:absolute;top:0;left:0;right:0;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;background:rgba(10,14,26,0.8);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule);z-index:100}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.9rem;transition:color 0.2s}
+.topnav a:hover{color:var(--accent)}
+h1{font-size:3rem;font-weight:800;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2{font-size:2.2rem;font-weight:700;margin-bottom:1.2rem;color:var(--ink)}
+h3{font-size:1.4rem;font-weight:600;margin-bottom:0.8rem;color:var(--accent3)}
+p{font-size:1.15rem;line-height:1.8;color:var(--ink2);margin-bottom:1rem}
+.muted{color:var(--muted)}
+.cover-slide{justify-content:center;align-items:center;text-align:center;padding:0 5rem}
+.cover-slide h1{font-size:4rem}
+.cover-sub{font-size:1.4rem;color:var(--muted);margin-bottom:2rem}
+.cover-tag{display:inline-block;padding:0.5rem 1.2rem;border-radius:2rem;background:var(--bg3);color:var(--accent3);font-size:0.95rem;margin-bottom:2rem;font-weight:600}
+.cover-badge{display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.5rem;border-radius:0.8rem;background:linear-gradient(135deg,var(--accent2),var(--accent));color:white;font-size:1.1rem;font-weight:700;margin-top:1rem}
+.hbox{display:flex;gap:2rem;flex:1;align-items:stretch}
+.card{flex:1;background:var(--bg2);border:1px solid var(--rule);border-radius:1rem;padding:1.8rem;transition:border-color 0.3s}
+.card:hover{border-color:var(--accent)}
+.card.accent{border-color:var(--accent);background:linear-gradient(135deg,rgba(244,63,94,0.1),rgba(225,29,72,0.05))}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:2rem;flex:1}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;flex:1}
+.formula-box{background:var(--bg2);border:1px solid var(--accent);border-radius:1rem;padding:2rem;text-align:center;margin:1rem 0;font-size:1.4rem;font-family:var(--mono);color:var(--accent3)}
+.flow{display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap;justify-content:center;margin:1.5rem 0}
+.flow-step{background:var(--bg3);border:1px solid var(--rule);border-radius:0.8rem;padding:0.8rem 1.2rem;font-weight:600;color:var(--ink2);font-size:1rem}
+.flow-step.accent{background:var(--accent);color:white;border-color:var(--accent)}
+.flow-arrow{color:var(--accent);font-size:1.5rem;font-weight:700}
+.tags{display:flex;flex-wrap:wrap;gap:0.6rem;margin:0.5rem 0}
+.tag{padding:0.4rem 0.9rem;border-radius:2rem;background:var(--bg3);color:var(--ink2);font-size:0.85rem;border:1px solid var(--rule)}
+.tag.accent{background:var(--accent);color:white;border-color:var(--accent)}
+.tag.success{background:var(--success);color:#0a0e1a}
+.tag.warning{background:var(--warning);color:#0a0e1a}
+.tag.danger{background:var(--danger);color:white}
+.big-num{font-size:4rem;font-weight:900;background:linear-gradient(135deg,var(--accent3),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.code-block{background:#0d1117;border:1px solid var(--rule);border-radius:0.8rem;padding:1.2rem 1.5rem;font-family:var(--mono);font-size:0.9rem;line-height:1.7;color:#e6edf3;overflow-x:auto;margin:1rem 0;white-space:pre}
+.code-kw{color:#ff7b72}
+.code-fn{color:#d2a8ff}
+.code-str{color:#a5d6ff}
+.code-cm{color:#8b949e}
+.code-num{color:#79c0ff}
+ul,ol{margin-left:1.5rem;margin-bottom:1rem}
+li{font-size:1.05rem;line-height:1.8;color:var(--ink2);margin-bottom:0.5rem}
+li::marker{color:var(--accent)}
+.table{width:100%;border-collapse:collapse;margin:1rem 0}
+.table th{background:var(--bg3);padding:0.8rem 1rem;text-align:left;font-weight:600;color:var(--accent3);border-bottom:2px solid var(--accent)}
+.table td{padding:0.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink2);font-size:0.95rem}
+.table tr:hover td{background:var(--bg2)}
+.nav-btn{position:fixed;bottom:2rem;z-index:200;width:3rem;height:3rem;border-radius:50%;border:1px solid var(--rule);background:var(--bg2);color:var(--ink);font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;backdrop-filter:blur(10px)}
+.nav-btn:hover{background:var(--accent);border-color:var(--accent)}
+#prev{left:2rem}
+#next{right:2rem}
+.progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent3),var(--accent),var(--accent2));z-index:300;transition:width 0.3s}
+.end-slide{justify-content:center;align-items:center;text-align:center}
+.end-slide h2{font-size:3.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.chapter-badge{display:inline-block;padding:0.4rem 1rem;border-radius:2rem;background:linear-gradient(135deg,var(--accent2),var(--accent));color:white;font-size:0.85rem;font-weight:700;margin-bottom:1rem}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.grid-7{display:grid;grid-template-columns:repeat(7,1fr);gap:0.8rem;margin:1.5rem 0}
+.episode-card{background:var(--bg2);border:1px solid var(--rule);border-radius:0.8rem;padding:1rem;text-align:center;transition:all 0.3s}
+.episode-card:hover{border-color:var(--accent);transform:translateY(-4px)}
+.episode-num{font-size:1.8rem;font-weight:800;color:var(--accent3)}
+.episode-title{font-size:0.8rem;color:var(--muted);margin-top:0.3rem;line-height:1.3}
+.checklist-item{display:flex;align-items:flex-start;gap:0.8rem;padding:0.7rem 0;border-bottom:1px solid var(--rule)}
+.checklist-icon{color:var(--success);font-size:1.2rem;flex-shrink:0;margin-top:0.1rem}
+.decision-tree{background:var(--bg2);border-radius:1rem;padding:1.5rem;border:1px solid var(--rule);margin:1rem 0}
+.tree-node{padding:0.6rem 1rem;margin:0.3rem 0;border-radius:0.5rem;font-weight:600}
+.tree-question{background:var(--bg3);color:var(--accent3)}
+.tree-answer{background:var(--accent);color:white;margin-left:2rem}
+.tree-answer.alt{background:var(--bg3);color:var(--ink2);margin-left:2rem}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+
+<div class="topnav">
+  <a href="slides.html" style="font-weight:600;color:var(--accent3)">📊 PPT课件</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="chapter6.html">回到视频页</a>
+    <a href="ppt-30.html">← 上一集</a>
+    <a href="ppt-32.html">下一集 →</a>
+  </div>
+</div>
+
+<div class="slide cover-slide active">
+  <div class="cover-tag">第6章 · 总结</div>
+  <h1>训练技巧与PyTorch实战</h1>
+  <p class="cover-sub">核心知识点总结与代码模板</p>
+  <div class="cover-badge">🧠 7集内容回顾 · 实战指南</div>
+  <p style="margin-top:3rem;color:var(--muted);font-size:1rem">按 → 或空格开始 · 支持触屏滑动 · 点击左右两侧翻页</p>
+</div>
+
+<div class="slide">
+  <div class="chapter-badge">导览</div>
+  <h2>本章总结内容</h2>
+  <p class="muted">系统梳理第6章所有核心知识点</p>
+  <div class="two-col" style="margin-top:2rem">
+    <div class="card accent">
+      <h3>📋 理论回顾</h3>
+      <ul>
+        <li>7集内容全景回顾</li>
+        <li>损失函数选择决策树</li>
+        <li>归一化方法对比</li>
+        <li>正则化方法组合拳</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>⚡ 实战工具</h3>
+      <ul>
+        <li>PyTorch核心API回顾</li>
+        <li>训练循环pseudo-code模板</li>
+        <li>训练问题诊断表</li>
+        <li>超参数调优checklist</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <h2>第6章 7集内容全景回顾</h2>
+  <p class="muted">从损失函数到完整训练流程</p>
+  <div class="grid-7" style="margin-top:2rem">
+    <div class="episode-card">
+      <div class="episode-num">08</div>
+      <div class="episode-title">损失函数</div>
+    </div>
+    <div class="episode-card">
+      <div class="episode-num">09</div>
+      <div class="episode-title">MNIST实战</div>
+    </div>
+    <div class="episode-card">
+      <div class="episode-num">10</div>
+      <div class="episode-title">学习率</div>
+    </div>
+    <div class="episode-card">
+      <div class="episode-num">11</div>
+      <div class="episode-title">参数初始化</div>
+    </div>
+    <div class="episode-card" style="border-color:var(--accent)">
+      <div class="episode-num" style="color:var(--accent)">12</div>
+      <div class="episode-title">归一化/BN</div>
+    </div>
+    <div class="episode-card" style="border-color:var(--accent)">
+      <div class="episode-num" style="color:var(--accent)">13</div>
+      <div class="episode-title">正则化/Dropout</div>
+    </div>
+    <div class="episode-card" style="border-color:var(--accent)">
+      <div class="episode-num" style="color:var(--accent)">14</div>
+      <div class="episode-title">训练DL模型</div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:1.5rem">
+    <div class="flow">
+      <div class="flow-step">损失函数</div><span class="flow-arrow">→</span>
+      <div class="flow-step">实战上手</div><span class="flow-arrow">→</span>
+      <div class="flow-step">学习率调优</div><span class="flow-arrow">→</span>
+      <div class="flow-step">初始化</div><span class="flow-arrow">→</span>
+      <div class="flow-step accent">归一化</div><span class="flow-arrow">→</span>
+      <div class="flow-step accent">正则化</div><span class="flow-arrow">→</span>
+      <div class="flow-step accent">完整流程</div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <h2>第08-11集核心回顾</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3>📉 损失函数</h3>
+      <ul>
+        <li><strong>回归</strong>：MSE / MAE / Huber</li>
+        <li><strong>分类</strong>：CrossEntropy（含softmax）</li>
+        <li><strong>多标签</strong>：BCEWithLogitsLoss</li>
+      </ul>
+      <div class="tags">
+        <span class="tag accent">MSE</span>
+        <span class="tag">CrossEntropy</span>
+        <span class="tag">Huber</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>🔢 MNIST实战</h3>
+      <ul>
+        <li>DataLoader数据加载</li>
+        <li>MLP模型定义nn.Module</li>
+        <li>训练循环：forward→loss→backward→step</li>
+        <li>准确率评估</li>
+      </ul>
+      <div class="tags">
+        <span class="tag accent">nn.Module</span>
+        <span class="tag">DataLoader</span>
+      </div>
+    </div>
+  </div>
+  <div class="two-col" style="margin-top:1.5rem">
+    <div class="card">
+      <h3>📈 学习率</h3>
+      <ul>
+        <li>最重要的超参数，默认1e-3</li>
+        <li>调度器：StepLR / CosineAnnealing / Warmup</li>
+        <li>LR Finder找最佳学习率</li>
+      </ul>
+      <div class="tags">
+        <span class="tag accent">Adam默认1e-3</span>
+        <span class="tag">Warmup</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>⚙️ 参数初始化</h3>
+      <ul>
+        <li>Xavier/Glorot：tanh/sigmoid</li>
+        <li>He/Kaiming：ReLU系列（默认推荐）</li>
+        <li>避免全零/过大/过小初始化</li>
+      </ul>
+      <div class="tags">
+        <span class="tag accent">Kaiming</span>
+        <span class="tag">Xavier</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <h2>第12-14集核心回顾</h2>
+  <div class="three-col">
+    <div class="card accent">
+      <div class="card-icon">🔄</div>
+      <h3>归一化/BatchNorm</h3>
+      <ul>
+        <li>解决ICS问题，加速收敛</li>
+        <li>BN：对mini-batch标准化</li>
+        <li>LayerNorm：Transformer必备</li>
+        <li>PyTorch: nn.BatchNorm1d/2d</li>
+      </ul>
+    </div>
+    <div class="card accent">
+      <div class="card-icon">🛡️</div>
+      <h3>正则化/Dropout</h3>
+      <p>随机关闭神经元，防过拟合</p>
+      <ul>
+        <li>L2/Weight Decay：默认加</li>
+        <li>Dropout: p=0.5(隐藏层)</li>
+        <li>数据增强：CV最有效</li>
+        <li>Early Stopping</li>
+      </ul>
+    </div>
+    <div class="card accent">
+      <div class="card-icon">🏋️</div>
+      <h3>训练DL模型</h3>
+      <ul>
+        <li>完整8步训练流程</li>
+        <li>训练曲线诊断问题</li>
+        <li>先过拟合小数据Sanity Check</li>
+        <li>调参优先级：LR > batch size</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <h2>损失函数选择决策树</h2>
+  <div class="decision-tree">
+    <div class="tree-node tree-question">❓ 你的任务类型是什么？</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:0.8rem">
+      <div>
+        <div class="tree-node tree-answer">回归（预测连续值）</div>
+        <div style="margin-left:2rem;margin-top:0.5rem">
+          <div class="tree-node tree-question" style="font-size:0.95rem">有异常值？</div>
+          <div class="tree-node tree-answer alt" style="font-size:0.9rem;background:var(--success);color:#0a0e1a">→ Huber Loss</div>
+          <div class="tree-node tree-answer alt" style="font-size:0.9rem">→ MSE Loss</div>
+        </div>
+      </div>
+      <div>
+        <div class="tree-node tree-answer">分类（预测离散类别）</div>
+        <div style="margin-left:2rem;margin-top:0.5rem">
+          <div class="tree-node tree-question" style="font-size:0.95rem">单标签/多标签？</div>
+          <div class="tree-node tree-answer alt" style="font-size:0.9rem;background:var(--accent);color:white">→ CrossEntropyLoss（单标签多分类）</div>
+          <div class="tree-node tree-answer alt" style="font-size:0.9rem;background:var(--warning);color:#0a0e1a">→ BCEWithLogitsLoss（多标签）</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:1.5rem">
+    <h3>💡 PyTorch快速参考</h3>
+    <div class="code-block"><span class="code-cm"># 回归</span>
+criterion = nn.MSELoss()
+<span class="code-cm"># 分类（记得最后一层不要加softmax!）</span>
+criterion = nn.CrossEntropyLoss()
+<span class="code-cm"># 多标签分类</span>
+criterion = nn.BCEWithLogitsLoss()</div>
+  </div>
+</div>
+
+<div class="slide">
+  <h2>PyTorch核心API回顾</h2>
+  <div class="three-col">
+    <div class="card">
+      <h3>🏗️ 模型定义</h3>
+      <div class="code-block" style="font-size:0.8rem"><span class="code-kw">class</span> <span class="code-fn">Model</span>(nn.Module):
+    <span class="code-kw">def</span> <span class="code-fn">__init__</span>(self):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(784, 256),
+            nn.ReLU(),
+            nn.Linear(256, 10)
+        )
+    <span class="code-kw">def</span> <span class="code-fn">forward</span>(self, x):
+        <span class="code-kw">return</span> self.net(x)</div>
+    </div>
+    <div class="card">
+      <h3>📦 数据加载</h3>
+      <div class="code-block" style="font-size:0.8rem"><span class="code-kw">from</span> torch.utils.data <span class="code-kw">import</span> DataLoader
+
+train_loader = DataLoader(
+    train_dataset,
+    batch_size=64,
+    shuffle=<span class="code-num">True</span>
+)
+<span class="code-kw">for</span> x, y <span class="code-kw">in</span> train_loader:
+    <span class="code-cm"># x: (B, 784), y: (B,)</span>
+    ...</div>
+    </div>
+    <div class="card">
+      <h3>⚡ 优化器</h3>
+      <div class="code-block" style="font-size:0.8rem"><span class="code-kw">import</span> torch.optim <span class="code-kw">as</span> optim
+
+model = Model()
+optimizer = optim.Adam(
+    model.parameters(),
+    lr=<span class="code-num">1e-3</span>,
+    weight_decay=<span class="code-num">1e-4</span>
+)
+criterion = nn.CrossEntropyLoss()</div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <h2>PyTorch核心API回顾（续）</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3>🔄 训练核心步骤</h3>
+      <div class="code-block" style="font-size:0.85rem">model.train()
+<span class="code-kw">for</span> x, y <span class="code-kw">in</span> train_loader:
+    optimizer.zero_grad()      <span class="code-cm"># ① 清零梯度</span>
+    logits = model(x)          <span class="code-cm"># ② 前向传播</span>
+    loss = criterion(logits, y)<span class="code-cm"># ③ 计算loss</span>
+    loss.backward()            <span class="code-cm"># ④ 反向传播</span>
+    optimizer.step()           <span class="code-cm"># ⑤ 更新参数</span></div>
+    </div>
+    <div class="card">
+      <h3>📊 评估模式</h3>
+      <div class="code-block" style="font-size:0.85rem">model.eval()
+<span class="code-kw">with</span> torch.no_grad():
+    <span class="code-kw">for</span> x, y <span class="code-kw">in</span> val_loader:
+        logits = model(x)
+        pred = logits.argmax(dim=1)
+        acc = (pred == y).float().mean()
+        
+<span class="code-cm"># 评估完记得切回train模式!</span>
+model.train()</div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:1.5rem">
+    <h3>⚠️ 两个最容易犯的错误</h3>
+    <div class="two-col">
+      <div>
+        <h3 style="color:var(--danger);font-size:1.1rem">❌ 忘记zero_grad()</h3>
+        <p style="font-size:0.95rem">梯度会累加，导致参数更新错误</p>
+      </div>
+      <div>
+        <h3 style="color:var(--danger);font-size:1.1rem">❌ 忘记model.eval()</h3>
+        <p style="font-size:0.95rem">Dropout/BN在推理时行为不同，结果随机</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <h2>训练循环Pseudo-code模板</h2>
+  <div class="code-block" style="font-size:0.95rem"><span class="code-kw">def</span> <span class="code-fn">train</span>(model, train_loader, val_loader, epochs):
+    best_acc = <span class="code-num">0</span>
+    
+    <span class="code-kw">for</span> epoch <span class="code-kw">in</span> range(epochs):
+        <span class="code-cm"># ========== Training ==========</span>
+        model.train()
+        train_loss = <span class="code-num">0</span>
+        <span class="code-kw">for</span> x, y <span class="code-kw">in</span> train_loader:
+            optimizer.zero_grad()
+            logits = model(x)
+            loss = criterion(logits, y)
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=<span class="code-num">1.0</span>)  <span class="code-cm"># 梯度裁剪</span>
+            optimizer.step()
+            train_loss += loss.item()
+        scheduler.step()  <span class="code-cm"># 学习率调度</span>
+        
+        <span class="code-cm"># ========== Validation ==========</span>
+        model.eval()
+        val_loss = <span class="code-num">0</span>; correct = <span class="code-num">0</span>; total = <span class="code-num">0</span>
+        <span class="code-kw">with</span> torch.no_grad():
+            <span class="code-kw">for</span> x, y <span class="code-kw">in</span> val_loader:
+                logits = model(x)
+                val_loss += criterion(logits, y).item()
+                correct += (logits.argmax(<span class="code-num">1</span>) == y).sum().item()
+                total += y.size(<span class="code-num">0</span>)
+        
+        val_acc = correct / total
+        <span class="code-fn">print</span>(<span class="code-str">f"Epoch {epoch}: train_loss={train_loss/len(train_loader):.4f}, val_acc={val_acc:.4f}"</span>)
+        
+        <span class="code-cm"># ========== Early Stopping & Save Best ==========</span>
+        <span class="code-kw">if</span> val_acc > best_acc:
+            best_acc = val_acc
+            torch.save(model.state_dict(), <span class="code-str">"best_model.pt"</span>)
+            patience_counter = <span class="code-num">0</span>
+        <span class="code-kw">else</span>:
+            patience_counter += <span class="code-num">1</span>
+            <span class="code-kw">if</span> patience_counter >= patience:
+                <span class="code-fn">print</span>(<span class="code-str">"Early stopping!"</span>)
+                <span class="code-kw">break</span></div>
+</div>
+
+<div class="slide">
+  <h2>学习率设置策略总结</h2>
+  <div class="three-col">
+    <div class="card">
+      <h3>🔰 初学者</h3>
+      <ul>
+        <li><strong>优化器</strong>：Adam</li>
+        <li><strong>初始LR</strong>：1e-3</li>
+        <li><strong>调度器</strong>：StepLR(step=10, gamma=0.5)</li>
+        <li><strong>Weight Decay</strong>：1e-4</li>
+      </ul>
+      <div class="tags">
+        <span class="tag success">简单可靠</span>
+      </div>
+    </div>
+    <div class="card accent">
+      <h3>🚀 进阶使用</h3>
+      <ul>
+        <li><strong>优化器</strong>：AdamW</li>
+        <li><strong>初始LR</strong>：LR Finder找</li>
+        <li><strong>调度器</strong>：CosineAnnealingLR</li>
+        <li><strong>Warmup</strong>：前5% epoch线性升温</li>
+      </ul>
+      <div class="tags">
+        <span class="tag accent">效果更好</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>🏆 追求SOTA</h3>
+      <ul>
+        <li><strong>优化器</strong>：SGD+Momentum(0.9)</li>
+        <li><strong>初始LR</strong>：LR Finder</li>
+        <li><strong>调度器</strong>：OneCycleLR</li>
+        <li><strong>Weight Decay</strong>：网格搜索</li>
+      </ul>
+      <div class="tags">
+        <span class="tag warning">需要调参</span>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:1.5rem">
+    <h3>💡 关键经验</h3>
+    <p>学习率是最重要的超参数。如果loss不降，先调LR！太大→震荡/NaN，太小→收敛慢/不收敛。</p>
+  </div>
+</div>
+
+<div class="slide">
+  <h2>初始化方法选择指南</h2>
+  <table class="table">
+    <tr>
+      <th>激活函数</th>
+      <th>推荐初始化</th>
+      <th>PyTorch API</th>
+      <th>适用场景</th>
+    </tr>
+    <tr>
+      <td><strong>ReLU / LeakyReLU</strong></td>
+      <td style="color:var(--accent);font-weight:600">Kaiming (He) 初始化</td>
+      <td><code>kaiming_normal_()</code></td>
+      <td>默认选择！大多数网络</td>
+    </tr>
+    <tr>
+      <td><strong>tanh / sigmoid</strong></td>
+      <td style="color:var(--accent3);font-weight:600">Xavier (Glorot) 初始化</td>
+      <td><code>xavier_normal_()</code></td>
+      <td>传统RNN/老网络</td>
+    </tr>
+    <tr>
+      <td><strong>GELU / Swish</strong></td>
+      <td style="color:var(--accent);font-weight:600">Kaiming 或预训练</td>
+      <td><code>kaiming_normal_()</code></td>
+      <td>Transformer类</td>
+    </tr>
+    <tr>
+      <td><strong>有BN层</strong></td>
+      <td>初始化影响较小</td>
+      <td>默认/kaiming均可</td>
+      <td>BN削弱初始化敏感性</td>
+    </tr>
+  </table>
+  <div class="card" style="margin-top:1rem">
+    <div class="code-block"><span class="code-cm"># PyTorch中手动初始化</span>
+<span class="code-kw">for</span> m <span class="code-kw">in</span> model.modules():
+    <span class="code-kw">if</span> isinstance(m, nn.Linear):
+        nn.init.kaiming_normal_(m.weight, nonlinearity=<span class="code-str">'relu'</span>)
+        nn.init.zeros_(m.bias)</div>
+  </div>
+</div>
+
+<div class="slide">
+  <h2>BN vs LayerNorm 使用场景</h2>
+  <table class="table">
+    <tr>
+      <th>特性</th>
+      <th>Batch Normalization</th>
+      <th>Layer Normalization</th>
+    </tr>
+    <tr>
+      <td><strong>归一化维度</strong></td>
+      <td>在batch维度上</td>
+      <td>在特征维度上</td>
+    </tr>
+    <tr>
+      <td><strong>依赖batch size</strong></td>
+      <td style="color:var(--danger)">依赖，小batch效果差</td>
+      <td style="color:var(--success)">不依赖，单样本计算</td>
+    </tr>
+    <tr>
+      <td><strong>训练/测试差异</strong></td>
+      <td>有（running mean/var）</td>
+      <td>无</td>
+    </tr>
+    <tr>
+      <td><strong>CNN首选</strong></td>
+      <td style="color:var(--success)">✅ 是</td>
+      <td>❌ 否</td>
+    </tr>
+    <tr>
+      <td><strong>NLP/Transformer首选</strong></td>
+      <td>❌ 否（padding问题）</td>
+      <td style="color:var(--success)">✅ 是</td>
+    </tr>
+    <tr>
+      <td><strong>PyTorch API</strong></td>
+      <td><code>nn.BatchNorm1d/2d/3d</code></td>
+      <td><code>nn.LayerNorm(normalized_shape)</code></td>
+    </tr>
+    <tr>
+      <td><strong>放置位置</strong></td>
+      <td>Conv/Linear → BN → ReLU</td>
+      <td>Attention → Add → LN (Pre-LN/Post-LN)</td>
+    </tr>
+  </table>
+</div>
+
+<div class="slide">
+  <h2>归一化方法全家福</h2>
+  <div class="flow" style="margin:2rem 0">
+    <div class="flow-step accent">BatchNorm</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step">LayerNorm</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step">InstanceNorm</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step">GroupNorm</div>
+  </div>
+  <div class="three-col">
+    <div class="card">
+      <h3>🖼️ BatchNorm (CV)</h3>
+      <p>对N张图的同一通道做归一化</p>
+      <p class="muted" style="font-size:0.9rem">CNN标配</p>
+      <div class="tags">
+        <span class="tag accent">CNN</span>
+        <span class="tag">依赖batch</span>
+      </div>
+    </div>
+    <div class="card accent">
+      <h3>📝 LayerNorm (NLP)</h3>
+      <p>对每个样本所有特征归一化</p>
+      <p class="muted" style="font-size:0.9rem">Transformer标配</p>
+      <div class="tags">
+        <span class="tag accent">Transformer</span>
+        <span class="tag success">不依赖batch</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>🎨 InstanceNorm (风格)</h3>
+      <p>对每个样本每个通道归一化</p>
+      <p class="muted" style="font-size:0.9rem">风格迁移用</p>
+      <div class="tags">
+        <span class="tag">风格迁移</span>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:1.5rem">
+    <h3>📦 GroupNorm (小batch)</h3>
+    <p>通道分组后归一化，batch size很小时BN的替代方案（如目标检测）</p>
+  </div>
+</div>
+
+<div class="slide">
+  <h2>正则化方法组合拳</h2>
+  <p class="muted">好的模型需要多种正则化配合使用</p>
+  <div class="three-col" style="margin-top:2rem">
+    <div class="card accent">
+      <div class="big-num">1</div>
+      <h3 style="margin-top:1rem">💪 数据增强（最强）</h3>
+      <ul>
+        <li>CV：翻转/裁剪/旋转/颜色抖动</li>
+        <li>NLP：同义词替换/回译</li>
+        <li>本质：增加数据多样性</li>
+      </ul>
+      <div class="tags">
+        <span class="tag accent">最优先</span>
+      </div>
+    </div>
+    <div class="card accent">
+      <div class="big-num">2</div>
+      <h3 style="margin-top:1rem">⚖️ Weight Decay</h3>
+      <ul>
+        <li>默认加，几乎无副作用</li>
+        <li>推荐值：1e-4 ~ 1e-2</li>
+        <li>AdamW正确实现</li>
+      </ul>
+      <div class="tags">
+        <span class="tag accent">默认开启</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="big-num">3</div>
+      <h3 style="margin-top:1rem">🎲 Dropout</h3>
+      <ul>
+        <li>p=0.5（隐藏层）</li>
+        <li>p=0.1~0.2（输入层）</li>
+        <li>推理时一定要关！</li>
+      </ul>
+      <div class="tags">
+        <span class="tag">可选</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <h2>正则化方法组合拳（续）</h2>
+  <div class="two-col">
+    <div class="card">
+      <div class="big-num">4</div>
+      <h3 style="margin-top:1rem">⏹️ Early Stopping</h3>
+      <ul>
+        <li>验证集指标不升就停</li>
+        <li>保存验证集最佳模型</li>
+        <li>patience=5~10</li>
+      </ul>
+      <div class="tags">
+        <span class="tag warning">必须监控</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="big-num">5</div>
+      <h3 style="margin-top:1rem">📉 减小模型容量</h3>
+      <ul>
+        <li>减少层数/隐藏维度</li>
+        <li>从简单模型开始</li>
+        <li>先过拟合再正则化</li>
+      </ul>
+      <div class="tags">
+        <span class="tag">最后手段</span>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:1.5rem">
+    <h3>📋 实践推荐配置</h3>
+    <div class="code-block"><span class="code-cm"># 计算机视觉任务默认正则化组合</span>
+optimizer = optim.AdamW(model.parameters(), lr=<span class="code-num">1e-3</span>, weight_decay=<span class="code-num">1e-4</span>)
+<span class="code-cm"># 模型中加入Dropout</span>
+self.dropout = nn.Dropout(<span class="code-num">0.5</span>)
+<span class="code-cm"># 加上数据增强</span>
+transform = transforms.Compose([
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomCrop(32, padding=4),
+    transforms.ToTensor(),
+])</div>
+  </div>
+</div>
+
+<div class="slide">
+  <h2>L1 vs L2 正则化对比</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3>📐 L2 Regularization (Weight Decay)</h3>
+      <div class="formula-box" style="font-size:1.1rem">L = L<sub>original</sub> + λ Σ w²</div>
+      <ul>
+        <li><strong>效果</strong>：让权重均匀变小，接近0但不为0</li>
+        <li><strong>优点</strong>：稳定，处处可导</li>
+        <li><strong>缺点</strong>：不产生稀疏性</li>
+        <li><strong>使用</strong>：深度学习默认首选</li>
+      </ul>
+      <div class="tags">
+        <span class="tag accent">默认用这个</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>📏 L1 Regularization</h3>
+      <div class="formula-box" style="font-size:1.1rem">L = L<sub>original</sub> + λ Σ |w|</div>
+      <ul>
+        <li><strong>效果</strong>：让部分权重变0，产生稀疏解</li>
+        <li><strong>优点</strong>：有特征选择效果</li>
+        <li><strong>缺点</strong>：在0点不可导</li>
+        <li><strong>使用</strong>：特征选择/压缩场景</li>
+      </ul>
+      <div class="tags">
+        <span class="tag">特征选择</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <h2>训练问题诊断表</h2>
+  <table class="table">
+    <tr>
+      <th>症状</th>
+      <th>可能原因</th>
+      <th>解决方案</th>
+    </tr>
+    <tr>
+      <td rowspan="3" style="color:var(--danger)"><strong>Train/Val loss都不下降</strong></td>
+      <td>学习率太大（震荡）</td>
+      <td>降低LR，如1e-3→1e-4</td>
+    </tr>
+    <tr>
+      <td>学习率太小（走不动）</td>
+      <td>增大LR，用LR Finder</td>
+    </tr>
+    <tr>
+      <td>数据/标签有问题</td>
+      <td>检查数据可视化，过拟合小样本测试</td>
+    </tr>
+    <tr>
+      <td rowspan="2" style="color:var(--warning)"><strong>Train loss降，Val loss升</strong></td>
+      <td style="color:var(--warning)">过拟合！</td>
+      <td>加正则化（WD/Dropout/数据增强）</td>
+    </tr>
+    <tr>
+      <td>训练太久</td>
+      <td>Early Stopping，保存最佳模型</td>
+    </tr>
+    <tr>
+      <td rowspan="2"><strong>Train loss下降很慢</strong></td>
+      <td>学习率太小</td>
+      <td>增大LR</td>
+    </tr>
+    <tr>
+      <td>梯度消失/初始化不好</td>
+      <td>用BN/残差连接/He初始化</td>
+    </tr>
+    <tr>
+      <td style="color:var(--danger)"><strong>Loss = NaN</strong></td>
+      <td>梯度爆炸/数据有NaN</td>
+      <td>降低LR + 梯度裁剪 + 检查数据</td>
+    </tr>
+  </table>
+</div>
+
+<div class="slide">
+  <h2>超参数调优Checklist</h2>
+  <div style="max-width:800px;margin:1rem auto">
+    <div class="checklist-item">
+      <span class="checklist-icon">✅</span>
+      <div>
+        <strong style="color:var(--accent)">Sanity Check通过</strong>
+        <p style="font-size:0.95rem;margin:0">在小数据集(几百样本)上能过拟合到loss≈0</p>
+      </div>
+    </div>
+    <div class="checklist-item">
+      <span class="checklist-icon">✅</span>
+      <div>
+        <strong style="color:var(--accent)">学习率已调整</strong>
+        <p style="font-size:0.95rem;margin:0">用LR Finder或从[1e-2, 1e-3, 1e-4]尝试</p>
+      </div>
+    </div>
+    <div class="checklist-item">
+      <span class="checklist-icon">✅</span>
+      <div>
+        <strong style="color:var(--accent)">Batch Size合适</strong>
+        <p style="font-size:0.95rem;margin:0">32/64/128，根据显存调整，不要太大</p>
+      </div>
+    </div>
+    <div class="checklist-item">
+      <span class="checklist-icon">✅</span>
+      <div>
+        <strong style="color:var(--accent)">Weight Decay已加</strong>
+        <p style="font-size:0.95rem;margin:0">默认1e-4，过拟合严重加到1e-3/1e-2</p>
+      </div>
+    </div>
+    <div class="checklist-item">
+      <span class="checklist-icon">✅</span>
+      <div>
+        <strong style="color:var(--accent)">有BatchNorm/LayerNorm</strong>
+        <p style="font-size:0.95rem;margin:0">CNN用BN，Transformer用LN，加速收敛</p>
+      </div>
+    </div>
+    <div class="checklist-item">
+      <span class="checklist-icon">✅</span>
+      <div>
+        <strong style="color:var(--accent)">数据增强已配置</strong>
+        <p style="font-size:0.95rem;margin:0">CV任务翻转/裁剪是标配</p>
+      </div>
+    </div>
+    <div class="checklist-item">
+      <span class="checklist-icon">✅</span>
+      <div>
+        <strong style="color:var(--accent)">优化器选择</strong>
+        <p style="font-size:0.95rem;margin:0">Adam/AdamW默认，追求极致用SGD+Momentum</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <h2>核心代码模板：数据准备</h2>
+  <div class="code-block" style="font-size:0.9rem"><span class="code-kw">import</span> torch
+<span class="code-kw">from</span> torch <span class="code-kw">import</span> nn, optim
+<span class="code-kw">from</span> torch.utils.data <span class="code-kw">import</span> DataLoader, random_split
+<span class="code-kw">from</span> torchvision <span class="code-kw">import</span> datasets, transforms
+
+<span class="code-cm"># 数据预处理</span>
+transform_train = transforms.Compose([
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomCrop(32, padding=4),
+    transforms.ToTensor(),
+    transforms.Normalize((<span class="code-num">0.5</span>,), (<span class="code-num">0.5</span>,))
+])
+transform_test = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((<span class="code-num">0.5</span>,), (<span class="code-num">0.5</span>,))
+])
+
+<span class="code-cm"># 加载数据并划分</span>
+full_dataset = datasets.MNIST(root=<span class="code-str">'./data'</span>, train=<span class="code-num">True</span>, transform=transform_train, download=<span class="code-num">True</span>)
+train_size = int(<span class="code-num">0.8</span> * len(full_dataset))
+val_size = len(full_dataset) - train_size
+train_dataset, val_dataset = random_split(full_dataset, [train_size, val_size])
+val_dataset.dataset.transform = transform_test
+
+train_loader = DataLoader(train_dataset, batch_size=64, shuffle=<span class="code-num">True</span>)
+val_loader = DataLoader(val_dataset, batch_size=100, shuffle=<span class="code-num">False</span>)
+test_dataset = datasets.MNIST(root=<span class="code-str">'./data'</span>, train=<span class="code-num">False</span>, transform=transform_test)
+test_loader = DataLoader(test_dataset, batch_size=100, shuffle=<span class="code-num">False</span>)</div>
+</div>
+
+<div class="slide">
+  <h2>核心代码模板：模型定义</h2>
+  <div class="code-block" style="font-size:0.9rem"><span class="code-kw">class</span> <span class="code-fn">MLP</span>(nn.Module):
+    <span class="code-kw">def</span> <span class="code-fn">__init__</span>(self, input_dim=784, hidden_dims=[256, 128], num_classes=10, dropout=0.5):
+        super().__init__()
+        layers = []
+        prev_dim = input_dim
+        
+        <span class="code-kw">for</span> h_dim <span class="code-kw">in</span> hidden_dims:
+            layers.append(nn.Linear(prev_dim, h_dim))
+            layers.append(nn.BatchNorm1d(h_dim))      <span class="code-cm"># BatchNorm加速收敛</span>
+            layers.append(nn.ReLU())
+            layers.append(nn.Dropout(dropout))        <span class="code-cm"># Dropout防过拟合</span>
+            prev_dim = h_dim
+        
+        layers.append(nn.Linear(prev_dim, num_classes))  <span class="code-cm"># 最后不加softmax!</span>
+        self.net = nn.Sequential(*layers)
+        
+        <span class="code-cm"># Kaiming初始化</span>
+        self._init_weights()
+    
+    <span class="code-kw">def</span> <span class="code-fn">_init_weights</span>(self):
+        <span class="code-kw">for</span> m <span class="code-kw">in</span> self.modules():
+            <span class="code-kw">if</span> isinstance(m, nn.Linear):
+                nn.init.kaiming_normal_(m.weight, nonlinearity=<span class="code-str">'relu'</span>)
+                nn.init.zeros_(m.bias)
+    
+    <span class="code-kw">def</span> <span class="code-fn">forward</span>(self, x):
+        x = x.view(x.size(<span class="code-num">0</span>), -1)  <span class="code-cm"># Flatten</span>
+        <span class="code-kw">return</span> self.net(x)
+
+model = MLP()
+model</div>
+</div>
+
+<div class="slide">
+  <h2>核心代码模板：训练配置</h2>
+  <div class="code-block" style="font-size:0.9rem">device = torch.device(<span class="code-str">'cuda'</span> <span class="code-kw">if</span> torch.cuda.is_available() <span class="code-kw">else</span> <span class="code-str">'cpu'</span>)
+model = model.to(device)
+
+<span class="code-cm"># 损失函数：分类用CrossEntropyLoss</span>
+criterion = nn.CrossEntropyLoss()
+
+<span class="code-cm"># 优化器：AdamW + Weight Decay</span>
+optimizer = optim.AdamW(
+    model.parameters(),
+    lr=<span class="code-num">1e-3</span>,
+    weight_decay=<span class="code-num">1e-4</span>
+)
+
+<span class="code-cm"># 学习率调度器：CosineAnnealing</span>
+scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=50)
+
+<span class="code-cm"># 或者：OneCycleLR（更高级）</span>
+<span class="code-cm"># scheduler = optim.lr_scheduler.OneCycleLR(</span>
+<span class="code-cm">#     optimizer, max_lr=1e-2, epochs=50, steps_per_epoch=len(train_loader)</span>
+<span class="code-cm"># )</span>
+
+<span class="code-cm"># Early Stopping参数</span>
+patience = <span class="code-num">7</span>
+best_val_acc = <span class="code-num">0</span>
+patience_counter = <span class="code-num">0</span>
+train_losses = []
+val_losses = []
+val_accs = []</div>
+</div>
+
+<div class="slide">
+  <h2>常见坑点与避坑指南</h2>
+  <div class="three-col">
+    <div class="card" style="border-color:var(--danger)">
+      <h3 style="color:var(--danger)">❌ 忘记zero_grad()</h3>
+      <p style="font-size:0.95rem">梯度会累加，导致参数更新错误</p>
+      <div class="code-block" style="font-size:0.8rem;margin-top:0.5rem"><span class="code-cm"># ❌ 错误</span>
+loss.backward()
+optimizer.step()
+<span class="code-cm"># ✅ 正确</span>
+optimizer.zero_grad()
+loss.backward()
+optimizer.step()</div>
+    </div>
+    <div class="card" style="border-color:var(--danger)">
+      <h3 style="color:var(--danger)">❌ 忘记model.eval()</h3>
+      <p style="font-size:0.95rem">Dropout/BN推理时随机，结果不对</p>
+      <div class="code-block" style="font-size:0.8rem;margin-top:0.5rem"><span class="code-cm"># ❌ 错误：验证时还在train模式</span>
+<span class="code-cm"># outputs = model(x)  # Dropout开着!</span>
+<span class="code-cm"># ✅ 正确</span>
+model.eval()
+<span class="code-kw">with</span> torch.no_grad():
+    outputs = model(x)
+model.train()</div>
+    </div>
+    <div class="card" style="border-color:var(--danger)">
+      <h3 style="color:var(--danger)">❌ 最后一层加softmax</h3>
+      <p style="font-size:0.95rem">CrossEntropyLoss已经包含log_softmax</p>
+      <div class="code-block" style="font-size:0.8rem;margin-top:0.5rem"><span class="code-cm"># ❌ 错误</span>
+self.net = nn.Sequential(
+    ...,
+    nn.Linear(256, 10),
+    nn.Softmax(dim=1)  <span class="code-cm"># 重复了!</span>
+)
+<span class="code-cm"># ✅ 正确：直接输出logits</span>
+self.net = nn.Sequential(
+    ...,
+    nn.Linear(256, 10)
+)</div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <h2>常见坑点与避坑指南（续）</h2>
+  <div class="two-col">
+    <div class="card" style="border-color:var(--warning)">
+      <h3 style="color:var(--warning)">⚠️ 训练/测试预处理不一致</h3>
+      <p style="font-size:0.95rem">测试时不要用训练时的数据增强（随机翻转等）</p>
+      <div class="tags">
+        <span class="tag warning">注意</span>
+      </div>
+    </div>
+    <div class="card" style="border-color:var(--warning)">
+      <h3 style="color:var(--warning)">⚠️ 张量没搬到GPU</h3>
+      <p style="font-size:0.95rem">model.to(device)了但x,y没.to(device)会报错</p>
+      <div class="code-block" style="font-size:0.8rem;margin-top:0.5rem"><span class="code-cm"># 每个batch都要搬</span>
+x = x.to(device)
+y = y.to(device)</div>
+    </div>
+  </div>
+  <div class="two-col" style="margin-top:1.5rem">
+    <div class="card" style="border-color:var(--warning)">
+      <h3 style="color:var(--warning)">⚠️ 标签泄露(Label Leakage)</h3>
+      <p style="font-size:0.95rem">验证/测试数据泄露到训练集，或预处理用了全量数据统计量</p>
+      <div class="tags">
+        <span class="tag warning">数据划分后再fit归一化参数</span>
+      </div>
+    </div>
+    <div class="card" style="border-color:var(--warning)">
+      <h3 style="color:var(--warning)">⚠️ 梯度爆炸→NaN</h3>
+      <p style="font-size:0.95rem">loss突然变NaN大多是LR太大或梯度爆炸</p>
+      <div class="code-block" style="font-size:0.8rem;margin-top:0.5rem"><span class="code-cm"># 加梯度裁剪</span>
+torch.nn.utils.clip_grad_norm_(
+    model.parameters(),
+    max_norm=<span class="code-num">1.0</span>
+)</div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <h2>训练好模型的标准</h2>
+  <div class="hbox" style="align-items:center">
+    <div style="flex:1">
+      <div class="card accent" style="margin-bottom:1rem">
+        <h3>🎯 Sanity Check通过</h3>
+        <p style="margin:0">在几十~几百个样本上能过拟合，loss降到接近0</p>
+      </div>
+      <div class="card accent" style="margin-bottom:1rem">
+        <h3>📈 训练/验证曲线接近</h3>
+        <p style="margin:0">Train loss和Val loss差距不大，没有严重过拟合</p>
+      </div>
+      <div class="card accent" style="margin-bottom:1rem">
+        <h3>🏆 验证集指标达标</h3>
+        <p style="margin:0">验证集准确率/指标达到你的预期目标</p>
+      </div>
+      <div class="card accent">
+        <h3>🔧 能正确加载预测</h3>
+        <p style="margin:0">保存的模型加载后在测试集上结果一致</p>
+      </div>
+    </div>
+    <div style="flex:1">
+      <div class="card" style="height:100%;display:flex;flex-direction:column;justify-content:center">
+        <h3 style="text-align:center">理想的训练曲线</h3>
+        <div style="font-family:var(--mono);font-size:0.85rem;line-height:2;color:var(--muted);margin-top:1rem;text-align:center">
+          <span style="color:var(--accent)">train loss</span> ↓↓↓<br>
+          <span style="color:var(--success)">val loss</span> ↓↓ 然后趋于平稳<br>
+          <span style="color:var(--accent3)">val acc</span> ↑↑↑ 然后趋于平稳<br>
+          <br>
+          <span style="color:var(--warning)">val loss开始上升 → 过拟合了！</span><br>
+          <span style="color:var(--danger)">两个loss都不降 → LR或数据有问题</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <h2>可视化工具推荐</h2>
+  <div class="three-col">
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <h3>TensorBoard</h3>
+      <p style="font-size:0.95rem">PyTorch官方支持，无需额外注册</p>
+      <div class="code-block" style="font-size:0.8rem;margin-top:0.5rem"><span class="code-kw">from</span> torch.utils.tensorboard <span class="code-kw">import</span> SummaryWriter
+
+writer = SummaryWriter()
+writer.add_scalar(<span class="code-str">'Loss/train'</span>, loss, epoch)
+writer.add_scalar(<span class="code-str">'Acc/val'</span>, acc, epoch)
+writer.close()</div>
+      <p style="font-size:0.85rem;color:var(--muted);margin-top:0.5rem">启动：tensorboard --logdir=runs</p>
+    </div>
+    <div class="card accent">
+      <div class="card-icon">🪄</div>
+      <h3>Weights & Biases</h3>
+      <p style="font-size:0.95rem">更美观，云端同步，自动记录超参</p>
+      <div class="code-block" style="font-size:0.8rem;margin-top:0.5rem"><span class="code-kw">import</span> wandb
+wandb.init(project=<span class="code-str">"my-project"</span>)
+wandb.log({<span class="code-str">"loss"</span>: loss, <span class="code-str">"acc"</span>: acc})</div>
+      <p style="font-size:0.85rem;color:var(--muted);margin-top:0.5rem">需要注册wandb账号</p>
+      <div class="tags">
+        <span class="tag accent">推荐</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-icon">📈</div>
+      <h3>Matplotlib手动画图</h3>
+      <p style="font-size:0.95rem">最简单，把losses存成list画图即可</p>
+      <div class="code-block" style="font-size:0.8rem;margin-top:0.5rem"><span class="code-kw">import</span> matplotlib.pyplot <span class="code-kw">as</span> plt
+plt.plot(train_losses, label=<span class="code-str">'train'</span>)
+plt.plot(val_losses, label=<span class="code-str">'val'</span>)
+plt.legend()
+plt.show()</div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <h2>本章核心要点速记</h2>
+  <div class="two-col">
+    <div class="card accent">
+      <h3>🎯 训练DL模型的正确姿势</h3>
+      <ol>
+        <li><strong>先Sanity Check</strong>：小数据过拟合</li>
+        <li><strong>数据预处理</strong>：归一化+数据增强</li>
+        <li><strong>模型配置</strong>：BN/LN + 合适初始化</li>
+        <li><strong>优化配置</strong>：AdamW + Weight Decay + 合适LR</li>
+        <li><strong>训练监控</strong>：画train/val曲线</li>
+        <li><strong>正则化</strong>：Dropout + Early Stopping</li>
+        <li><strong>调参</strong>：LR最重要，其他次之</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>💡 一句话经验</h3>
+      <ul style="list-style:none;margin-left:0">
+        <li style="padding-left:1.5rem;text-indent:-1.2rem">🔹 <strong>不收敛</strong>→调学习率</li>
+        <li style="padding-left:1.5rem;text-indent:-1.2rem">🔹 <strong>过拟合</strong>→加数据/正则化</li>
+        <li style="padding-left:1.5rem;text-indent:-1.2rem">🔹 <strong>CNN</strong>用BatchNorm，<strong>Transformer</strong>用LayerNorm</li>
+        <li style="padding-left:1.5rem;text-indent:-1.2rem">🔹 <strong>默认优化器</strong>：AdamW (lr=1e-3, wd=1e-4)</li>
+        <li style="padding-left:1.5rem;text-indent:-1.2rem">🔹 <strong>记得</strong>：zero_grad(), model.eval(), 不要加softmax</li>
+        <li style="padding-left:1.5rem;text-indent:-1.2rem">🔹 <strong>梯度爆炸</strong>→梯度裁剪+降低LR</li>
+        <li style="padding-left:1.5rem;text-indent:-1.2rem">🔹 <strong>先简单后复杂</strong>，从baseline开始</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <h2>🎉 恭喜完成第6章！</h2>
+  <p style="font-size:1.3rem;color:var(--muted);margin:1.5rem 0">你已经掌握了深度学习训练的核心技巧</p>
+  <div class="card accent" style="max-width:600px;text-align:left">
+    <h3>📺 下章预告</h3>
+    <p style="margin:0.5rem 0"><strong>CNN计算机视觉与NLP大模型</strong></p>
+    <ul style="margin-bottom:0">
+      <li>卷积层Conv2d原理与实现</li>
+      <li>池化层、经典网络(LeNet/AlexNet/ResNet)</li>
+      <li>残差连接Residual Connection</li>
+      <li>Attention与Transformer入门</li>
+    </ul>
+  </div>
+  <div style="margin-top:2rem;display:flex;gap:1rem">
+    <a href="chapter6.html" style="padding:1rem 2rem;border-radius:0.8rem;background:var(--bg3);color:var(--ink);text-decoration:none;font-weight:600">← 返回视频页</a>
+    <a href="ppt-32.html" style="padding:1rem 2rem;border-radius:0.8rem;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;text-decoration:none;font-weight:600">下一章 PPT →</a>
+  </div>
+</div>
+
+<button class="nav-btn" id="prev">←</button>
+<button class="nav-btn" id="next">→</button>
+
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+</body>
+</html>

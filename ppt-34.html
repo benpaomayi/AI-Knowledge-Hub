@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>第17集 CNN：池化层、分类与代码示例 - ML学习站PPT</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#fbbf24;--accent2:#f59e0b;--accent3:#d97706;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--accent3);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent3);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(217,119,6,0.15) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(251,191,36,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(217,119,6,0.1);border:1px solid rgba(217,119,6,0.25);border-radius:50px;font-size:1rem;color:var(--accent);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent),var(--warning));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:700px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(251,191,36,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:2rem;margin:1.5rem 0;text-align:center;font-family:var(--mono);font-size:clamp(1rem,1.8vw,1.3rem);color:var(--accent);line-height:2}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:1rem;display:block;text-align:left;line-height:1.7}
+.katex{color:var(--accent3)}.katex .mord.text{color:var(--ink2)}
+.hbox{background:rgba(251,191,36,0.08);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1rem 0}
+.hbox h4{color:var(--accent);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(248,113,113,0.08);border-left-color:var(--danger)}.hbox.warn h4{color:var(--danger)}
+.hbox.danger{background:rgba(248,113,113,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.purple{background:rgba(217,119,6,0.08);border-left-color:var(--accent2)}.hbox.purple h4{color:var(--accent2)}
+.hbox.pink{background:rgba(217,119,6,0.08);border-left-color:var(--accent3)}.hbox.pink h4{color:var(--accent3)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.95rem}
+table.cmp th{background:var(--bg3);color:var(--accent3);padding:12px 14px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.9rem}
+table.cmp td{padding:10px 14px;border-bottom:1px solid var(--rule);color:var(--ink2);line-height:1.6}
+table.cmp tr:hover td{background:rgba(251,191,36,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent);background:rgba(251,191,36,0.1);color:var(--accent);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent)}
+.tag.p{color:var(--accent2)}.tag.pi{color:var(--accent3)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}.tag.d{color:var(--danger)}
+.code-block{background:#0d1117;border:1px solid var(--rule);border-radius:12px;padding:1.5rem 2rem;font-family:var(--mono);font-size:0.85rem;line-height:1.7;color:#e6edf3;overflow-x:auto;margin:1rem 0;white-space:pre}
+.code-kw{color:#ff7b72}.code-fn{color:#d2a8ff}.code-str{color:#a5d6ff}.code-cm{color:#8b949e}.code-num{color:#79c0ff}.code-cls{color:#ffa657}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent3),var(--accent2),var(--accent),var(--success));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent3);color:var(--accent3)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent3)}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.end-slide .end-buttons{display:flex;gap:1.5rem;justify-content:center;margin-top:2.5rem;flex-wrap:wrap}
+.end-slide .end-btn{padding:14px 32px;border-radius:12px;font-size:1.05rem;font-weight:600;text-decoration:none;transition:all .3s}
+.end-slide .end-btn.primary{background:linear-gradient(135deg,var(--accent3),var(--accent2));color:white}
+.end-slide .end-btn.secondary{background:var(--bg2);border:1px solid var(--rule);color:var(--ink2)}
+.end-slide .end-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(251,191,36,0.2)}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col{grid-template-columns:1fr}.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="slides.html" style="font-weight:600;color:var(--accent3)">📊 PPT课件</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="chapter7.html">回到视频页</a>
+    <a href="ppt-33.html">← 上一集</a>
+    <a href="ppt-35.html">下一集 →</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">🔥 深度学习 · 第17集</div>
+    <h1 class="cover-title">CNN：池化层、分类与代码示例</h1>
+    <p class="cover-sub">BV1fW7L6XEiv · 时长15分07秒 · 池化层、经典架构与PyTorch实战</p>
+    <div class="tags">
+      <span class="tag pi">池化层</span>
+      <span class="tag p">MaxPool</span>
+      <span class="tag w">AvgPool</span>
+      <span class="tag">经典CNN架构</span>
+      <span class="tag g">PyTorch代码</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">2 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">本集内容导览</h1>
+    <h3 class="sub">学完卷积层，这集我们来认识池化层，并亲手搭建CNN</h3>
+    <div class="body">
+      <ul>
+        <li><strong style="color:var(--accent3)">池化层详解</strong>——Max Pooling、Average Pooling、Global Average Pooling</li>
+        <li><strong style="color:var(--accent2)">池化 vs 带步长卷积</strong>——两种下采样方式对比</li>
+        <li><strong style="color:var(--accent)">典型CNN流水线</strong>——Conv→BN→ReLU→Pool→FC的完整结构</li>
+        <li><strong style="color:var(--danger)">经典CNN架构演进</strong>——从LeNet到ResNet的20年发展史</li>
+        <li><strong style="color:var(--success)">CNN特征可视化</strong>——看看不同层都学到了什么</li>
+        <li><strong style="color:var(--warning)">PyTorch代码实战</strong>——搭建并训练一个完整CNN</li>
+      </ul>
+    </div>
+    <div class="hbox pink">
+      <h4>💻 这集有代码！</h4>
+      <p>准备好你的Python环境，学完理论后我们一起用PyTorch写一个真正的CNN来做图像分类。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">3 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">为什么需要池化层？</h1>
+    <h3 class="sub">卷积层提取特征后，为什么不直接接分类器？</h3>
+    <div class="hbox">
+      <h4>🤔 问题：特征图太大了</h4>
+      <p>即使经过几次Same Conv，特征图的空间尺寸还是很大。以224×224输入为例，即使不下采样，到最后一层展平(Flatten)后也有224×224×512 ≈ 2500万维——接全连接层又会参数爆炸！</p>
+    </div>
+    <div class="three-col" style="margin-top:1.5rem">
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent)}">📉</div>
+        <h4>降低尺寸</h4>
+        <p>下采样减小特征图的宽高，减少后续层的计算量和参数量。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent2)}">👁️</div>
+        <h4>增大感受野</h4>
+        <p>空间尺寸减小，相同大小的卷积核能"看到"更大范围的输入。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)}">🛡️</div>
+        <h4>平移不变性</h4>
+        <p>对小范围的平移/形变更加鲁棒，目标稍微移动仍能检测到。</p>
+      </div>
+    </div>
+    <div class="hbox success" style="margin-top:1rem">
+      <h4>💡 核心思想</h4>
+      <p>池化层保留<strong style="color:var(--accent)">主要特征</strong>，去掉冗余信息，同时让特征更紧凑。它没有可学习参数，是一个固定的操作。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">4 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">Max Pooling（最大池化）</h1>
+    <h3 class="sub">取窗口内的最大值——最常用的池化方式</h3>
+    <div class="hbox pink">
+      <h4>🎯 Max Pool怎么做？</h4>
+      <p>和卷积类似，一个窗口（通常2×2）在特征图上滑动，<strong style="color:var(--accent)">取窗口内的最大值</strong>作为输出。窗口之间通常不重叠（stride=kernel_size）。</p>
+    </div>
+    <div class="card" style="margin:1rem 0">
+      <h4 style="color:var(--accent2)">🔢 例子：2×2 Max Pool（stride=2）</h4>
+      <div class="two-col" style="gap:1.5rem;margin-top:0.5rem">
+        <div>
+          <p style="font-size:0.9rem;color:var(--muted);margin-bottom:0.5rem">输入（4×4）：</p>
+          <div style="font-family:var(--mono);font-size:1rem;line-height:1.9;text-align:center;color:var(--ink2)">
+            <div>[1, 3, 2, 1]</div>
+            <div>[<strong style="color:var(--accent2)">4</strong>, <strong style="color:var(--accent2)">6</strong>, 5, 2]</div>
+            <div>[<strong style="color:var(--accent2)">7</strong>, <strong style="color:var(--accent2)">8</strong>, 3, 1]</div>
+            <div>[2, 5, 1, 4]</div>
+          </div>
+        </div>
+        <div>
+          <p style="font-size:0.9rem;color:var(--muted);margin-bottom:0.5rem">输出（2×2，尺寸减半！）：</p>
+          <div style="font-family:var(--mono);font-size:1.1rem;line-height:2;text-align:center;color:var(--ink2);background:var(--bg3);padding:1rem;border-radius:8px">
+            <div>[<strong style="color:var(--accent)">8</strong>, 5]</div>
+            <div>[8, 4]</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>✅ 为什么Max Pool最常用？</h4>
+      <p>最大值代表这个窗口内<strong style="color:var(--accent)">最显著的特征激活</strong>——"这个位置有没有检测到我要的特征"。保留最强响应，丢弃弱响应，能更好地保留特征的有无信息。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">5 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">Average Pooling（平均池化）</h1>
+    <h3 class="sub">取窗口内的平均值——更平滑，保留整体信息</h3>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--accent2)}">🔄 Average Pool</h4>
+        <p style="margin-bottom:0.8rem">取窗口内所有值的平均值作为输出：</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>效果更平滑，不像Max Pool那样"锐利"</li>
+          <li>保留了窗口内的整体平均激活水平</li>
+          <li>早期CNN（如LeNet）中使用过</li>
+          <li>现在用得比Max Pool少</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--success)}">🌐 Global Average Pooling (GAP)</h4>
+        <p style="margin-bottom:0.8rem">对<strong>整个特征图</strong>取平均：每个通道输出一个值！</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>输入H×W×C → 输出1×1×C</li>
+          <li>替代Flatten + 大FC层</li>
+          <li>大幅减少参数，防止过拟合</li>
+          <li>ResNet等现代网络常用</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox purple" style="margin-top:1rem">
+      <h4>💡 GAP的优势</h4>
+      <p>GAP把每个通道变成一个置信度值，可以解释为"这个特征在整张图中的平均激活程度"，对应类别的置信图。它<strong style="color:var(--accent)">没有任何参数</strong>，还天然具有全局感受野。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">6 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">Global Average Pooling详解</h1>
+    <h3 class="sub">现代CNN中替代全连接层的关键技术</h3>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node" style="min-width:120px">
+        特征图<br>
+        <small style="color:var(--muted)">7×7×512</small>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:120px">
+        GAP<br>
+        <small style="color:var(--muted)">每个通道取全局平均</small>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:120px">
+        特征向量<br>
+        <small style="color:var(--muted)">1×1×512 = 512维</small>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:120px">
+        FC分类<br>
+        <small style="color:var(--muted)">512→1000类</small>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="hbox danger">
+        <h4>❌ 传统做法（Flatten + FC）</h4>
+        <p>7×7×512 = 25,088维<br>
+        接1000类FC层：<br>
+        参数 = 25,088×1000 + 1000 ≈ <strong style="color:var(--danger)">2500万参数</strong><br>
+        参数多，容易过拟合！</p>
+      </div>
+      <div class="hbox success">
+        <h4>✅ GAP做法</h4>
+        <p>GAP后只有512维<br>
+        接1000类FC层：<br>
+        参数 = 512×1000 + 1000 ≈ <strong style="color:var(--success)">51万参数</strong><br>
+        参数减少98%！还更可解释</p>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>📜 GAP历史</h4>
+      <p>由Network in Network(2013)提出，后来被ResNet、MobileNet等广泛采用，成为现代CNN的标准组件之一。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">7 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">池化 vs 带步长卷积</h1>
+    <h3 class="sub">两种下采样方式，现代架构更偏好哪种？</h3>
+    <table class="cmp">
+      <tr>
+        <th>对比维度</th>
+        <th>池化层 (Max/Avg Pool)</th>
+        <th>带步长卷积 (Stride=2 Conv)</th>
+      </tr>
+      <tr>
+        <td><strong>可学习参数</strong></td>
+        <td style="color:var(--success)">❌ 无参数，固定操作</td>
+        <td style="color:var(--accent)">✅ 有可学习权重</td>
+      </tr>
+      <tr>
+        <td><strong>计算量</strong></td>
+        <td>很小（只需取最大/平均）</td>
+        <td>较大（有卷积运算）</td>
+      </tr>
+      <tr>
+        <td><strong>灵活性</strong></td>
+        <td>操作固定，只能下采样</td>
+        <td>下采样的同时还能学习特征变换</td>
+      </tr>
+      <tr>
+        <td><strong>代表架构</strong></td>
+        <td>LeNet、AlexNet、VGGNet</td>
+        <td>ResNet、ResNeXt、MobileNetV2（部分用）</td>
+      </tr>
+      <tr>
+        <td><strong>下采样效果</strong></td>
+        <td>Max Pool保留最强激活，Avg Pool平滑</td>
+        <td>可学习如何最好地组合信息来下采样</td>
+      </tr>
+    </table>
+    <div class="hbox pink">
+      <h4>📊 趋势</h4>
+      <p>早期网络（AlexNet/VGG）用Max Pool下采样；现代架构（ResNet等）倾向于用<strong style="color:var(--accent)">stride=2的卷积</strong>替代部分池化层，因为可学习的下采样更灵活。但GAP仍然在网络最后广泛使用。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">8 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">典型CNN流水线结构</h1>
+    <h3 class="sub">一个完整的CNN是什么样的？</h3>
+    <div class="flow" style="margin:2rem 0;flex-direction:column;gap:0.8rem">
+      <div class="flow-node hl" style="min-width:auto;text-align:left">
+        <strong style="color:var(--accent)">📥 输入层</strong>
+        <span style="color:var(--muted);margin-left:1rem">H×W×C 图像张量（如224×224×3）</span>
+      </div>
+      <div class="flow-arrow" style="transform:rotate(90deg)">↓</div>
+      <div class="flow-node" style="min-width:auto;text-align:left;border-left:4px solid var(--accent2);padding-left:1.5rem">
+        <strong style="color:var(--accent2)">🔄 特征提取阶段（重复N次）</strong><br>
+        <span style="color:var(--muted);font-size:0.95rem">Conv2d → BatchNorm2d → ReLU → MaxPool2d (×N个block)</span>
+      </div>
+      <div class="flow-arrow" style="transform:rotate(90deg)">↓</div>
+      <div class="flow-node" style="min-width:auto;text-align:left">
+        <strong>📐 展平/池化</strong>
+        <span style="color:var(--muted);margin-left:1rem">Flatten 或 Global Average Pooling</span>
+      </div>
+      <div class="flow-arrow" style="transform:rotate(90deg)">↓</div>
+      <div class="flow-node" style="min-width:auto;text-align:left">
+        <strong>🧠 分类头（全连接层）</strong>
+        <span style="color:var(--muted);margin-left:1rem">FC → ReLU → Dropout → FC（输出类别数）</span>
+      </div>
+      <div class="flow-arrow" style="transform:rotate(90deg)">↓</div>
+      <div class="flow-node hl" style="min-width:auto;text-align:left">
+        <strong style="color:var(--success)}">📤 输出层</strong>
+        <span style="color:var(--muted);margin-left:1rem">Softmax输出各类别概率（训练时CrossEntropyLoss已包含Softmax）</span>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>💡 记忆口诀</h4>
+      <p><strong style="color:var(--accent)">Conv→BN→ReLU→(Pool)</strong> 是CNN的基础模块，重复堆叠，最后接分类头。BN加在Conv和ReLU之间稳定训练，Pool用于下采样。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">9 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">经典CNN架构演进（一）</h1>
+    <h3 class="sub">从LeNet到AlexNet——CNN的诞生与爆发</h3>
+    <div class="card" style="margin-bottom:1rem">
+      <div class="two-col" style="gap:1.5rem">
+        <div>
+          <h4 style="color:var(--accent)}">📜 LeNet-5 (1998)</h4>
+          <p style="font-size:0.95rem;color:var(--muted)">Yann LeCun提出，CNN开山之作<br>
+          • 5层网络（2卷积+2池化+2全连接）<br>
+          • 用于手写数字识别MNIST<br>
+          • 奠定了现代CNN的基础结构：Conv→Pool→FC<br>
+          • 当时算力不足，应用受限</p>
+        </div>
+        <div>
+          <h4 style="color:var(--danger)}">🚀 AlexNet (2012)</h4>
+          <p style="font-size:0.95rem;color:var(--muted)">Hinton团队，ImageNet竞赛冠军<br>
+          • 8层网络（5卷积+3全连接）<br>
+          • Top-5错误率15.3%，比第二名低10.8%！<br>
+          • 首次使用ReLU、Dropout、GPU训练<br>
+          • <strong style="color:var(--danger)">引爆深度学习革命！</strong></p>
+        </div>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>🏛️ AlexNet的历史意义</h4>
+      <p>在AlexNet之前，CNN是"边缘技术"；AlexNet在ImageNet上碾压性胜利后，整个计算机视觉社区转向深度学习。深度学习时代由此开启。ReLU取代Sigmoid、Dropout防止过拟合、数据增强——这些都是AlexNet确立的标准做法。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">10 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">经典CNN架构演进（二）</h1>
+    <h3 class="sub">VGGNet与GoogLeNet——更深更宽的探索</h3>
+    <div class="card" style="margin-bottom:1rem">
+      <div class="two-col" style="gap:1.5rem">
+        <div>
+          <h4 style="color:var(--accent2)}">📐 VGGNet (2014, 牛津)</h4>
+          <p style="font-size:0.95rem;color:var(--muted)">VGG-16/VGG-19，16-19层<br>
+          • <strong>全部用3×3卷积</strong>，结构极简统一<br>
+          • 验证了小核堆叠效果优于大核<br>
+          • 设计哲学：简单一致的架构<br>
+          • 参数量大（VGG-16约1.38亿参数）<br>
+          • 至今仍被用作特征提取backbone</p>
+        </div>
+        <div>
+          <h4 style="color:var(--success)}">🧩 GoogLeNet/Inception (2014, Google)</h4>
+          <p style="font-size:0.95rem;color:var(--muted)">22层，Inception模块<br>
+          • 同一层并行使用1×1、3×3、5×5卷积<br>
+          • 用1×1卷积降维减少计算<br>
+          • Global Average Pooling替代大FC层<br>
+          • 参数量仅500万（VGG的1/27！）<br>
+          • 多尺度特征融合的思路</p>
+        </div>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>💡 VGGNet的影响</h4>
+      <p>VGGNet的"全3×3卷积"设计简单优雅，证明了网络深度的重要性。虽然参数多、计算量大，但因为结构规整、容易迁移，很长一段时间都是最流行的backbone。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">11 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">经典CNN架构演进（三）</h1>
+    <h3 class="sub">ResNet——残差连接让网络能训练到上百层</h3>
+    <div class="card accent" style="margin-bottom:1rem">
+      <h4 style="color:var(--accent3)}">🏆 ResNet (2015, 何恺明等)</h4>
+      <p>CVPR 2016最佳论文，里程碑式工作。提出残差连接（Residual Connection/Skip Connection），成功训练了<strong style="color:var(--accent)">152层</strong>的超深网络，甚至有1202层的版本。</p>
+    </div>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--danger)}">💥</div>
+        <h4>解决退化问题</h4>
+        <p>网络加深时效果不升反降。ResNet通过残差连接让深层网络至少不会比浅网络差。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--success)}">🛤️</div>
+        <h4>残差捷径</h4>
+        <p>y = F(x) + x，梯度可以直接通过shortcut回传，解决梯度消失问题。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)}">🏅</div>
+        <h4>超越人类</h4>
+        <p>ResNet-152在ImageNet上Top-5错误率3.57%，<strong>首次超越人类水平</strong>（约5.1%）。</p>
+      </div>
+    </div>
+    <div class="hbox pink" style="margin-top:1rem">
+      <h4>🔮 ResNet的深远影响</h4>
+      <p>残差连接不仅改变了CV，也改变了整个深度学习——Transformer中的Add&Norm也是残差连接！下一集（ppt-35）我们会详细讲残差连接。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">12 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">CNN架构演进总结表</h1>
+    <h3 class="sub">1998-2015，从5层到152层的跨越</h3>
+    <table class="cmp">
+      <tr>
+        <th>架构</th>
+        <th>年份</th>
+        <th>层数</th>
+        <th>Top-5错误率</th>
+        <th>关键创新</th>
+        <th>参数量</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--muted)}">LeNet-5</strong></td>
+        <td>1998</td>
+        <td>5</td>
+        <td>-</td>
+        <td>CNN开山之作</td>
+        <td>~6万</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--danger)}">AlexNet</strong></td>
+        <td>2012</td>
+        <td>8</td>
+        <td style="color:var(--danger)}">15.3%</td>
+        <td>ReLU/Dropout/GPU</td>
+        <td>~6000万</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)}">ZFNet</strong></td>
+        <td>2013</td>
+        <td>8</td>
+        <td>14.8%</td>
+        <td>可视化CNN特征</td>
+        <td>~6000万</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)}">VGGNet</strong></td>
+        <td>2014</td>
+        <td>16/19</td>
+        <td>7.3%</td>
+        <td>全3×3卷积，更深</td>
+        <td>~1.38亿</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--success)}">GoogLeNet</strong></td>
+        <td>2014</td>
+        <td>22</td>
+        <td>6.7%</td>
+        <td>Inception模块/1×1卷积/GAP</td>
+        <td>~500万</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent3)}">ResNet</strong></td>
+        <td>2015</td>
+        <td>18/34/50/101/152</td>
+        <td style="color:var(--success)}"><strong>3.57%</strong></td>
+        <td style="color:var(--accent3)}"><strong>残差连接（里程碑！）</strong></td>
+        <td>~2500万(ResNet-50)</td>
+      </tr>
+    </table>
+    <div class="hbox success">
+      <h4>📈 趋势观察</h4>
+      <p>网络越来越深（5→152层），错误率越来越低（15%→3.5%），但参数量并不是线性增长——架构创新（1×1卷积/GAP/残差）让参数更高效。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">13 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">CNN特征可视化</h1>
+    <h3 class="sub">CNN不同层到底学到了什么？可视化告诉我们答案</h3>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node hl" style="min-width:150px;border-color:var(--accent)">
+        <strong style="color:var(--accent)}">第1-2层（浅层）</strong><br>
+        <small style="color:var(--muted)}">边缘、颜色、简单纹理</small><br>
+        <span style="font-size:1.8rem">╱ ░</span>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:150px;border-color:var(--accent2)">
+        <strong style="color:var(--accent2)}">第3-5层（中层）</strong><br>
+        <small style="color:var(--muted)}">纹理、图案、简单形状</small><br>
+        <span style="font-size:1.8rem">▓ ◉</span>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:150px;border-color:var(--accent3)">
+        <strong style="color:var(--accent3)}">第6-10层（中深层）</strong><br>
+        <small style="color:var(--muted)}">物体部件：眼睛/车轮/叶子</small><br>
+        <span style="font-size:1.8rem">👁️ 🎡</span>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:150px">
+        <strong>第10+层（深层）</strong><br>
+        <small style="color:var(--muted)}">完整物体/语义概念</small><br>
+        <span style="font-size:1.8rem">🐱 🚗 🏠</span>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="hbox success">
+        <h4>🔬 可视化方法</h4>
+        <p>• 可视化卷积核权重<br>
+        • 可视化特征图激活<br>
+        • 反卷积/Guided Backprop<br>
+        • Grad-CAM（类激活热力图）<br>
+        • DeepDream/特征反转</p>
+      </div>
+      <div class="hbox purple">
+        <h4>💡 关键发现</h4>
+        <p>CNN确实在<strong style="color:var(--accent)}分层提取特征</strong>——从低级视觉特征到高级语义概念，与人类视觉皮层的处理方式惊人地相似！这也验证了CNN设计的合理性。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">14 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">PyTorch构建CNN：基础组件</h1>
+    <h3 class="sub">先认识PyTorch中CNN的核心API</h3>
+    <div class="code-block"><span class="code-kw">import</span> torch
+<span class="code-kw">import</span> torch.nn <span class="code-kw">as</span> nn
+
+<span class="code-cm"># ========== 卷积层 ==========</span>
+nn.Conv2d(
+    in_channels,    <span class="code-cm"># 输入通道数</span>
+    out_channels,   <span class="code-cm"># 输出通道数（卷积核个数）</span>
+    kernel_size,    <span class="code-cm"># 核大小，3表示(3,3)</span>
+    stride=<span class="code-num">1</span>,        <span class="code-cm"># 步幅</span>
+    padding=<span class="code-num">0</span>,       <span class="code-cm"># 填充</span>
+    bias=<span class="code-kw">True</span>       <span class="code-cm"># 是否加偏置</span>
+)
+
+<span class="code-cm"># ========== 池化层 ==========</span>
+nn.MaxPool2d(kernel_size=<span class="code-num">2</span>, stride=<span class="code-num">2</span>)  <span class="code-cm"># 2×2最大池化，步长2</span>
+nn.AvgPool2d(kernel_size=<span class="code-num">2</span>, stride=<span class="code-num">2</span>)  <span class="code-cm"># 2×2平均池化</span>
+nn.AdaptiveAvgPool2d(output_size=(<span class="code-num">1</span>,<span class="code-num">1</span>)) <span class="code-cm"># GAP，自适应输出1×1</span>
+
+<span class="code-cm"># ========== 其他常用层 ==========</span>
+nn.BatchNorm2d(num_features)  <span class="code-cm"># 批归一化</span>
+nn.ReLU()                     <span class="code-cm"># ReLU激活</span>
+nn.Dropout(p=<span class="code-num">0.5</span>)              <span class="code-cm"># Dropout正则化</span>
+nn.Linear(in_features, out_features)  <span class="code-cm"># 全连接层</span>
+nn.Flatten()                  <span class="code-cm"># 展平：把H×W×C拉成向量</span></div>
+    <div class="hbox">
+      <h4>💡 小技巧</h4>
+      <p>nn.Sequential可以把层串联起来，让代码更简洁。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">15 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">PyTorch代码：LeNet风格CNN</h1>
+    <h3 class="sub">动手写一个完整的CNN做MNIST手写数字分类</h3>
+    <div class="code-block"><span class="code-kw">import</span> torch
+<span class="code-kw">import</span> torch.nn <span class="code-kw">as</span> nn
+<span class="code-kw">import</span> torch.nn.functional <span class="code-kw">as</span> F
+
+<span class="code-kw">class</span> <span class="code-cls">LeNet</span>(nn.Module):
+    <span class="code-kw">def</span> <span class="code-fn">__init__</span>(self, num_classes=<span class="code-num">10</span>):
+        <span class="code-fn">super</span>().__init__()
+        <span class="code-cm"># 特征提取部分</span>
+        self.features = nn.Sequential(
+            <span class="code-cm"># 输入: 1×28×28 (MNIST灰度图)</span>
+            nn.Conv2d(<span class="code-num">1</span>, <span class="code-num">6</span>, kernel_size=<span class="code-num">5</span>, padding=<span class="code-num">2</span>),  <span class="code-cm"># → 6×28×28</span>
+            nn.ReLU(),
+            nn.MaxPool2d(<span class="code-num">2</span>, <span class="code-num">2</span>),                        <span class="code-cm"># → 6×14×14</span>
+            nn.Conv2d(<span class="code-num">6</span>, <span class="code-num">16</span>, kernel_size=<span class="code-num">5</span>),             <span class="code-cm"># → 16×10×10</span>
+            nn.ReLU(),
+            nn.MaxPool2d(<span class="code-num">2</span>, <span class="code-num">2</span>),                        <span class="code-cm"># → 16×5×5</span>
+        )
+        <span class="code-cm"># 分类头（全连接部分）</span>
+        self.classifier = nn.Sequential(
+            nn.Linear(<span class="code-num">16</span>*<span class="code-num">5</span>*<span class="code-num">5</span>, <span class="code-num">120</span>),
+            nn.ReLU(),
+            nn.Linear(<span class="code-num">120</span>, <span class="code-num">84</span>),
+            nn.ReLU(),
+            nn.Linear(<span class="code-num">84</span>, num_classes),
+        )
+
+    <span class="code-kw">def</span> <span class="code-fn">forward</span>(self, x):
+        x = self.features(x)
+        x = x.flatten(<span class="code-num">1</span>)  <span class="code-cm"># 展平: (N,16,5,5) → (N,400)</span>
+        x = self.classifier(x)
+        <span class="code-kw">return</span> x
+
+<span class="code-cm"># 创建模型</span>
+model = LeNet(num_classes=<span class="code-num">10</span>)
+print(model)</div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">16 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">PyTorch代码：现代风格CNN</h1>
+    <h3 class="sub">加入BN和GAP，更像ResNet风格的网络</h3>
+    <div class="code-block"><span class="code-kw">class</span> <span class="code-cls">SimpleCNN</span>(nn.Module):
+    <span class="code-kw">def</span> <span class="code-fn">__init__</span>(self, num_classes=<span class="code-num">10</span>):
+        <span class="code-fn">super</span>().__init__()
+        self.features = nn.Sequential(
+            <span class="code-cm"># Block 1: 输入1×28×28 → 32×14×14</span>
+            nn.Conv2d(<span class="code-num">1</span>, <span class="code-num">32</span>, <span class="code-num">3</span>, padding=<span class="code-num">1</span>),
+            nn.BatchNorm2d(<span class="code-num">32</span>),
+            nn.ReLU(inplace=<span class="code-kw">True</span>),
+            nn.MaxPool2d(<span class="code-num">2</span>, <span class="code-num">2</span>),
+
+            <span class="code-cm"># Block 2: 32×14×14 → 64×7×7</span>
+            nn.Conv2d(<span class="code-num">32</span>, <span class="code-num">64</span>, <span class="code-num">3</span>, padding=<span class="code-num">1</span>),
+            nn.BatchNorm2d(<span class="code-num">64</span>),
+            nn.ReLU(inplace=<span class="code-kw">True</span>),
+            nn.MaxPool2d(<span class="code-num">2</span>, <span class="code-num">2</span>),
+
+            <span class="code-cm"># Block 3: 64×7×7 → 128×3×3 (stride=2卷积下采样)</span>
+            nn.Conv2d(<span class="code-num">64</span>, <span class="code-num">128</span>, <span class="code-num">3</span>, padding=<span class="code-num">1</span>, stride=<span class="code-num">2</span>),
+            nn.BatchNorm2d(<span class="code-num">128</span>),
+            nn.ReLU(inplace=<span class="code-kw">True</span>),
+        )
+        <span class="code-cm"># Global Average Pooling: 128×3×3 → 128×1×1</span>
+        self.gap = nn.AdaptiveAvgPool2d((<span class="code-num">1</span>, <span class="code-num">1</span>))
+        <span class="code-cm"># 分类头</span>
+        self.classifier = nn.Linear(<span class="code-num">128</span>, num_classes)
+
+    <span class="code-kw">def</span> <span class="code-fn">forward</span>(self, x):
+        x = self.features(x)
+        x = self.gap(x)
+        x = x.flatten(<span class="code-num">1</span>)  <span class="code-cm"># (N,128,1,1) → (N,128)</span>
+        x = self.classifier(x)
+        <span class="code-kw">return</span> x</div>
+    <div class="hbox success">
+      <h4>✨ 改进点</h4>
+      <p>加入BatchNorm稳定训练，用GAP替代Flatten减少参数，网络结构更现代，泛化能力更好。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">17 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">CNN训练要点</h1>
+    <h3 class="sub">训练CNN时需要注意的几个关键点</h3>
+    <div class="hbox warn">
+      <h4>📐 输入维度：必须是4维tensor</h4>
+      <p>CNN输入形状是 <strong style="font-family:var(--mono);color:var(--accent)">(N, C, H, W)</strong>：批次N × 通道C × 高H × 宽W。单张图片预测时要用unsqueeze(0)加batch维度。</p>
+    </div>
+    <div class="hbox danger">
+      <h4>⚠️ 尺寸匹配是第一大坑</h4>
+      <p>写代码时随时计算每层输出尺寸！<br>
+      公式：O = ⌊(I-K+2P)/S⌋ + 1<br>
+      不确定就print(tensor.shape)检查，这是最有效的debug方法。</p>
+    </div>
+    <div class="hbox success">
+      <h4>✅ 用nn.Sequential简化代码</h4>
+      <p>把Conv→BN→ReLU→Pool按顺序放进Sequential，forward方法只需要一行调用，结构清晰易读。</p>
+    </div>
+    <div class="hbox purple">
+      <h4>🔄 数据输入管道</h4>
+      <p>使用torchvision.datasets和DataLoader：<br>
+      • transforms.ToTensor()：把PIL图像转为[0,1]的tensor，自动调整为(C,H,W)格式<br>
+      • transforms.Normalize(mean,std)：标准化（ImageNet: mean=[0.485,0.456,0.406]）<br>
+      • DataLoader设置batch_size、shuffle=True、num_workers加速</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">18 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">训练循环代码示例</h1>
+    <h3 class="sub">一个标准的PyTorch训练循环长这样</h3>
+    <div class="code-block"><span class="code-kw">import</span> torch.optim <span class="code-kw">as</span> optim
+
+device = torch.device(<span class="code-str">'cuda'</span> <span class="code-kw">if</span> torch.cuda.is_available() <span class="code-kw">else</span> <span class="code-str">'cpu'</span>)
+model = SimpleCNN().to(device)
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=<span class="code-num">1e-3</span>)
+
+<span class="code-cm"># 训练循环</span>
+<span class="code-kw">for</span> epoch <span class="code-kw">in</span> range(<span class="code-num">10</span>):
+    model.train()
+    running_loss = <span class="code-num">0.0</span>
+    <span class="code-kw">for</span> images, labels <span class="code-kw">in</span> train_loader:
+        images, labels = images.to(device), labels.to(device)
+
+        optimizer.zero_grad()       <span class="code-cm"># 清零梯度</span>
+        outputs = model(images)      <span class="code-cm"># 前向传播</span>
+        loss = criterion(outputs, labels)  <span class="code-cm"># 计算损失</span>
+        loss.backward()              <span class="code-cm"># 反向传播</span>
+        optimizer.step()             <span class="code-cm"># 更新参数</span>
+
+        running_loss += loss.item()
+
+    <span class="code-cm"># 每个epoch后评估</span>
+    model.eval()
+    correct = total = <span class="code-num">0</span>
+    <span class="code-kw">with</span> torch.no_grad():
+        <span class="code-kw">for</span> images, labels <span class="code-kw">in</span> test_loader:
+            outputs = model(images.to(device))
+            _, predicted = outputs.max(<span class="code-num">1</span>)
+            total += labels.size(<span class="code-num">0</span>)
+            correct += predicted.eq(labels.to(device)).sum().item()
+
+    print(<span class="code-fn">f'Epoch {epoch+1}, Loss: {running_loss/len(train_loader):.4f}, '</span>
+          <span class="code-fn">f'Acc: {100.*correct/total:.2f}%'</span>)</div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">19 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">BN层放在哪里？</h1>
+    <h3 class="sub">Conv→BN→ReLU还是Conv→ReLU→BN？</h3>
+    <div class="hbox success">
+      <h4>✅ 标准做法：Conv → BN → ReLU</h4>
+      <p>原始ResNet论文的做法：卷积层后接BatchNorm，再接ReLU激活。BN对卷积的线性输出做归一化，然后再经过非线性激活。这是<strong style="color:var(--accent)">最常用、最稳妥</strong>的顺序。</p>
+    </div>
+    <div class="card" style="margin:1rem 0">
+      <h4 style="color:var(--accent2)">📋 还有其他顺序吗？</h4>
+      <div style="font-size:0.95rem;color:var(--muted);line-height:1.8">
+        <div style="padding:0.5rem 0">• <strong style="color:var(--accent)">Conv → BN → ReLU</strong>（标准/ResNet）✅</div>
+        <div style="padding:0.5rem 0">• <strong>Conv → ReLU → BN</strong>（早期VGG风格，少用）</div>
+        <div style="padding:0.5rem 0">• <strong>BN → ReLU → Conv</strong>（Pre-activation ResNet，更好训练）</div>
+        <div style="padding:0.5rem 0">• 有BN层时卷积层可以<strong>不要bias</strong>（BN里有β偏置）</div>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>💡 小贴士</h4>
+      <p>如果不确定顺序，就用Conv→BN→ReLU。这是经过大量实践验证的最佳实践，几乎所有现代CNN都用这个顺序。nn.Sequential里按顺序写就行。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">20 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">本章小结</h1>
+    <h3 class="sub">CNN的核心组件全回顾</h3>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node hl" style="min-width:120px">
+        <strong style="color:var(--accent)}">卷积层Conv</strong><br>
+        <small>提取局部特征</small>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:120px">
+        <strong>BN层</strong><br>
+        <small>稳定训练加速收敛</small>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:120px">
+        <strong style="color:var(--warning)}">ReLU激活</strong><br>
+        <small>引入非线性</small>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:120px">
+        <strong style="color:var(--accent2)}">池化层Pool</strong><br>
+        <small>降维+增大感受野</small>
+      </div>
+    </div>
+    <div class="flow" style="margin-top:0.5rem">
+      <div class="flow-node" style="min-width:140px">
+        重复N次提取多尺度特征
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:120px">
+        <strong>Flatten/GAP</strong><br>
+        <small>变为向量</small>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:120px">
+        <strong style="color:var(--success)}">全连接FC</strong><br>
+        <small>分类输出</small>
+      </div>
+    </div>
+    <div class="hbox pink" style="margin-top:1rem">
+      <h4>🧠 理解CNN的关键</h4>
+      <p>CNN不是什么黑魔法——它就是<strong style="color:var(--accent)">卷积层+激活+池化的重复堆叠</strong>，通过局部连接和权重共享高效提取层次化特征，最后用全连接层分类。理解每层的作用，你就理解了CNN。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">21 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">CNN训练常见问题</h1>
+    <h3 class="sub">模型不收敛？准确率低？看看这些常见坑</h3>
+    <div class="hbox danger">
+      <h4>❌ 问题1：loss不下降，准确率很低</h4>
+      <p><strong>排查：</strong>学习率是否太大/太小？数据预处理是否正确？（归一化了吗？）输入形状是否正确？标签是否对应？优化器选对了吗？</p>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 问题2：训练集准确率高，测试集低（过拟合）</h4>
+      <p><strong>解决：</strong>加Dropout、加数据增强（RandomCrop/RandomHorizontalFlip）、加权重衰减(L2正则)、用更简单模型、收集更多数据。</p>
+    </div>
+    <div class="hbox">
+      <h4>🐛 问题3：维度不匹配报错</h4>
+      <p><strong>解决：</strong>RuntimeError: mat1 and mat2 shapes cannot be multiplied——打印每层x.shape看哪里不对，用O=(I-K+2P)/S+1公式算FC层输入维度。</p>
+    </div>
+    <div class="hbox success">
+      <h4>💡 Debug黄金法则</h4>
+      <p>不确定的时候，在forward里print(x.shape)！这是最直接有效的debug方法，没有之一。先让一个batch过一遍模型看shape是否都对，再开始训练。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">22 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">数据增强（Data Augmentation）</h1>
+    <h3 class="sub">免费的正则化手段，大幅提升泛化能力</h3>
+    <div class="hbox">
+      <h4>🎯 为什么需要数据增强？</h4>
+      <p>CNN对平移、旋转、翻转、颜色变化不天然鲁棒。通过在训练时随机变换图像，人为"增加"训练数据的多样性，让模型见过更多变化，减少过拟合。</p>
+    </div>
+    <div class="code-block"><span class="code-kw">from</span> torchvision <span class="code-kw">import</span> transforms
+
+train_transform = transforms.Compose([
+    transforms.RandomCrop(<span class="code-num">32</span>, padding=<span class="code-num">4</span>),       <span class="code-cm"># 随机裁剪</span>
+    transforms.RandomHorizontalFlip(),            <span class="code-cm"># 随机水平翻转</span>
+    transforms.ToTensor(),
+    transforms.Normalize((<span class="code-num">0.4914</span>, <span class="code-num">0.4822</span>, <span class="code-num">0.4465</span>),
+                         (<span class="code-num">0.2023</span>, <span class="code-num">0.1994</span>, <span class="code-num">0.2010</span>)),
+])
+
+test_transform = transforms.Compose([
+    transforms.ToTensor(),  <span class="code-cm"># 测试时只做ToTensor+Normalize，不增强！</span>
+    transforms.Normalize((<span class="code-num">0.4914</span>, <span class="code-num">0.4822</span>, <span class="code-num">0.4465</span>),
+                         (<span class="code-num">0.2023</span>, <span class="code-num">0.1994</span>, <span class="code-num">0.2010</span>)),
+])</div>
+    <div class="hbox warn">
+      <h4>⚠️ 注意</h4>
+      <p><strong style="color:var(--danger)">测试/验证时绝对不能做数据增强</strong>！只做ToTensor和Normalize，否则评估结果不稳定。数据增强只在训练时使用。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">23 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">快速自测</h1>
+    <h3 class="sub">检查一下你对CNN组件的理解</h3>
+    <div class="card" style="margin-bottom:1rem">
+      <h4 style="color:var(--accent3)}">🤔 问题1</h4>
+      <p>Max Pooling和Average Pooling的区别是什么？为什么Max Pool更常用？</p>
+    </div>
+    <div class="card" style="margin-bottom:1rem">
+      <h4 style="color:var(--accent3)}">🤔 问题2</h4>
+      <p>Global Average Pooling相比Flatten+FC有什么优势？</p>
+    </div>
+    <div class="card" style="margin-bottom:1rem">
+      <h4 style="color:var(--accent3)}">🤔 问题3</h4>
+      <p>按时间顺序排列：AlexNet、LeNet、ResNet、VGGNet、GoogLeNet。它们各自的关键创新是什么？</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--accent3)}">🤔 问题4</h4>
+      <p>Conv→BN→ReLU→Pool这一套中，BN层的作用是什么？为什么BN层在ReLU前面？</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">24 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">自测答案</h1>
+    <h3 class="sub">你都答对了吗？</h3>
+    <div class="hbox success">
+      <h4>✅ 问题1答案</h4>
+      <p>Max Pool取窗口最大值，保留<strong>最显著特征激活</strong>；Average Pool取平均值，更平滑。Max Pool更常用因为它保留了"这个位置有没有这个特征"的最强信号，特征区分度更好。</p>
+    </div>
+    <div class="hbox success">
+      <h4>✅ 问题2答案</h4>
+      <p>GAP把每个通道全局平均为一个值：<br>
+      1. <strong>参数极少</strong>——没有FC层的大量参数，防止过拟合<br>
+      2. <strong>更好的可解释性</strong>——每个通道对应一个特征图的全局置信度<br>
+      3. <strong>无参数</strong>——纯计算操作，不会增加参数量<br>
+      4. <strong>全局感受野</strong>——天然整合了全局空间信息</p>
+    </div>
+    <div class="hbox success">
+      <h4>✅ 问题3答案</h4>
+      <p>顺序：<strong style="color:var(--accent)">LeNet(1998,CNN开山)</strong> → <strong>AlexNet(2012,ReLU+Dropout+GPU引爆DL)</strong> → <strong>VGG/GoogLeNet(2014,更深/Inception)</strong> → <strong style="color:var(--accent3)">ResNet(2015,残差连接,里程碑)</strong></p>
+    </div>
+    <div class="hbox success">
+      <h4>✅ 问题4答案</h4>
+      <p>BN层对每个mini-batch做归一化，使输出均值为0方差为1，缓解内部协变量偏移，加速训练、稳定训练、允许更大学习率、有轻微正则化效果。BN在ReLU前是因为要对卷积的线性输出做归一化再非线性激活。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">25 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">本集核心要点总结</h1>
+    <h3 class="sub">CNN组件+架构+代码一页纸总结</h3>
+    <div class="card" style="margin-bottom:0.8rem">
+      <h4 style="color:var(--accent)}">🏊 池化层</h4>
+      <p>Max Pool取最大值（最常用，保留最强激活），Avg Pool取平均，GAP全局平均替代FC。作用：降尺寸、增感受野、提供平移不变性。</p>
+    </div>
+    <div class="card" style="margin-bottom:0.8rem">
+      <h4 style="color:var(--accent2)}">🔄 CNN流水线</h4>
+      <p>[Conv→BN→ReLU→(Pool)]×N → GAP/Flatten → FC → Output。BN稳定训练，Pool下采样，FC做分类。</p>
+    </div>
+    <div class="card" style="margin-bottom:0.8rem">
+      <h4 style="color:var(--danger)}">📚 CNN架构演进</h4>
+      <p>LeNet(1998)→AlexNet(2012,引爆DL)→VGG(全3×3)→GoogLeNet(Inception)→ResNet(残差连接,最深152层,超越人类)。</p>
+    </div>
+    <div class="card" style="margin-bottom:0.8rem">
+      <h4 style="color:var(--success)}">🔍 特征可视化</h4>
+      <p>CNN分层学习特征：浅层学边缘颜色，中层学纹理，深层学物体部件，最深层学完整物体概念。</p>
+    </div>
+    <div class="card" style="margin-bottom:0.8rem">
+      <h4 style="color:var(--accent3)}">💻 PyTorch实战</h4>
+      <p>nn.Conv2d/nn.MaxPool2d/nn.BatchNorm2d/nn.AdaptiveAvgPool2d/nn.Linear。注意输入是(N,C,H,W)，随时打印shape debug。</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--warning)}">🎓 训练技巧</h4>
+      <p>数据增强防过拟合，Conv→BN→ReLU标准顺序，GAP减少参数，用Adam/SDG+动量优化。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">26 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">但是等等——为什么网络不能无限加深？</h1>
+    <h3 class="sub">如果更深更好，为什么不直接做1000层CNN？</h3>
+    <div class="hbox danger">
+      <h4>🤯 退化问题(Degradation Problem)</h4>
+      <p>实验发现：网络加深到一定程度（如20层以上）后，<strong style="color:var(--danger)">训练误差反而上升</strong>，测试误差也更差！<br><br>
+      这不是过拟合（训练集都变差了），也不是梯度消失（BN已经很大程度缓解了梯度消失）。这是一个全新的问题。</p>
+    </div>
+    <div class="card" style="margin:1rem 0">
+      <h4 style="color:var(--danger)}">❓ 为什么会这样？</h4>
+      <p>深层网络难以学习<strong>恒等映射(Identity Mapping)</strong>：<br>
+      如果浅层已经学到了很好的特征，深层应该至少能做到"什么都不做"（直接传递，即H(x)=x）。但让多个非线性层去拟合恒等映射非常困难！深层网络反而比浅网络更差。</p>
+    </div>
+    <div class="hbox pink">
+      <h4>✨ 解决方案：残差连接</h4>
+      <p>何恺明等人2015年提出ResNet，用一个简单的"捷径"（Skip Connection）解决了这个问题，让网络能训练到上百甚至上千层！<strong style="color:var(--accent)">下一集重点讲解！</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">27 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">下集预告</h1>
+    <h3 class="sub">残差连接——CNN和Transformer的共同"捷径"</h3>
+    <div class="flow" style="margin:2rem 0">
+      <div class="flow-node hl" style="min-width:150px">
+        <strong>第18集</strong><br>
+        残差连接：CNN和Transformer的共同捷径<br>
+        <small style="color:var(--muted)">BV1LGMw6HEEB · 33分26秒</small>
+      </div>
+    </div>
+    <div class="hbox pink">
+      <h4>📖 下集你将学到</h4>
+      <p>
+      • <strong>退化问题</strong>——为什么深层网络反而效果差<br>
+      • <strong>残差连接核心思想</strong>——y = F(x) + x，学习残差而非直接映射<br>
+      • <strong>梯度高速公路</strong>——为什么残差能训练超深网络<br>
+      • <strong>ResNet构建块</strong>——BasicBlock vs Bottleneck<br>
+      • <strong>ResNet家族</strong>——ResNet-18/34/50/101/152<br>
+      • <strong>残差连接的广泛应用</strong>——DenseNet/Transformer/U-Net都在用<br>
+      • <strong>PyTorch实现</strong>——亲手写一个Residual Block
+      </p>
+    </div>
+    <div class="hbox success">
+      <h4>🚀 这是一个非常重要的设计！</h4>
+      <p>残差连接不仅让CNN突破了深度瓶颈，也是Transformer的核心组件之一。理解它，你就理解了现代深度学习架构的关键设计思想。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · CNN：池化层、分类与代码示例</div>
+  <div class="slide-number">28 / 29</div>
+  <div class="slide-content" style="text-align:center;justify-content:center;align-items:center">
+    <h1 class="st" style="font-size:clamp(2.5rem,5vw,4rem)">🎓 第17集完成！</h1>
+    <h3 class="sub" style="max-width:700px;margin:0 auto 2rem">你已经掌握了CNN的完整组件——卷积、池化、BN、激活，会用PyTorch搭建CNN，了解了从LeNet到ResNet的架构演进，还亲手看了代码。CNN的基础已经打牢了！</h3>
+    <p style="font-size:1.3rem;color:var(--accent);font-weight:600;margin-bottom:2rem">下集残差连接，让我们见识什么是真正的"深度"！</p>
+    <div class="tags" style="justify-content:center">
+      <span class="tag pi">✅ 池化层掌握</span>
+      <span class="tag p">🏛️ CNN架构了解</span>
+      <span class="tag w">💻 PyTorch代码</span>
+      <span class="tag g">🔥 准备好残差连接</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-number">29 / 29</div>
+  <div class="slide-content">
+    <h1>🎉 感谢学习第17集！</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      CNN：池化层、分类与代码示例<br><br>
+      <strong style="color:var(--accent)">池化层降维 + 经典架构演进 + PyTorch实战</strong><br><br>
+      BV1fW7L6XEiv · 深度学习第17集
+    </p>
+    <div class="end-buttons">
+      <a href="chapter7.html" class="end-btn secondary">📺 回到视频页</a>
+      <a href="ppt-33.html" class="end-btn secondary">← 上一集</a>
+      <a href="ppt-35.html" class="end-btn primary">下一集：残差连接 →</a>
+    </div>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag pi">🔥 CNN基础完成</span>
+      <span class="tag p">💻 动手写代码</span>
+      <span class="tag g">继续加油</span>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+});
+</script>
+</body></html>

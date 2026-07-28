@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>DL第7集 梯度下降（神经网络版） - ML学习站PPT</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#f97316;--accent2:#fb923c;--accent3:#f59e0b;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--accent3);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent3);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(245,158,11,0.15) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(249,115,22,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.25);border-radius:50px;font-size:1rem;color:var(--accent);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:700px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(249,115,22,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:1.8rem 2rem;margin:1.5rem 0;text-align:center;font-size:clamp(1rem,1.8vw,1.25rem);line-height:2.2;overflow-x:auto}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:1rem;display:block;text-align:left;line-height:1.7}
+.katex{color:var(--accent3)}.katex .mord.text{color:var(--ink2)}
+.hbox{background:rgba(249,115,22,0.08);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1rem 0}
+.hbox h4{color:var(--accent);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(251,191,36,0.08);border-left-color:var(--warning)}.hbox.warn h4{color:var(--warning)}
+.hbox.danger{background:rgba(248,113,113,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.orange{background:rgba(251,146,60,0.08);border-left-color:var(--accent2)}.hbox.orange h4{color:var(--accent2)}
+.hbox.amber{background:rgba(245,158,11,0.08);border-left-color:var(--accent3)}.hbox.amber h4{color:var(--accent3)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.9rem}
+table.cmp th{background:var(--bg3);color:var(--accent3);padding:12px 10px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.85rem}
+table.cmp td{padding:10px;vertical-align:top;border-bottom:1px solid var(--rule);color:var(--ink2);line-height:1.6}
+table.cmp tr:hover td{background:rgba(249,115,22,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent3);background:rgba(245,158,11,0.1);color:var(--accent3);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent)}
+.tag.o{color:var(--accent2)}.tag.a{color:var(--accent3)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}.tag.d{color:var(--danger)}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent3),var(--accent2),var(--accent),var(--success));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent3);color:var(--accent3)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent3)}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.end-slide .end-buttons{display:flex;gap:1.5rem;justify-content:center;margin-top:2.5rem;flex-wrap:wrap}
+.end-slide .end-btn{padding:14px 32px;border-radius:12px;font-size:1.05rem;font-weight:600;text-decoration:none;transition:all .3s}
+.end-slide .end-btn.primary{background:linear-gradient(135deg,var(--accent3),var(--accent2));color:white}
+.end-slide .end-btn.secondary{background:var(--bg2);border:1px solid var(--rule);color:var(--ink2)}
+.end-slide .end-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(249,115,22,0.2)}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:1.5rem;align-items:stretch;margin:1.5rem 0}
+.vs-side{padding:1.5rem;border-radius:14px}
+.vs-divider{display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;color:var(--muted)}
+.code-block{background:var(--bg3);border-radius:12px;padding:1.5rem;margin:1rem 0;font-family:var(--mono);font-size:0.9rem;line-height:1.7;color:var(--ink2);overflow-x:auto}
+.code-block .kw{color:var(--accent3)}.code-block .fn{color:var(--accent2)}.code-block .str{color:var(--success)}.code-block .cmt{color:var(--muted)}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col{grid-template-columns:1fr}.hint{display:none}.vs{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="slides.html" style="font-weight:600;color:var(--accent3)">📊 PPT课件</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="chapter5.html">回到视频页</a>
+    <a href="ppt-21.html">← 上一集</a>
+    <a href="ppt-23.html">下一集 →</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">📉 深度学习入门 · 第7集</div>
+    <h1 class="cover-title">梯度下降：神经网络如何找到好参数</h1>
+    <p class="cover-sub">从SGD到Adam，优化算法的进化之路<br>BV1XbLh6mEru · 时长 26分40秒</p>
+    <div class="tags">
+      <span class="tag a">梯度下降</span>
+      <span class="tag o">Mini-batch</span>
+      <span class="tag">Momentum</span>
+      <span class="tag g">Adam</span>
+      <span class="tag w">学习率调度</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">2 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">本集内容导览</h1>
+    <h3 class="sub">优化算法——让神经网络快速、稳定地收敛</h3>
+    <div class="body">
+      <ul>
+        <li><strong style="color:var(--accent3)">梯度下降三种变体</strong>——Batch/SGD/Mini-batch</li>
+        <li><strong style="color:var(--accent2)">为什么Mini-batch是王道</strong>——GPU并行、噪声、稳定性</li>
+        <li><strong style="color:var(--accent)">Batch Size选择</strong>——32/64/128/256怎么选？</li>
+        <li><strong style="color:var(--success)">动量法Momentum</strong>——给梯度下降加"惯性"</li>
+        <li><strong style="color:var(--warning)">自适应学习率优化器</strong>——AdaGrad/RMSProp/Adam</li>
+        <li><strong style="color:var(--danger)">学习率调度</strong>——StepLR/Cosine/Warmup</li>
+        <li><strong style="color:var(--accent3)">PyTorch代码实战</strong>——配置不同优化器</li>
+      </ul>
+    </div>
+    <div class="hbox amber">
+      <h4>🎯 学习目标</h4>
+      <p>理解不同优化器的原理和优缺点，知道如何选择优化器和学习率，能够在PyTorch中配置和使用优化器。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">3 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">回顾：梯度下降核心思想</h1>
+    <h3 class="sub">θ = θ - η·∇L(θ)——沿梯度反方向更新参数</h3>
+    <div class="formula">
+      $$\displaystyle \theta = \theta - η \cdot \nabla _{ \theta }L( \theta )$$
+      <span class="desc">η是学习率，∇L是损失函数对参数θ的梯度。梯度方向是损失上升最快的方向，所以沿反方向走，损失就会下降。反复迭代直到收敛。</span>
+    </div>
+    <div class="flow">
+      <div class="flow-node">初始化参数θ</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl">计算梯度∇L</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">θ = θ - η∇L</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">重复直到收敛</div>
+    </div>
+    <div class="hbox orange">
+      <h4>🔑 关键问题：∇L怎么算？用多少数据算？</h4>
+      <p>上一集我们学了反向传播——它解决了"怎么高效算梯度"的问题。这一集我们解决"用多少数据算梯度"以及"怎么用梯度更新参数更好"的问题。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">4 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">Batch Gradient Descent（批量梯度下降）</h2>
+    <h3 class="sub">每次用全部训练数据计算梯度——最原始的版本</h3>
+    <div class="formula">
+      $$\displaystyle \theta = \theta - η \cdot \nabla _{ \theta }L( \theta ; 全部训练数据)$$
+    </div>
+    <div class="two-col">
+      <div class="hbox success">
+        <h4>✅ 优点</h4>
+        <p>
+          • 梯度估计<strong>最准确</strong>（用了全部数据）<br>
+          • 收敛稳定，能朝着最优解直线前进<br>
+          • 对凸问题能保证收敛到全局最优
+        </p>
+      </div>
+      <div class="hbox danger">
+        <h4>❌ 缺点</h4>
+        <p>
+          • <strong>极慢！</strong>数据集几百万样本，每次更新要算完所有数据<br>
+          • 内存要求大——要把全部数据放进显存/内存<br>
+          • 不能在线学习——新数据来了不能增量更新<br>
+          • 容易陷入局部最优（太"稳"了，没有探索性）
+        </p>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 实际情况</h4>
+      <p>在深度学习中，<strong>基本不用Batch GD</strong>——数据量太大，根本跑不动。只有很小的数据集或凸优化问题才会用。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">5 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">Stochastic Gradient Descent（随机梯度下降）</h2>
+    <h3 class="sub">每次随机选1个样本计算梯度——另一个极端</h3>
+    <div class="formula">
+      $$\displaystyle \theta = \theta - η \cdot \nabla _{ \theta }L( \theta ; 单个随机样本)$$
+    </div>
+    <div class="two-col">
+      <div class="hbox success">
+        <h4>✅ 优点</h4>
+        <p>
+          • <strong>极快！</strong>一次更新只需1个样本<br>
+          • 内存要求极小<br>
+          • 可以在线学习(online learning)<br>
+          • 噪声有助于跳出局部最优
+        </p>
+      </div>
+      <div class="hbox danger">
+        <h4>❌ 缺点</h4>
+        <p>
+          • 梯度估计<strong>噪声很大</strong>，方向不准<br>
+          • 更新震荡严重，损失曲线剧烈波动<br>
+          • 永远不会"收敛"，只会在最优点附近晃荡<br>
+          • 无法利用GPU矩阵并行加速
+        </p>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 实际情况</h4>
+      <p>纯SGD（每次1个样本）在深度学习中也<strong>很少用</strong>——GPU擅长并行计算，1个样本根本吃不饱GPU，浪费算力。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">6 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">Mini-batch Gradient Descent（小批量梯度下降）</h2>
+    <h3 class="sub">折中方案——每次选一小批样本计算梯度</h3>
+    <div class="formula">
+      $$\displaystyle \theta = \theta - η \cdot \nabla _{ \theta }L( \theta ; 一小批(batch)样本)$$
+    </div>
+    <div class="card accent" style="margin:1.5rem 0">
+      <h4>🏆 这才是实际中的标准选择！</h4>
+      <p style="margin-top:0.8rem;line-height:1.8">
+        每次不是用全部数据，也不是用1个，而是用一小批（比如32/64/128/256个）样本。<br>
+        这是Batch GD和SGD之间的折中，结合了两者的优点，避免了两者的缺点。
+      </p>
+    </div>
+    <div class="hbox amber">
+      <h4>💡 术语澄清</h4>
+      <p>在深度学习中，当人们说"SGD"时，通常指的就是<strong>Mini-batch SGD</strong>，而不是每次1个样本的纯SGD。不要混淆！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">7 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">为什么Mini-batch是王道？</h2>
+    <h3 class="sub">四个理由让它成为深度学习的标准选择</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="card-icon" style="color:var(--success)">⚡</div>
+        <h4>GPU并行加速</h4>
+        <p>GPU擅长并行矩阵运算，一批32/64/128个样本组成矩阵，一次性并行计算，比一个个算快得多！</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">🎲</div>
+        <h4>噪声帮助跳出局部最优</h4>
+        <p>小批量带来的梯度噪声不是坏事——它能让优化过程跳出尖锐的局部最小值，找到更平坦、泛化更好的最小值。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">📊</div>
+        <h4>收敛更稳定</h4>
+        <p>比纯SGD(1个样本)稳定得多，梯度估计更准，不会乱晃；又比Batch GD快得多。</p>
+      </div>
+    </div>
+    <div class="hbox orange">
+      <h4>💾 第四个理由：内存效率</h4>
+      <p>不需要把全部数据集放进内存，一批一批来就好。大数据集（几百万张图片）也能训练。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">8 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">Batch Size怎么选？</h2>
+    <h3 class="sub">这是一个需要权衡的超参数</h3>
+    <table class="cmp">
+      <tr>
+        <th>Batch Size</th>
+        <th>梯度质量</th>
+        <th>训练速度</th>
+        <th>显存需求</th>
+        <th>泛化能力</th>
+        <th>适用场景</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--danger)">1</strong></td>
+        <td style="color:var(--danger)">噪声极大</td>
+        <td style="color:var(--warning)">单步快但需要多步</td>
+        <td style="color:var(--success)">极小</td>
+        <td style="color:var(--success)">较好？噪声有正则效果</td>
+        <td>在线学习</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">32</strong></td>
+        <td style="color:var(--warning)">有噪声</td>
+        <td style="color:var(--success)">快</td>
+        <td style="color:var(--success)">小</td>
+        <td style="color:var(--success)">好</td>
+        <td>默认首选！小数据集/微调</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">64/128</strong></td>
+        <td style="color:var(--success)">较准确</td>
+        <td style="color:var(--success)">快</td>
+        <td style="color:var(--warning)">中等</td>
+        <td style="color:var(--warning)">好</td>
+        <td>最常用！大多数场景</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent3)">256/512</strong></td>
+        <td style="color:var(--success)">准确</td>
+        <td style="color:var(--warning)">单步慢但步少</td>
+        <td style="color:var(--danger)">大</td>
+        <td style="color:var(--warning)">可能略差</td>
+        <td>大数据集、大模型</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--danger)">全数据</strong></td>
+        <td style="color:var(--success)">最准确</td>
+        <td style="color:var(--danger)">极慢</td>
+        <td style="color:var(--danger)">极大</td>
+        <td style="color:var(--danger)">较差</td>
+        <td>凸优化、小数据集</td>
+      </tr>
+    </table>
+    <div class="hbox success">
+      <h4>✅ 实用建议</h4>
+      <p>不知道选什么时，<strong>先试32或64</strong>！这是最稳妥的默认选择。显存够可以试128/256，但不是越大越好——有研究表明大batch可能泛化略差。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">9 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">Epoch vs Iteration</h2>
+    <h3 class="sub">这两个概念很容易搞混，一定要分清</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="big-num" style="font-size:3rem">Epoch</div>
+        <h4>轮次</h4>
+        <p><strong>完整遍历一遍整个训练集</strong>，叫1个epoch。所有样本都被模型"看"过一次了。</p>
+      </div>
+      <div class="card accent">
+        <div class="big-num" style="font-size:3rem">Iteration</div>
+        <h4>迭代/步</h4>
+        <p><strong>处理一个mini-batch</strong>，做一次参数更新，叫1个iteration（或step）。</p>
+      </div>
+      <div class="card">
+        <div class="big-num" style="font-size:3rem">举例</div>
+        <h4>换算关系</h4>
+        <p>10000样本，batch=100：<br>1 epoch = 100 iterations</p>
+      </div>
+    </div>
+    <div class="formula">
+      $$\displaystyle iterations_per_epoch = 训练样本数 / batch_size$$
+    </div>
+    <div class="hbox amber">
+      <h4>💡 记住</h4>
+      <p>当别人说"训练了100个epoch"，意思是整个训练集过了100遍；说"训练了10000步(step)"，意思是参数更新了10000次。两者关系取决于batch size。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">10 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">SGD的问题：沟壑与震荡</h2>
+    <h3 class="sub">普通SGD在某些方向上反复横跳，收敛慢</h3>
+    <div class="card" style="margin-bottom:1rem">
+      <h4>🏔️ 损失曲面的"沟壑"问题</h4>
+      <p style="margin-top:0.8rem;line-height:1.8">
+        神经网络的损失曲面不是圆形的碗，而是像一个狭长的"沟壑"（ravine）：<br>
+        • 一个方向（沟壑方向）很陡，梯度大<br>
+        • 另一个方向（沿沟壑底部）很平缓，梯度小<br><br>
+        SGD在陡的方向上反复震荡（过冲→回来→再过冲），在平缓方向上前进很慢，整体走"之"字形，收敛效率低。
+      </p>
+    </div>
+    <div class="hbox warn">
+      <h4>🎯 怎么解决？</h4>
+      <p>就像小球滚下山坡会有惯性——如果能积累"之前的速度"，就能：<br>
+      1. 在震荡方向上抵消前后摆动，减少震荡<br>
+      2. 在平缓方向上保持前进，加速收敛<br>
+      这就是<strong style="color:var(--accent3)">动量法(Momentum)</strong>的核心思想！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">11 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">Momentum动量法</h2>
+    <h3 class="sub">给梯度下降加上"惯性"，像小球滚下山坡</h3>
+    <div class="formula">
+      $$\displaystyle v_{t} = \beta \cdot v_{t-1} + (1- \beta ) \cdot \nabla L_{t} \ \theta = \theta - η \cdot v_{t}$$
+      <span class="desc">v是"速度"，β是动量系数（通常0.9）。不是直接用当前梯度更新，而是用梯度的移动平均——积累了历史梯度方向。</span>
+    </div>
+    <div class="two-col">
+      <div class="hbox success">
+        <h4>✅ 为什么有效？</h4>
+        <p>
+          • <strong>减少震荡</strong>：前后相反的梯度互相抵消<br>
+          • <strong>加速收敛</strong>：一致方向的梯度互相叠加，速度越来越快<br>
+          • <strong>逃出局部最优</strong>：有了"惯性"，能冲过小的局部最小值<br>
+          • 收敛速度通常比普通SGD快很多
+        </p>
+      </div>
+      <div class="hbox orange">
+        <h4>🎮 直觉理解</h4>
+        <p>
+          • 想象推一个很重的球下山：一开始慢，但越滚越快<br>
+          • 遇到小上坡（局部最优），靠惯性冲过去<br>
+          • β=0.9意味着：当前速度保留90%，新梯度贡献10%<br>
+          • 就像指数加权平均，最近10步左右的梯度都有影响
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">12 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">Nesterov Accelerated Gradient (NAG)</h2>
+    <h3 class="sub">动量法的改进——"向前看一步"再算梯度</h3>
+    <div class="formula">
+      $$\displaystyle v_{t} = \beta \cdot v_{t-1} + (1- \beta ) \cdot \nabla L( \theta - η \beta \cdot v_{t-1}) \ \theta = \theta - η \cdot v_{t}$$
+      <span class="desc">不是在当前位置θ算梯度，而是在"按照当前动量会走到的位置"θ-ηβv<sub>t-1</sub>算梯度——先往前看一步，再调整方向。</span>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--accent2)">🧠 直觉</h4>
+        <p style="margin-top:0.8rem">
+          就像开车：普通Momentum是先开（按动量），到位置了再看路标（算梯度）再调整方向；<br>
+          NAG是先往前看一眼路标（在预期位置算梯度），提前知道要转弯了，就不会冲过头。
+        </p>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent3)">📊 效果</h4>
+        <p style="margin-top:0.8rem">
+          NAG在某些情况下比Momentum收敛更快、更稳定，不会那么容易冲过头。但在自适应学习率优化器（Adam等）流行后，NAG用得没那么多了。
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">13 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">问题：所有参数用同一个学习率合适吗？</h2>
+    <h3 class="sub">稀疏特征、频繁更新的参数需要不同的学习率</h3>
+    <div class="card" style="margin-bottom:1rem">
+      <h4>🤔 思考一下</h4>
+      <p style="margin-top:0.8rem;line-height:1.8">
+        一个神经网络里可能有几百万个参数：<br>
+        • 有些参数对应的特征<strong>经常出现</strong>（比如常见词、常见像素模式）——更新很频繁<br>
+        • 有些参数对应的特征<strong>很少出现</strong>（比如罕见词、罕见模式）——更新很少<br><br>
+        如果都用同一个学习率η：<br>
+        • 对频繁更新的参数，η可能太大（震荡）<br>
+        • 对稀疏、很少更新的参数，η可能太小（学太慢）
+      </p>
+    </div>
+    <div class="hbox amber">
+      <h4>💡 解决方案思路</h4>
+      <p>能不能让<strong>每个参数有自己的学习率</strong>？更新频繁的参数自动减小学习率，更新少的参数保持较大学习率？这就是<strong style="color:var(--accent3)">自适应学习率优化器</strong>的核心思想。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">14 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">AdaGrad：自适应学习率</h2>
+    <h3 class="sub">给每个参数一个"历史梯度平方和"来缩放学习率</h3>
+    <div class="formula">
+      $$\displaystyle s_{t} = s_{t-1} + \nabla L_{t} ⊙ \nabla L_{t} \ \theta = \theta - η \cdot \nabla L_{t} / ( \sqrt{s_{t} + \epsilon )$$
+      <span class="desc">s累积历史梯度的平方。梯度大的参数，s累积快，有效学习率η/√s变小；梯度小的参数，s累积慢，有效学习率相对大。</span>
+    </div>
+    <div class="two-col">
+      <div class="hbox success">
+        <h4>✅ 优点</h4>
+        <p>
+          • 自动调整每个参数的学习率<br>
+          • 稀疏特征学习率大，稠密特征学习率小<br>
+          • 适合处理稀疏数据
+        </p>
+      </div>
+      <div class="hbox danger">
+        <h4>❌ 致命缺点</h4>
+        <p>
+          • s是单调递增的（一直加）<br>
+          • 训练越久，学习率被压得越小<br>
+          • <strong>最终学习率趋近于0</strong>，训练提前停止！<br>
+          • 这在深度学习中是大问题
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">15 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">RMSProp：解决AdaGrad的问题</h2>
+    <h3 class="sub">用滑动平均代替累加，不让学习率降到0</h3>
+    <div class="formula">
+      $$\displaystyle s_{t} = \beta \cdot s_{t-1} + (1- \beta ) \cdot \nabla L_{t} ⊙ \nabla L_{t} \ \theta = \theta - η \cdot \nabla L_{t} / ( \sqrt{s_{t} + \epsilon )$$
+      <span class="desc">s不再是无限累加，而是梯度平方的指数滑动平均（β通常0.999）——和Momentum的思路一样，老的梯度会慢慢"遗忘"，s不会无限增大，学习率不会降到0。</span>
+    </div>
+    <div class="hbox success" style="margin:1.5rem 0">
+      <h4>✅ 效果</h4>
+      <p>Hinton在Coursera课上提出的未发表方法，简单却有效——既保留了自适应学习率的优点，又解决了AdaGrad学习率单调递减的问题。RMSProp在RNN等场景表现不错。</p>
+    </div>
+    <div class="hbox orange">
+      <h4>💡 思路总结</h4>
+      <p>Momentum用滑动平均累积<strong>梯度本身（一阶矩）</strong>，减少震荡、加速；RMSProp用滑动平均累积<strong>梯度平方（二阶矩）</strong>，自适应调整每个参数的学习率。如果把两者结合起来呢？——这就是Adam！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">16 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">Adam：Momentum + RMSProp 的结合</h2>
+    <h3 class="sub">Adaptive Moment Estimation——目前最常用的默认优化器</h3>
+    <div class="formula">
+      $$\displaystyle m_{t} = \beta _1 \cdot m_{t-1} + (1- \beta _1) \cdot \nabla L_{t} &nbsp;&nbsp;<span style="font-size:0.85rem;color:var(--muted)">(一阶矩：梯度的滑动平均，类似Momentum)</span> \ v_{t} = \beta _2 \cdot v_{t-1} + (1- \beta _2) \cdot \nabla L_{t}⊙ \nabla L_{t} &nbsp;&nbsp;<span style="font-size:0.85rem;color:var(--muted)">(二阶矩：梯度平方的滑动平均，类似RMSProp)</span> \ m̂_{t} = m_{t}/(1- \beta _1ᵗ),&nbsp; v̂_{t} = v_{t}/(1- \beta _2ᵗ) &nbsp;&nbsp;<span style="font-size:0.85rem;color:var(--muted)">(偏差修正：初始m,v为0，需要校正)</span> \ \theta = \theta - η \cdot m̂_{t} / ( \sqrt{v̂_{t} + \epsilon )$$
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">17 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">Adam超参数详解</h2>
+    <h3 class="sub">默认参数通常就很好，一般不需要调</h3>
+    <table class="cmp">
+      <tr>
+        <th>参数</th>
+        <th>默认值</th>
+        <th>含义</th>
+        <th>需要调吗？</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">η (lr)</strong></td>
+        <td>0.001</td>
+        <td>学习率，最重要的参数</td>
+        <td style="color:var(--warning)">经常需要调！常见范围1e-4 ~ 1e-3</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">β₁</strong></td>
+        <td>0.9</td>
+        <td>一阶矩（梯度均值）的衰减率，类似Momentum的β</td>
+        <td style="color:var(--success)">一般不用改</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent3)">β₂</strong></td>
+        <td>0.999</td>
+        <td>二阶矩（梯度平方）的衰减率，类似RMSProp的β</td>
+        <td style="color:var(--success)">一般不用改，有时可用0.99/0.995</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--success)">ε</strong></td>
+        <td>1e-8</td>
+        <td>防止除0的小常数</td>
+        <td style="color:var(--success)">完全不用改</td>
+      </tr>
+    </table>
+    <div class="hbox success">
+      <h4>🏆 Adam的优点</h4>
+      <p>
+        • 收敛速度快，对学习率不那么敏感<br>
+        • 基本不需要手动调β₁/β₂，默认就很好<br>
+        • 处理稀疏梯度、噪声梯度都不错<br>
+        • <strong>是绝大多数场景的默认首选</strong>
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">18 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">Adam的小缺点：可能收敛到次优点</h2>
+    <h3 class="sub">Adam收敛快，但最终精度有时不如精调的SGD+Momentum</h3>
+    <div class="vs">
+      <div class="vs-side" style="background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.2)">
+        <h3 style="color:var(--accent);margin-bottom:1rem">🟠 Adam</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul>
+            <li>收敛<strong>快</strong>，前期下降迅速</li>
+            <li>对学习率鲁棒，好调参</li>
+            <li>省时间，快速出baseline</li>
+            <li>有时最终<strong>泛化略差</strong></li>
+            <li>论文实验、原型开发首选</li>
+          </ul>
+        </div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side" style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2)">
+        <h3 style="color:var(--success);margin-bottom:1rem">🟢 SGD+Momentum</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul>
+            <li>收敛<strong>慢</strong>，需要更多epoch</li>
+            <li>对学习率敏感，需要精细调参</li>
+            <li>可能需要更好的学习率调度</li>
+            <li>调得好时<strong>泛化更好</strong></li>
+            <li>比赛刷榜、追求极致精度时用</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="hbox amber">
+      <h4>💡 实用建议</h4>
+      <p>
+        <strong>开始用Adam快速出baseline</strong>，确定模型、数据没问题后，如果需要进一步提升精度，可以<strong>尝试SGD+Momentum+学习率调度</strong>精调。<br>
+        AdamW（Adam+权重衰减）是Adam的改进版，现在Transformer训练常用。
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">19 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">其他常见优化器</h2>
+    <h3 class="sub">Adam家族还有很多变体，以及其他选择</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <h4 style="color:var(--success)">AdamW</h4>
+        <p>Adam + 权重衰减(Weight Decay)解耦。现在<strong>训练Transformer的标配</strong>（GPT/BERT/ViT都用），比原版Adam泛化更好。</p>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent2)">AdaMax</h4>
+        <p>Adam的变体，用L∞范数代替L2范数，更稳定一些。但用得不多。</p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--accent3)">NAdam</h4>
+        <p>Adam + Nesterov动量，把NAG的"向前看"思想融入Adam。据说有时比Adam稍好。</p>
+      </div>
+    </div>
+    <div class="three-col">
+      <div class="card">
+        <h4 style="color:var(--warning)">RMSprop</h4>
+        <p>前面讲过了，Hinton课上提出，RNN时代常用，现在基本被Adam取代。</p>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--danger)">Adadelta</h4>
+        <p>AdaGrad的另一种改进，甚至不需要设置初始学习率，但用得很少。</p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--accent)">LION</h4>
+        <p>2023年Google提出的新优化器，省显存，在大模型上表现好，值得关注。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">20 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">优化器选择建议</h1>
+    <h3 class="sub">面对这么多优化器，该怎么选？</h3>
+    <div class="flow" style="flex-direction:column;gap:1rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node hl" style="text-align:left;min-width:auto;border-left:4px solid var(--accent);padding-left:1.5rem">
+        <strong style="color:var(--accent)">🥇 默认首选：Adam / AdamW</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">lr=0.001（或3e-4），快速收敛、省时间，适合90%场景</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent2);padding-left:1.5rem">
+        <strong style="color:var(--accent2)">🥈 训练Transformer/大模型：AdamW</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">必须用权重衰减，配合Warmup+Cosine学习率调度</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--success);padding-left:1.5rem">
+        <strong style="color:var(--success)">🥉 追求极致精度/刷比赛：SGD+Momentum</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">lr=0.1（配合衰减），momentum=0.9，耐心调参+学习率调度</span>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 别浪费太多时间选优化器</h4>
+      <p>优化器的影响通常不如<strong>学习率</strong>、<strong>模型架构</strong>、<strong>数据质量/数量</strong>大。用Adam先跑通，比花一周选优化器更有价值。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">21 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">学习率是最重要的超参数</h2>
+    <h3 class="sub">没有之一——学习率决定了训练能不能成功</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card" style="border-color:rgba(248,113,113,0.3)">
+        <div class="card-icon" style="color:var(--danger)">🐢</div>
+        <h4>学习率太小</h4>
+        <p>收敛极慢，训练要很久；可能卡在局部最优出不来；看起来loss在降，但降得太慢。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--success)">🎯</div>
+        <h4>学习率合适</h4>
+        <p>loss快速下降，稳定收敛；训练速度快，最终效果好。这是我们要找的"黄金区间"。</p>
+      </div>
+      <div class="card" style="border-color:rgba(248,113,113,0.3)">
+        <div class="card-icon" style="color:var(--danger)">💥</div>
+        <h4>学习率太大</h4>
+        <p>loss震荡不下降，甚至上升；参数更新步子太大，直接跨过去了；严重时loss变NaN，训练崩溃。</p>
+      </div>
+    </div>
+    <div class="hbox amber">
+      <h4>💡 怎么找合适的学习率？</h4>
+      <p><strong>学习率查找(Learning Rate Range Test)</strong>：从很小的lr开始，训练几百步，lr指数增长，观察loss什么时候开始下降——那个点就是合适的lr。或者用网格搜索：试1e-4, 3e-4, 1e-3, 3e-3等。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">22 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">学习率调度(Learning Rate Scheduling)</h2>
+    <h3 class="sub">固定学习率不是最优的——训练过程中调整lr效果更好</h3>
+    <div class="card" style="margin-bottom:1rem">
+      <h4>🤔 为什么要调度学习率？</h4>
+      <p style="margin-top:0.8rem;line-height:1.8">
+        训练初期：参数离最优解远，需要<strong>大学习率</strong>快速前进<br>
+        训练后期：参数接近最优解，需要<strong>小学习率</strong>微调，避免震荡<br><br>
+        就像开车：高速上开快，到目的地附近减速——不能一直120码，也不能一直20码。
+      </p>
+    </div>
+    <div class="hbox orange">
+      <h4>📊 常见调度策略</h4>
+      <p>接下来我们看几种最常用的学习率调度方法。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">23 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">常见学习率调度策略</h2>
+    <h3 class="sub">从简单到先进，各有适用场景</h3>
+    <table class="cmp">
+      <tr>
+        <th>调度器</th>
+        <th>原理</th>
+        <th>优点</th>
+        <th>适用场景</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">StepLR</strong></td>
+        <td>每N个epoch，lr乘以γ（如0.1）</td>
+        <td>简单直观</td>
+        <td>传统CNN、SGD训练</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">MultiStepLR</strong></td>
+        <td>在指定epoch点衰减（如[30,60,90]）</td>
+        <td>灵活控制点</td>
+        <td>ResNet等经典网络训练</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--success)">CosineAnnealingLR</strong></td>
+        <td>余弦退火：lr从初始值平滑降到接近0</td>
+        <td>平滑、效果好</td>
+        <td>现在很流行，大多数场景都好用</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--warning)">ReduceLROnPlateau</strong></td>
+        <td>监控val_loss，不下降就衰减lr</td>
+        <td>自适应，不用手动设milestone</td>
+        <td>不确定训练时长时</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent3)">Warmup + Cosine</strong></td>
+        <td>前几步lr从0线性升到最大值，再余弦衰减</td>
+        <td>稳定训练、Transformer标配</td>
+        <td><strong>大模型/Transformer必用！</strong></td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">24 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">Warmup：为什么训练初期不能用大lr？</h2>
+    <h3 class="sub">一开始就大lr会导致训练不稳定，甚至崩溃</h3>
+    <div class="card" style="margin-bottom:1rem">
+      <h4>🔍 为什么需要Warmup？</h4>
+      <p style="margin-top:0.8rem;line-height:1.8">
+        训练刚开始时，参数是随机初始化的，梯度可能很大/很不稳定。如果一开始就用大学习率：<br>
+        • 参数更新步长太大，可能直接"飞"到一个很差的区域<br>
+        • 尤其是Adam等自适应优化器，前几步的梯度统计量（m,v）还不准<br>
+        • 可能直接导致loss变NaN，训练崩掉<br><br>
+        <strong>Warmup策略</strong>：前几百/几千步，学习率从一个很小的值（或0）<strong>线性增长</strong>到设定的最大值，然后再用Cosine等方式衰减。
+      </p>
+    </div>
+    <div class="hbox success">
+      <h4>✅ Transformer训练标配</h4>
+      <p>GPT、BERT、ViT等所有大模型都用Warmup+CosineAnnealing。通常warmup占总步数的5%-10%（比如总10000步，前500-1000步warmup）。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">25 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">代码示例：PyTorch优化器配置</h2>
+    <h3 class="sub">在PyTorch中使用不同优化器非常简单</h3>
+    <div class="code-block">
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+<span class="kw">import</span> torch.optim <span class="kw">as</span> optim
+
+model = <span class="fn">MyModel</span>()
+
+<span class="cmt"># 1. SGD（带动量）</span>
+optimizer = optim.<span class="fn">SGD</span>(model.parameters(), lr=0.1, momentum=0.9, weight_decay=1e-4)
+
+<span class="cmt"># 2. Adam（最常用默认选择）</span>
+optimizer = optim.<span class="fn">Adam</span>(model.parameters(), lr=0.001, betas=(0.9, 0.999))
+
+<span class="cmt"># 3. AdamW（Transformer/大模型标配）</span>
+optimizer = optim.<span class="fn">AdamW</span>(model.parameters(), lr=3e-4, weight_decay=0.01)
+
+<span class="cmt"># 学习率调度器</span>
+scheduler = optim.lr_scheduler.<span class="fn">CosineAnnealingLR</span>(optimizer, T_max=100)
+<span class="cmt"># 或者带Warmup（需要用PyTorch 1.10+或transformers库）</span>
+<span class="kw">from</span> transformers <span class="kw">import</span> get_cosine_schedule_with_warmup
+scheduler = <span class="fn">get_cosine_schedule_with_warmup</span>(
+    optimizer, num_warmup_steps=500, num_training_steps=10000
+)
+
+<span class="cmt"># 训练循环中使用</span>
+<span class="kw">for</span> x, y <span class="kw">in</span> dataloader:
+    optimizer.<span class="fn">zero_grad</span>()
+    loss = <span class="fn">criterion</span>(model(x), y)
+    loss.<span class="fn">backward</span>()
+    optimizer.<span class="fn">step</span>()
+    scheduler.<span class="fn">step</span>()  <span class="cmt"># 更新学习率</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">26 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">DL优化中的其他困难</h1>
+    <h3 class="sub">局部最小值、鞍点、梯度消失/爆炸</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="card-icon" style="color:var(--warning)">🕳️</div>
+        <h4>局部最小值</h4>
+        <p>以前以为是大问题，实际上高维空间中<strong>鞍点</strong>比局部最小值常见得多，而且SGD噪声+动量能逃出小局部最优。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--danger)">⚡</div>
+        <h4>鞍点(Saddle Point)</h4>
+        <p>某些方向是极大值，某些方向是极小值，梯度为0但不是最优点。这才是高维空间真正的"减速带"。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">📉</div>
+        <h4>梯度消失/爆炸</h4>
+        <p>上集讲过，深层网络的顽疾。需要：合理初始化、BatchNorm、残差连接、梯度裁剪等手段辅助。</p>
+      </div>
+    </div>
+    <div class="hbox orange">
+      <h4>💡 好消息</h4>
+      <p>这些问题听起来可怕，但现代深度学习框架+好的架构设计（ResNet/Transformer）+好的初始化/BN/优化器，大部分时候你不需要太担心——按照最佳实践来，训练通常能正常收敛。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">27 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">本集核心知识点总结</h1>
+    <h3 class="sub">从SGD到Adam——优化算法的进化</h3>
+    <div class="hbox amber" style="margin:1.5rem 0">
+      <h4>🎯 记住这些核心点</h4>
+      <p>
+        • <strong>Mini-batch SGD</strong>是标准选择，batch size默认32/64<br>
+        • <strong>1 epoch = 遍历一遍全部数据</strong>；1 iteration = 更新一次参数<br>
+        • <strong>Momentum</strong>通过积累历史梯度减少震荡、加速收敛<br>
+        • <strong>Adam = Momentum + RMSProp</strong>，自适应学习率，默认首选<br>
+        • Adam超参数一般不用调，lr=0.001是好的起点<br>
+        • <strong>学习率是最重要的超参数</strong>，没有之一<br>
+        • 学习率调度很重要：Warmup+Cosine是现代标配<br>
+        • 用<strong>AdamW训练Transformer</strong>，SGD+Momentum适合刷精度
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-chapter">DL第7集 · 梯度下降（神经网络版）</div>
+  <div class="slide-number">28 / 28</div>
+  <div class="slide-content">
+    <h1>🎉 第5章知识学完了！</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      恭喜你完成了神经网络基础的全部7集！<br><br>
+      <strong style="color:var(--accent3)">AI简史 → 环境搭建 → 感知机 → MLP → 反向传播 → 激活函数 → 梯度下降</strong><br><br>
+      下一集：第5章总结+下章预告<br>
+      B站：BV1XbLh6mEru · 26分40秒
+    </p>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag a">✅ 梯度下降</span>
+      <span class="tag o">⚡ Adam</span>
+      <span class="tag g">📉 学习率调度</span>
+      <span class="tag">🏆 第5章完成</span>
+    </div>
+    <div class="end-buttons">
+      <a href="chapter5.html" class="end-btn secondary">📺 回到视频页</a>
+      <a href="ppt-21.html" class="end-btn secondary">← 上一集</a>
+      <a href="ppt-23.html" class="end-btn primary">第5章总结 →</a>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+});
+</script>
+</body></html>

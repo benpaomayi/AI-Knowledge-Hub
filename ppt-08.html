@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>第8集 欠拟合与过拟合 - ML学习站PPT</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#38bdf8;--accent2:#818cf8;--accent3:#c084fc;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--accent);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(56,189,248,0.1) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(129,140,248,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.25);border-radius:50px;font-size:1rem;color:var(--accent);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:700px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(56,189,248,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:2rem;margin:1.5rem 0;text-align:center;font-family:var(--mono);font-size:clamp(1rem,1.8vw,1.3rem);color:var(--accent);line-height:2}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:1rem;display:block;text-align:left;line-height:1.7}
+.katex{color:var(--accent3)}.katex .mord.text{color:var(--ink2)}
+.hbox{background:rgba(56,189,248,0.08);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1.5rem 0}
+.hbox h4{color:var(--accent);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(251,191,36,0.08);border-left-color:var(--warning)}.hbox.warn h4{color:var(--warning)}
+.hbox.danger{background:rgba(248,113,113,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.purple{background:rgba(129,140,248,0.08);border-left-color:var(--accent2)}.hbox.purple h4{color:var(--accent2)}
+.hbox.pink{background:rgba(192,132,252,0.08);border-left-color:var(--accent3)}.hbox.pink h4{color:var(--accent3)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:1rem}
+table.cmp th{background:var(--bg3);color:var(--accent);padding:12px 16px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.95rem}
+table.cmp td{padding:10px 16px;border-bottom:1px solid var(--rule);color:var(--ink2)}
+table.cmp tr:hover td{background:rgba(56,189,248,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent);background:rgba(56,189,248,0.1);color:var(--accent);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent)}
+.tag.p{color:var(--accent2)}.tag.pi{color:var(--accent3)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}.tag.d{color:var(--danger)}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent);color:var(--accent)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent)}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;background:linear-gradient(135deg,var(--accent),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.code{background:var(--bg);border:1px solid var(--rule);border-radius:14px;padding:1.5rem 2rem;margin:1.5rem 0;font-family:var(--mono);font-size:clamp(0.85rem,1.4vw,1rem);line-height:1.8;color:var(--ink2);overflow-x:auto;white-space:pre}
+.code .kw{color:var(--accent3)}.code .fn{color:var(--accent)}.code .str{color:var(--success)}.code .cm{color:var(--muted);font-style:italic}.code .num{color:var(--warning)}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:2rem;align-items:center;margin:2rem 0}
+.vs-side{padding:2rem;border-radius:16px;text-align:center}.vs-left{background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2)}
+.vs-right{background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2)}
+.vs-divider{font-size:2rem;font-weight:800;color:var(--muted)}
+.error-curve{width:100%;height:220px;position:relative;background:var(--bg2);border-radius:14px;border:1px solid var(--rule);margin:1.5rem 0;overflow:hidden}
+.curve-axis{position:absolute;bottom:40px;left:60px;right:40px;height:2px;background:var(--muted)}
+.curve-axis-y{position:absolute;bottom:40px;left:60px;width:2px;height:140px;background:var(--muted)}
+.curve-label-x{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:var(--muted);font-size:0.9rem}
+.curve-label-y{position:absolute;top:10px;left:10px;color:var(--muted);font-size:0.9rem}
+.curve-train{position:absolute;bottom:40px;left:60px;right:40px;height:140px}
+.curve-train svg{width:100%;height:100%}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col,.vs{grid-template-columns:1fr}.vs-divider{text-align:center}.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="slides.html" style="font-weight:600;color:var(--accent)">📊 PPT课件</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="ppt-07.html">← 上一集</a>
+    <a href="chapter2.html">回到视频页</a>
+    <a href="ppt-09.html" style="color:var(--accent);font-weight:600">下一章 →</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">机器学习入门教程 · 第8集 · 第2章</div>
+    <h1 class="cover-title">欠拟合与过拟合</h1>
+    <p class="cover-sub">机器学习的核心难题<br>如何让模型真正"学会"而不是"死记硬背"<br>BV1r9dYBiEjA · 时长 26分38秒</p>
+    <div class="tags">
+      <span class="tag">欠拟合</span>
+      <span class="tag d">过拟合</span>
+      <span class="tag g">泛化能力</span>
+      <span class="tag p">偏差方差权衡</span>
+      <span class="tag pi">正则化</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">2 / 44</div>
+  <div class="slide-content">
+    <h1 class="st">本集学习目标</h1>
+    <h3 class="sub">学完这一集，你将掌握机器学习中最重要的问题之一</h3>
+    <div class="body">
+      <ul>
+        <li><strong>理解泛化能力</strong>——为什么训练误差低不等于模型好？</li>
+        <li><strong>掌握欠拟合(Underfitting)</strong>——模型太简单是什么表现？怎么解决？</li>
+        <li><strong>掌握过拟合(Overfitting)</strong>——模型太复杂是什么表现？为什么会发生？</li>
+        <li><strong>理解偏差-方差权衡(Bias-Variance Tradeoff)</strong>——机器学习的核心矛盾</li>
+        <li><strong>学会判断拟合状态</strong>——如何通过训练误差和测试误差诊断问题？</li>
+        <li><strong>掌握解决方法</strong>——正则化(L1/L2)、交叉验证、早停、Dropout等实用技术</li>
+      </ul>
+    </div>
+    <div class="hbox success">
+      <h4>🎯 为什么这集很重要？</h4>
+      <p>欠拟合和过拟合是机器学习实践中最常遇到的问题。无论你用什么算法——线性回归、决策树还是神经网络——都绕不开这个问题。可以说，理解了偏差方差权衡，才算真正理解了机器学习。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">3 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">复习：训练集和测试集</h2>
+    <h3 class="sub">在开始之前，先回忆一下数据集划分的概念</h3>
+    <div class="two-col">
+      <div class="card accent">
+        <div class="card-icon">📚</div>
+        <h4 style="color:var(--accent)">训练集 (Training Set)</h4>
+        <p style="margin-bottom:0.8rem">用来训练模型的数据，相当于学生平时做的"练习题"</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>占总数据的 70%~80%</li>
+          <li>模型"看"过这些数据，用来学习规律</li>
+          <li>训练时模型直接接触这些数据的标签</li>
+          <li>就像学生的课本、课后习题</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-icon">📝</div>
+        <h4 style="color:var(--success)">测试集 (Test Set)</h4>
+        <p style="margin-bottom:0.8rem">用来评估模型性能的数据，相当于"期末考试题"</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>占总数据的 20%~30%</li>
+          <li>训练时模型<strong style="color:var(--danger)">完全看不到</strong>这些数据！</li>
+          <li>用来检验模型在新数据上的表现</li>
+          <li>就像高考题，学生考前绝对不能见过</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 关键原则：测试集不可见！</h4>
+      <p>测试集就像考试的密封卷，训练时绝对不能用测试集的任何信息（包括特征、标签）来调整模型。否则就是"作弊"，得到的结果是虚假的。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">4 / 44</div>
+  <div class="slide-content">
+    <h1 class="st">一个关键现象</h1>
+    <h3 class="sub">训练误差低 ≠ 模型好！这是新手最容易犯的错误</h3>
+    <div class="body">
+      <p>假设你训练了一个模型：</p>
+    </div>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card" style="text-align:center">
+        <div class="big-num" style="font-size:2.5rem;background:linear-gradient(135deg,var(--success),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent">99%</div>
+        <p style="color:var(--muted)">训练集准确率</p>
+      </div>
+      <div class="flow-arrow" style="font-size:2rem">≠</div>
+      <div class="card" style="text-align:center;border-color:rgba(248,113,113,0.3)">
+        <div class="big-num" style="font-size:2.5rem;background:linear-gradient(135deg,var(--danger),var(--warning));-webkit-background-clip:text;-webkit-text-fill-color:transparent">60%</div>
+        <p style="color:var(--muted)">测试集准确率</p>
+      </div>
+    </div>
+    <div class="hbox danger">
+      <h4>😱 这发生了什么？</h4>
+      <p>模型在训练数据上表现近乎完美，但一遇到新数据就拉垮！这就像一个学生：平时做过的题都能背下来，考试一考就不会——他根本没学会，只是把练习题的答案<strong>死记硬背</strong>住了！</p>
+    </div>
+    <div class="body" style="margin-top:1rem">
+      <p><strong>机器学习的真正目标不是训练误差小，而是在<strong style="color:var(--success)">从没见过的新数据上</strong>表现好！</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">5 / 44</div>
+  <div class="slide-content">
+    <h1 class="st">什么是泛化能力？</h1>
+    <h3 class="sub">泛化（Generalization）——对新数据的预测能力</h3>
+    <div class="formula">
+      $$\displaystyle 泛化能力 = 模型在<u>未见过的新数据</u>上的表现$$
+      <span class="desc">这才是机器学习最关心的指标。训练误差只是"课堂练习"，测试误差才是"期末考试"。</span>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div>
+        <div class="hbox success">
+          <h4>✅ 泛化能力强</h4>
+          <p>模型不仅在训练集上表现好，在测试集（新数据）上也表现好。说明它<strong>真正学到了数据背后的规律</strong>，而不是死记硬背。</p>
+        </div>
+      </div>
+      <div>
+        <div class="hbox danger">
+          <h4>❌ 泛化能力弱</h4>
+          <p>模型在训练集上表现很好，但在测试集上表现很差。说明它只是<strong>记住了训练样本</strong>，没有理解背后的规律。</p>
+        </div>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>🎓 生活类比</h4>
+      <p>泛化能力强的学生：理解了知识点，换什么题都会做（举一反三）。<br>泛化能力弱的学生：只会做见过的题，题目稍微变个花样就不会了。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">6 / 44</div>
+  <div class="slide-content">
+    <h1 class="st">欠拟合 (Underfitting) 详解</h1>
+    <h3 class="sub">问题：模型太简单，连训练数据都学不好</h3>
+    <div class="two-col">
+      <div>
+        <div class="body">
+          <p><strong>什么是欠拟合？</strong></p>
+          <p>模型的复杂度不够，连训练数据中的基本规律都没有学到。就像一个<strong style="color:var(--danger)">太笨的学生</strong>，连课本上的例题都学不会。</p>
+          <p style="margin-top:1rem"><strong>直观表现：</strong></p>
+          <ul>
+            <li>用一条直线去拟合非线性的数据</li>
+            <li>比如用线性回归去预测房价，但房价和面积其实不是简单的线性关系</li>
+            <li>模型太"粗糙"，捕捉不到数据的模式</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card" style="border-color:rgba(251,191,36,0.3)">
+        <div class="card-icon">📏</div>
+        <h4 style="color:var(--warning)">欠拟合的图示</h4>
+        <div style="height:180px;background:var(--bg);border-radius:10px;display:flex;align-items:center;justify-content:center;position:relative">
+          <svg width="280" height="160" viewBox="0 0 280 160">
+            <circle cx="40" cy="120" r="4" fill="var(--accent)"/>
+            <circle cx="70" cy="100" r="4" fill="var(--accent)"/>
+            <circle cx="100" cy="70" r="4" fill="var(--accent)"/>
+            <circle cx="140" cy="90" r="4" fill="var(--accent)"/>
+            <circle cx="180" cy="50" r="4" fill="var(--accent)"/>
+            <circle cx="220" cy="70" r="4" fill="var(--accent)"/>
+            <circle cx="250" cy="40" r="4" fill="var(--accent)"/>
+            <line x1="20" y1="120" x2="260" y2="50" stroke="var(--warning)" stroke-width="2"/>
+          </svg>
+          <div style="position:absolute;bottom:10px;left:10px;font-size:0.8rem;color:var(--warning)">一条直线根本拟合不了曲线！</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">7 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">欠拟合的表现</h2>
+    <h3 class="sub">如何判断你的模型欠拟合了？看误差！</h3>
+    <table class="cmp">
+      <tr>
+        <th>指标</th>
+        <th>表现</th>
+        <th>说明</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--danger)">训练误差</strong></td>
+        <td style="color:var(--danger)"><strong>很高</strong></td>
+        <td>模型连训练数据都没学好，在"练习题"上都错很多</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--danger)">测试误差</strong></td>
+        <td style="color:var(--danger)"><strong>也很高</strong></td>
+        <td>在新数据上表现同样糟糕</td>
+      </tr>
+      <tr>
+        <td><strong>两者差距</strong></td>
+        <td>差距很小</td>
+        <td>训练集和测试集表现都差，"水平稳定地差"</td>
+      </tr>
+    </table>
+    <div class="hbox warn">
+      <h4>📌 一句话总结欠拟合</h4>
+      <p style="font-size:1.1rem"><strong>"学渣状态"——训练集、测试集都不行，这也不会、那也不会。</strong></p>
+    </div>
+    <div class="three-col" style="margin-top:1rem">
+      <div class="card" style="text-align:center">
+        <div style="font-size:2rem;color:var(--danger)">高</div>
+        <p style="color:var(--muted);font-size:0.9rem">训练误差</p>
+      </div>
+      <div class="card" style="text-align:center">
+        <div style="font-size:2rem;color:var(--danger)">高</div>
+        <p style="color:var(--muted);font-size:0.9rem">测试误差</p>
+      </div>
+      <div class="card" style="text-align:center">
+        <div style="font-size:2rem;color:var(--warning)">小</div>
+        <p style="color:var(--muted);font-size:0.9rem">误差差距</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">8 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">欠拟合的原因</h2>
+    <h3 class="sub">为什么会出现欠拟合？通常有这几个原因</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="card-icon">🤖</div>
+        <h4 style="color:var(--warning)">1. 模型太简单</h4>
+        <p>选择了过于简单的模型，表达能力不足。比如：用线性模型拟合非线性问题、用单层神经网络解决复杂图像问题。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h4 style="color:var(--warning)">2. 特征不够</h4>
+        <p>输入给模型的特征太少或特征质量差。比如预测房价只用了"面积"一个特征，没有用地段、楼层、房龄等。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⏱️</div>
+        <h4 style="color:var(--warning)">3. 训练不足</h4>
+        <p>训练时间太短，迭代次数不够，模型还没来得及收敛就停止了。就像学生刚翻了两页书就去考试。</p>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>💡 欠拟合的本质</h4>
+      <p>模型的<strong>学习能力不足</strong>，不足以捕捉数据中蕴藏的规律。就像让一个小学生去做高考题——不是他不想学，是当前的能力还达不到。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">9 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">欠拟合的直觉：小学生做高考题</h2>
+    <h3 class="sub">用生活中的例子理解欠拟合</h3>
+    <div class="card" style="margin-bottom:1.5rem;border-color:rgba(251,191,36,0.3)">
+      <h4 style="color:var(--warning)">👶 场景：一个小学生参加高考</h4>
+      <div class="body" style="margin-top:0.5rem">
+        <ul>
+          <li>给他做<strong>往年真题</strong>（训练集）：很多题都不会做，正确率很低</li>
+          <li>给他做<strong>今年的高考题</strong>（测试集）：同样很多题不会做，正确率也很低</li>
+          <li>不是他"死记硬背"，而是他的<strong>知识水平</strong>（模型复杂度）还不够</li>
+          <li>他连基本的高中知识都没学过，当然什么题都不会</li>
+        </ul>
+      </div>
+    </div>
+    <div class="flow">
+      <div class="flow-node" style="border-color:var(--warning);color:var(--warning)">知识水平不够</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="border-color:var(--danger);color:var(--danger)">真题也不会</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="border-color:var(--danger);color:var(--danger)">新题更不会</div>
+    </div>
+    <div class="hbox warn">
+      <h4>🎯 对应的解决思路（剧透）</h4>
+      <p>让他继续上学，学更多知识（增加模型复杂度），教他更多解题方法（增加好的特征），给他更多时间学习（增加训练时长）。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">10 / 44</div>
+  <div class="slide-content">
+    <h1 class="st">过拟合 (Overfitting) 详解</h1>
+    <h3 class="sub">问题：模型太复杂，把噪声都当成规律学了</h3>
+    <div class="two-col">
+      <div>
+        <div class="body">
+          <p><strong>什么是过拟合？</strong></p>
+          <p>模型的复杂度过高，不仅学到了数据的真实规律，还把训练数据中的<strong style="color:var(--danger)">噪声、偶然因素</strong>都当成普遍规律学进去了。就像一个<strong style="color:var(--danger)">死记硬背的学生</strong>。</p>
+          <p style="margin-top:1rem"><strong>直观表现：</strong></p>
+          <ul>
+            <li>用一条极度弯曲的曲线去拟合每一个点</li>
+            <li>模型完美穿过几乎所有训练点，但泛化能力差</li>
+            <li>模型太"较真"，把个别异常点也当真理</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card" style="border-color:rgba(248,113,113,0.3)">
+        <div class="card-icon">🌀</div>
+        <h4 style="color:var(--danger)">过拟合的图示</h4>
+        <div style="height:180px;background:var(--bg);border-radius:10px;display:flex;align-items:center;justify-content:center;position:relative">
+          <svg width="280" height="160" viewBox="0 0 280 160">
+            <circle cx="40" cy="120" r="4" fill="var(--accent)"/>
+            <circle cx="70" cy="100" r="4" fill="var(--accent)"/>
+            <circle cx="100" cy="70" r="4" fill="var(--accent)"/>
+            <circle cx="140" cy="90" r="4" fill="var(--accent)"/>
+            <circle cx="180" cy="50" r="4" fill="var(--accent)"/>
+            <circle cx="220" cy="70" r="4" fill="var(--accent)"/>
+            <circle cx="250" cy="40" r="4" fill="var(--accent)"/>
+            <path d="M20,130 Q60,110 80,95 T120,60 T160,80 T200,45 T240,75 T260,35" fill="none" stroke="var(--danger)" stroke-width="2"/>
+          </svg>
+          <div style="position:absolute;bottom:10px;left:10px;font-size:0.8rem;color:var(--danger)">这条线完美穿过所有点，但新数据怎么办？</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">11 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">过拟合的表现</h2>
+    <h3 class="sub">过拟合是实践中更常见、更棘手的问题</h3>
+    <table class="cmp">
+      <tr>
+        <th>指标</th>
+        <th>表现</th>
+        <th>说明</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--success)">训练误差</strong></td>
+        <td style="color:var(--success)"><strong>非常低（甚至为0）</strong></td>
+        <td>模型在训练集上表现完美，"练习题"全做对了</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--danger)">测试误差</strong></td>
+        <td style="color:var(--danger)"><strong>远高于训练误差</strong></td>
+        <td>一到考试（新数据）就露馅了，表现大幅下降</td>
+      </tr>
+      <tr>
+        <td><strong>两者差距</strong></td>
+        <td style="color:var(--danger)"><strong>差距很大（鸿沟）</strong></td>
+        <td>这是过拟合最典型的信号——"平时满分，考试及格"</td>
+      </tr>
+    </table>
+    <div class="hbox danger">
+      <h4>📌 一句话总结过拟合</h4>
+      <p style="font-size:1.1rem"><strong>"书呆子/死记硬背状态"——训练集神勇，测试集拉垮，一到实战就不行。</strong></p>
+    </div>
+    <div class="three-col" style="margin-top:1rem">
+      <div class="card" style="text-align:center">
+        <div style="font-size:2rem;color:var(--success)">极低</div>
+        <p style="color:var(--muted);font-size:0.9rem">训练误差</p>
+      </div>
+      <div class="card" style="text-align:center">
+        <div style="font-size:2rem;color:var(--danger)">很高</div>
+        <p style="color:var(--muted);font-size:0.9rem">测试误差</p>
+      </div>
+      <div class="card" style="text-align:center;border-color:rgba(248,113,113,0.4)">
+        <div style="font-size:2rem;color:var(--danger)">很大</div>
+        <p style="color:var(--muted);font-size:0.9rem">误差差距 ⚠️</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">12 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">过拟合的原因</h2>
+    <h3 class="sub">为什么模型会"学歪了"？四个主要原因</h3>
+    <div class="two-col" style="margin:1rem 0">
+      <div class="card">
+        <div class="card-icon" style="color:var(--danger)">🤯</div>
+        <h4>1. 模型太复杂</h4>
+        <p>模型参数量太大、表达能力过强。比如：用10次多项式去拟合本来是2次多项式的数据、用很深的神经网络拟合小样本数据。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--danger)">📉</div>
+        <h4>2. 数据太少</h4>
+        <p>训练数据量不足。数据越少，模型越容易把个别样本的特点当成普遍规律——就像你只见过一只白猫，就以为所有猫都是白的。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--danger)">⏳</div>
+        <h4>3. 训练太久</h4>
+        <p>训练时间过长，迭代次数太多。一开始模型学到的是真实规律，训得太久就开始"钻牛角尖"，把噪声也学进去了。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--danger)">🔊</div>
+        <h4>4. 噪声也学了</h4>
+        <p>训练数据本身包含噪声（测量错误、异常点、偶然因素），模型把这些噪声也当成真实规律记住了。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">13 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">过拟合的直觉：死记硬背考试题</h2>
+    <h3 class="sub">这是最贴切的生活类比！</h3>
+    <div class="card" style="margin-bottom:1.5rem;border-color:rgba(248,113,113,0.3)">
+      <h4 style="color:var(--danger)">📚 场景：一个学生靠"背题"准备考试</h4>
+      <div class="body" style="margin-top:0.5rem">
+        <ul>
+          <li>他把<strong>近5年的高考真题</strong>（训练集）连题目带答案全背下来了</li>
+          <li>你问他这些真题，他对答如流，甚至能说出这是哪年哪道题</li>
+          <li>但是他<strong>根本没理解知识点</strong>，不知道答案是怎么来的</li>
+          <li>上了考场，题目稍微变了个数字、换了个问法（测试集的新数据），他就不会了！</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox danger">
+      <h4>😅 你是不是也遇到过这种情况？</h4>
+      <p>背了很多题，感觉自己都会了，一考试题目灵活一点就懵了。这就是"过拟合"——你记住了具体题目，却没学会背后的通用规律。机器学习模型也会犯同样的错！</p>
+    </div>
+    <div class="hbox success">
+      <h4>✨ 真正的学霸是什么样？</h4>
+      <p>理解了知识点的本质，题目千变万化都能做对——这就是我们要追求的"刚好拟合"状态。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">14 / 44</div>
+  <div class="slide-content">
+    <h1 class="st">刚好拟合 (Good Fit)</h1>
+    <h3 class="sub">理想状态：模型复杂度适中，学到了真实规律</h3>
+    <div class="two-col">
+      <div>
+        <div class="body">
+          <p><strong>什么是刚好拟合？</strong></p>
+          <p>模型复杂度恰到好处，既捕捉到了数据的<strong style="color:var(--success)">真实规律</strong>，又没有被噪声干扰。就像一个<strong style="color:var(--success)">真正学会了的学霸</strong>。</p>
+          <p style="margin-top:1rem"><strong>直观表现：</strong></p>
+          <ul>
+            <li>用平滑的曲线拟合数据的整体趋势</li>
+            <li>不刻意去穿过每一个训练点，允许少量误差</li>
+            <li>对噪声点有"抵抗力"，不会被个别点带偏</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card accent" style="border-color:rgba(52,211,153,0.4)">
+        <div class="card-icon">✨</div>
+        <h4 style="color:var(--success)">刚好拟合的图示</h4>
+        <div style="height:180px;background:var(--bg);border-radius:10px;display:flex;align-items:center;justify-content:center;position:relative">
+          <svg width="280" height="160" viewBox="0 0 280 160">
+            <circle cx="40" cy="120" r="4" fill="var(--accent)"/>
+            <circle cx="70" cy="100" r="4" fill="var(--accent)"/>
+            <circle cx="100" cy="70" r="4" fill="var(--accent)"/>
+            <circle cx="140" cy="90" r="4" fill="var(--accent)"/>
+            <circle cx="180" cy="50" r="4" fill="var(--accent)"/>
+            <circle cx="220" cy="70" r="4" fill="var(--accent)"/>
+            <circle cx="250" cy="40" r="4" fill="var(--accent)"/>
+            <path d="M25,125 Q100,85 180,60 T260,45" fill="none" stroke="var(--success)" stroke-width="2.5"/>
+          </svg>
+          <div style="position:absolute;bottom:10px;left:10px;font-size:0.8rem;color:var(--success)">平滑曲线抓住整体趋势，忽略个别噪声点 ✓</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">15 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">刚好拟合的表现</h2>
+    <h3 class="sub">这是我们训练模型时追求的理想状态</h3>
+    <table class="cmp">
+      <tr>
+        <th>指标</th>
+        <th>表现</th>
+        <th>说明</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--success)">训练误差</strong></td>
+        <td style="color:var(--success)"><strong>较低</strong></td>
+        <td>模型在训练集上表现良好，但不追求完美（允许一点误差）</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--success)">测试误差</strong></td>
+        <td style="color:var(--success)"><strong>也较低</strong></td>
+        <td>在新数据上同样表现优秀，泛化能力强</td>
+      </tr>
+      <tr>
+        <td><strong>两者差距</strong></td>
+        <td style="color:var(--success)"><strong>差距很小</strong></td>
+        <td>训练集和测试集表现接近且都很好</td>
+      </tr>
+    </table>
+    <div class="hbox success">
+      <h4>📌 一句话总结刚好拟合</h4>
+      <p style="font-size:1.1rem"><strong>"真学霸状态"——真正理解了规律，怎么考都不怕，举一反三，泛化能力强。</strong></p>
+    </div>
+    <div class="three-col" style="margin-top:1rem">
+      <div class="card" style="text-align:center;border-color:rgba(52,211,153,0.3)">
+        <div style="font-size:2rem;color:var(--success)">低</div>
+        <p style="color:var(--muted);font-size:0.9rem">训练误差</p>
+      </div>
+      <div class="card" style="text-align:center;border-color:rgba(52,211,153,0.3)">
+        <div style="font-size:2rem;color:var(--success)">低</div>
+        <p style="color:var(--muted);font-size:0.9rem">测试误差</p>
+      </div>
+      <div class="card" style="text-align:center;border-color:rgba(52,211,153,0.3)">
+        <div style="font-size:2rem;color:var(--success)">小</div>
+        <p style="color:var(--muted);font-size:0.9rem">误差差距 ✓</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">16 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">三种拟合状态对比</h2>
+    <h3 class="sub">模型复杂度 vs 误差曲线——机器学习最经典的图</h3>
+    <div class="three-col" style="margin-bottom:1.5rem">
+      <div class="card" style="border-color:rgba(251,191,36,0.3);text-align:center">
+        <h4 style="color:var(--warning);justify-content:center">欠拟合</h4>
+        <div style="font-size:2.5rem;margin:0.5rem 0">📏</div>
+        <p style="font-size:0.9rem">模型太简单<br>高偏差<br>训练误差高，测试误差也高</p>
+      </div>
+      <div class="card accent" style="border-color:rgba(52,211,153,0.4);text-align:center">
+        <h4 style="color:var(--success);justify-content:center">刚好拟合 ✓</h4>
+        <div style="font-size:2.5rem;margin:0.5rem 0">✨</div>
+        <p style="font-size:0.9rem">复杂度适中<br>偏差方差平衡<br>训练误差低，测试误差也低</p>
+      </div>
+      <div class="card" style="border-color:rgba(248,113,113,0.3);text-align:center">
+        <h4 style="color:var(--danger);justify-content:center">过拟合</h4>
+        <div style="font-size:2.5rem;margin:0.5rem 0">🌀</div>
+        <p style="font-size:0.9rem">模型太复杂<br>高方差<br>训练误差极低，测试误差很高</p>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>📈 误差曲线趋势描述</h4>
+      <p><strong>训练误差：</strong>随着模型复杂度增加，训练误差持续下降（模型越来越能记住训练数据）。<br>
+      <strong>测试误差：</strong>先下降后上升——一开始模型太简单不行，复杂度适中时测试误差最低，模型太复杂了测试误差反而上升（开始过拟合）。<br>
+      <strong>最佳点：</strong>测试误差最低的那个点，就是"刚好拟合"的最佳复杂度。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">17 / 44</div>
+  <div class="slide-content">
+    <h1 class="st">偏差 (Bias) 是什么？</h1>
+    <h3 class="sub">偏差：模型本身的假设带来的误差——"准不准"的问题</h3>
+    <div class="formula">
+      $$\displaystyle 偏差 = 模型的预测平均值 与 真实值 的偏离程度$$
+      <span class="desc">偏差衡量的是模型本身的"偏见"或"近视"——它对问题做了太强的假设，导致学不到真实规律。</span>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div>
+        <div class="body">
+          <p><strong>直观理解：打靶类比</strong></p>
+          <ul>
+            <li><strong style="color:var(--warning)">高偏差</strong>：所有弹孔都偏离靶心，而且偏的方向差不多——系统性偏差，枪没校准</li>
+            <li><strong style="color:var(--success)">低偏差</strong>：弹孔基本围绕靶心分布——枪校准得好，整体很准</li>
+          </ul>
+        </div>
+        <div class="hbox warn">
+          <h4>高偏差 = 欠拟合</h4>
+          <p>高偏差对应欠拟合：模型太简单，对数据做了错误的假设（比如假设数据是线性的，但实际不是），无论怎么训练都学不好。</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎯</div>
+        <h4>打靶示意图</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:0.5rem">
+          <div style="text-align:center">
+            <div style="width:100px;height:100px;border-radius:50%;border:2px solid var(--muted);margin:0 auto;position:relative">
+              <div style="position:absolute;top:60px;left:65px;width:8px;height:8px;background:var(--danger);border-radius:50%"></div>
+              <div style="position:absolute;top:65px;left:70px;width:8px;height:8px;background:var(--danger);border-radius:50%"></div>
+              <div style="position:absolute;top:55px;left:60px;width:8px;height:8px;background:var(--danger);border-radius:50%"></div>
+            </div>
+            <p style="font-size:0.85rem;color:var(--warning);margin-top:0.5rem">高偏差<br>(都偏了)</p>
+          </div>
+          <div style="text-align:center">
+            <div style="width:100px;height:100px;border-radius:50%;border:2px solid var(--muted);margin:0 auto;position:relative">
+              <div style="position:absolute;top:45px;left:45px;width:8px;height:8px;background:var(--success);border-radius:50%"></div>
+              <div style="position:absolute;top:50px;left:50px;width:8px;height:8px;background:var(--success);border-radius:50%"></div>
+              <div style="position:absolute;top:40px;left:55px;width:8px;height:8px;background:var(--success);border-radius:50%"></div>
+            </div>
+            <p style="font-size:0.85rem;color:var(--success);margin-top:0.5rem">低偏差<br>(都在中心)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">18 / 44</div>
+  <div class="slide-content">
+    <h1 class="st">方差 (Variance) 是什么？</h1>
+    <h3 class="sub">方差：模型对不同训练数据的敏感度——"稳不稳"的问题</h3>
+    <div class="formula">
+      $$\displaystyle 方差 = 模型在不同训练集上预测结果的波动程度$$
+      <span class="desc">方差衡量的是模型的"稳定性"——换一批训练数据，结果会不会差很多？</span>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div>
+        <div class="body">
+          <p><strong>直观理解：还是打靶</strong></p>
+          <ul>
+            <li><strong style="color:var(--danger)">高方差</strong>：弹孔很分散，东一个西一个——枪的稳定性差，每次射击结果差异大</li>
+            <li><strong style="color:var(--success)">低方差</strong>：弹孔都集中在一起——枪很稳，每次射击结果很一致</li>
+          </ul>
+        </div>
+        <div class="hbox danger">
+          <h4>高方差 = 过拟合</h4>
+          <p>高方差对应过拟合：模型太复杂，对训练数据太敏感——换一批训练数据，学到的模型就差很多，因为它记住了太多训练集的特性。</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎯</div>
+        <h4>打靶示意图</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:0.5rem">
+          <div style="text-align:center">
+            <div style="width:100px;height:100px;border-radius:50%;border:2px solid var(--muted);margin:0 auto;position:relative">
+              <div style="position:absolute;top:20px;left:20px;width:8px;height:8px;background:var(--danger);border-radius:50%"></div>
+              <div style="position:absolute;top:70px;left:75px;width:8px;height:8px;background:var(--danger);border-radius:50%"></div>
+              <div style="position:absolute;top:30px;left:80px;width:8px;height:8px;background:var(--danger);border-radius:50%"></div>
+            </div>
+            <p style="font-size:0.85rem;color:var(--danger);margin-top:0.5rem">高方差<br>(太分散)</p>
+          </div>
+          <div style="text-align:center">
+            <div style="width:100px;height:100px;border-radius:50%;border:2px solid var(--muted);margin:0 auto;position:relative">
+              <div style="position:absolute;top:45px;left:48px;width:8px;height:8px;background:var(--success);border-radius:50%"></div>
+              <div style="position:absolute;top:50px;left:52px;width:8px;height:8px;background:var(--success);border-radius:50%"></div>
+              <div style="position:absolute;top:48px;left:45px;width:8px;height:8px;background:var(--success);border-radius:50%"></div>
+            </div>
+            <p style="font-size:0.85rem;color:var(--success);margin-top:0.5rem">低方差<br>(很集中)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">19 / 44</div>
+  <div class="slide-content">
+    <h1 class="st">偏差-方差分解</h1>
+    <h3 class="sub">Bias-Variance Tradeoff——机器学习的核心矛盾</h3>
+    <div class="formula">
+      $$\displaystyle 总误差 = 偏差² + 方差 + 不可约误差$$
+      <span class="desc">这是机器学习中最重要的公式之一！模型的泛化误差可以分解为三个部分。</span>
+    </div>
+    <table class="cmp" style="margin-top:1.5rem">
+      <tr>
+        <th>误差组成</th>
+        <th>含义</th>
+        <th>对应问题</th>
+        <th>能否消除</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--warning)">偏差² (Bias²)</strong></td>
+        <td>模型假设错误带来的误差</td>
+        <td>欠拟合</td>
+        <td>可以通过增加复杂度降低</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--danger)">方差 (Variance)</strong></td>
+        <td>对训练数据敏感带来的误差</td>
+        <td>过拟合</td>
+        <td>可以通过降低复杂度降低</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--muted)">不可约误差</strong></td>
+        <td>数据本身的噪声</td>
+        <td>数据质量问题</td>
+        <td style="color:var(--danger)">无法消除！</td>
+      </tr>
+    </table>
+    <div class="hbox purple">
+      <h4>⚖️ 核心权衡</h4>
+      <p>偏差和方差是<strong>此消彼长</strong>的关系：降低偏差会升高方差，降低方差会升高偏差。我们的目标不是让某一个最小，而是找到平衡点让<strong>总误差最小</strong>——这就是偏差-方差权衡。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">20 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">欠拟合 = 高偏差</h2>
+    <h3 class="sub">模型太简单时：高偏差、低方差</h3>
+    <div class="two-col">
+      <div>
+        <div class="card" style="border-color:rgba(251,191,36,0.3)">
+          <h4 style="color:var(--warning)">高偏差、低方差的特征</h4>
+          <div class="body" style="margin-top:0.5rem">
+            <ul>
+              <li><strong>准头差</strong>：整体预测都偏离真实值</li>
+              <li><strong>很稳定</strong>：换一批训练数据，结果差不多（一样地差）</li>
+              <li>模型表达能力不足，连基本规律都学不到</li>
+              <li>对数据不敏感，"你怎么教我都是这水平"</li>
+            </ul>
+          </div>
+        </div>
+        <div class="hbox warn" style="margin-top:1rem">
+          <h4>🔧 解决方向</h4>
+          <p>降低偏差：增加模型复杂度、增加特征、减少正则化、训练更久。</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎯</div>
+        <h4>打靶：高偏差低方差</h4>
+        <div style="text-align:center;margin-top:1rem">
+          <div style="width:150px;height:150px;border-radius:50%;border:2px solid var(--muted);margin:0 auto;position:relative">
+            <div style="position:absolute;top:100px;left:90px;width:10px;height:10px;background:var(--warning);border-radius:50%"></div>
+            <div style="position:absolute;top:105px;left:95px;width:10px;height:10px;background:var(--warning);border-radius:50%"></div>
+            <div style="position:absolute;top:95px;left:100px;width:10px;height:10px;background:var(--warning);border-radius:50%"></div>
+            <div style="position:absolute;top:102px;left:88px;width:10px;height:10px;background:var(--warning);border-radius:50%"></div>
+            <div style="position:absolute;width:10px;height:10px;background:var(--success);border-radius:50%;top:65px;left:65px;opacity:0.5"></div>
+          </div>
+          <p style="color:var(--warning);margin-top:1rem">弹孔都集中但偏离靶心<br>——稳定地打不准</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">21 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">过拟合 = 高方差</h2>
+    <h3 class="sub">模型太复杂时：低偏差、高方差</h3>
+    <div class="two-col">
+      <div>
+        <div class="card" style="border-color:rgba(248,113,113,0.3)">
+          <h4 style="color:var(--danger)">低偏差、高方差的特征</h4>
+          <div class="body" style="margin-top:0.5rem">
+            <ul>
+              <li><strong>准头看似好</strong>：在训练集上几乎完美命中</li>
+              <li><strong>不稳定</strong>：换一批训练数据，结果差很多</li>
+              <li>模型太"敏感"，被训练数据的噪声牵着走</li>
+              <li>"这次考的题我背过就满分，没见过就完蛋"</li>
+            </ul>
+          </div>
+        </div>
+        <div class="hbox danger" style="margin-top:1rem">
+          <h4>🔧 解决方向</h4>
+          <p>降低方差：降低模型复杂度、增加训练数据、加正则化、早停、集成学习。</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎯</div>
+        <h4>打靶：低偏差高方差</h4>
+        <div style="text-align:center;margin-top:1rem">
+          <div style="width:150px;height:150px;border-radius:50%;border:2px solid var(--muted);margin:0 auto;position:relative">
+            <div style="position:absolute;top:20px;left:25px;width:10px;height:10px;background:var(--danger);border-radius:50%"></div>
+            <div style="position:absolute;top:110px;left:100px;width:10px;height:10px;background:var(--danger);border-radius:50%"></div>
+            <div style="position:absolute;top:30px;left:110px;width:10px;height:10px;background:var(--danger);border-radius:50%"></div>
+            <div style="position:absolute;top:90px;left:20px;width:10px;height:10px;background:var(--danger);border-radius:50%"></div>
+            <div style="position:absolute;width:10px;height:10px;background:var(--success);border-radius:50%;top:65px;left:65px;opacity:0.5"></div>
+          </div>
+          <p style="color:var(--danger);margin-top:1rem">弹孔分散得到处都是<br>——这次蒙上靶心，下次就偏了</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">22 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">偏差方差权衡：此消彼长</h2>
+    <h3 class="sub">随着模型复杂度增加，偏差下降、方差上升</h3>
+    <table class="cmp">
+      <tr>
+        <th>模型复杂度</th>
+        <th>偏差</th>
+        <th>方差</th>
+        <th>状态</th>
+        <th>总误差趋势</th>
+      </tr>
+      <tr>
+        <td>太简单</td>
+        <td style="color:var(--danger)">高 ↑</td>
+        <td style="color:var(--success)">低 ↓</td>
+        <td style="color:var(--warning)">欠拟合</td>
+        <td>高</td>
+      </tr>
+      <tr style="background:rgba(52,211,153,0.05)">
+        <td><strong style="color:var(--success)">适中 ✓</strong></td>
+        <td style="color:var(--success)">较低</td>
+        <td style="color:var(--success)">较低</td>
+        <td style="color:var(--success)"><strong>刚好拟合</strong></td>
+        <td style="color:var(--success)"><strong>最低！</strong></td>
+      </tr>
+      <tr>
+        <td>太复杂</td>
+        <td style="color:var(--success)">低 ↓</td>
+        <td style="color:var(--danger)">高 ↑</td>
+        <td style="color:var(--danger)">过拟合</td>
+        <td>高</td>
+      </tr>
+    </table>
+    <div class="flow" style="margin:2rem 0">
+      <div class="flow-node" style="border-color:var(--warning);color:var(--warning)">模型简单 → 高偏差</div>
+      <div class="flow-arrow">增加复杂度 →</div>
+      <div class="flow-node hl" style="min-width:200px">✨ 最佳平衡点<br>总误差最小</div>
+      <div class="flow-arrow">继续增加 →</div>
+      <div class="flow-node" style="border-color:var(--danger);color:var(--danger)">模型复杂 → 高方差</div>
+    </div>
+    <div class="hbox success">
+      <h4>🎯 训练的目标</h4>
+      <p>找到那个"甜点"(Sweet Spot)——让偏差和方差都比较小，总误差最低。这就是模型选择和调参的核心任务。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">23 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">数学直觉：总误差分解</h2>
+    <h3 class="sub">从数学角度理解为什么偏差和方差会这样变化</h3>
+    <div class="formula" style="font-size:1.1rem">
+      $$\begin{aligned}
+      \text{Err}(x) &= \mathbb{E}\left[(y - \hat{f}(x))^2\right] \\
+      &= \left(\mathbb{E}[\hat{f}(x)] - f(x)\right)^2 + \mathbb{E}\left[(\hat{f}(x) - \mathbb{E}[\hat{f}(x)])^2\right] + \sigma^2 \\
+      &= \text{Bias}^2 + \text{Variance} + \text{Irreducible Error}
+      \end{aligned}$$
+      <span class="desc">
+      • \(f(x)\) 是真实的函数（我们永远不知道）<br>
+      • \(\hat{f}(x)\) 是我们训练出来的模型预测值<br>
+      • \(\mathbb{E}[\cdot]\) 表示期望（在不同训练集上的平均）<br>
+      • \(\sigma^2\) 是数据本身的噪声，无论如何都消不掉
+      </span>
+    </div>
+    <div class="three-col" style="margin-top:1rem">
+      <div class="hbox warn" style="margin:0">
+        <h4>Bias²</h4>
+        <p style="font-size:0.9rem">模型预测的平均值偏离真实值多少——模型"准不准"</p>
+      </div>
+      <div class="hbox danger" style="margin:0">
+        <h4>Variance</h4>
+        <p style="font-size:0.9rem">模型预测值自身的波动有多大——模型"稳不稳"</p>
+      </div>
+      <div class="hbox" style="margin:0">
+        <h4>σ²</h4>
+        <p style="font-size:0.9rem">数据本身带的噪声——这部分我们无能为力</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">24 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">如何判断过拟合还是欠拟合？</h2>
+    <h3 class="sub">诊断方法很简单：比较训练误差和测试误差的差距！</h3>
+    <table class="cmp">
+      <tr>
+        <th>状态</th>
+        <th>训练误差</th>
+        <th>测试误差</th>
+        <th>训练-测试差距</th>
+        <th>判断</th>
+      </tr>
+      <tr>
+        <td style="color:var(--warning)">欠拟合</td>
+        <td style="color:var(--danger)">高</td>
+        <td style="color:var(--danger)">高</td>
+        <td>小</td>
+        <td style="color:var(--warning)">两个都差 → 模型太简单</td>
+      </tr>
+      <tr style="background:rgba(52,211,153,0.05)">
+        <td style="color:var(--success)"><strong>刚好拟合</strong></td>
+        <td style="color:var(--success)">低</td>
+        <td style="color:var(--success)">低</td>
+        <td>小</td>
+        <td style="color:var(--success)"><strong>两个都好 → 完美！</strong></td>
+      </tr>
+      <tr>
+        <td style="color:var(--danger)">过拟合</td>
+        <td style="color:var(--success)">很低</td>
+        <td style="color:var(--danger)">高</td>
+        <td style="color:var(--danger)">大！</td>
+        <td style="color:var(--danger)">训练好测试差 → 模型太复杂</td>
+      </tr>
+    </table>
+    <div class="hbox success">
+      <h4>✅ 诊断口诀</h4>
+      <p>
+      <strong>训练误差高 → 欠拟合</strong>（连题都不会做，太笨了）<br>
+      <strong>训练好测试差、差距大 → 过拟合</strong>（只会背题，不会举一反三）<br>
+      <strong>两个都低、差距小 → 完美</strong>（真正学会了）
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">25 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">解决欠拟合的方法</h2>
+    <h3 class="sub">欠拟合比较好解决，方向是"增强模型能力"</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="card-icon">➕</div>
+        <h4 style="color:var(--warning)">1. 增加特征</h4>
+        <p>输入更多、更好的特征。比如预测房价时不仅用面积，还加上地段、楼层、房龄、周边配套等特征。特征多了，模型能学的东西就多了。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🤖</div>
+        <h4 style="color:var(--warning)">2. 用更复杂模型</h4>
+        <p>换表达能力更强的模型。比如：从线性回归换成多项式回归/非线性模型，从浅层网络换成深度网络，从简单模型换成集成模型。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⬇️</div>
+        <h4 style="color:var(--warning)">3. 减少正则化</h4>
+        <p>如果你用了正则化，可以减小正则化强度λ。正则化是用来"约束"模型的，欠拟合说明约束太强了，需要松绑。</p>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>💡 其他方法</h4>
+      <p>还可以增加训练迭代次数（训练更久）、减小学习率让模型收敛得更好、删除噪声样本减少干扰等。欠拟合通常不是大问题，因为实践中过拟合更常见。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">26 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">解决过拟合的方法一览</h2>
+    <h3 class="sub">过拟合是实践中的重点和难点，有很多应对武器</h3>
+    <div class="flow" style="flex-direction:column;gap:0.8rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem">
+        <span style="font-size:1.5rem">📊</span>
+        <div><strong style="color:var(--accent)">方法1：增加训练数据</strong> — 更多数据让模型学到真实规律</div>
+      </div>
+      <div class="flow-node hl" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem">
+        <span style="font-size:1.5rem">⚖️</span>
+        <div><strong style="color:var(--success)">方法2：正则化 (Regularization)</strong> — <strong>最常用、最重要的方法！</strong></div>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem">
+        <span style="font-size:1.5rem">🔄</span>
+        <div><strong style="color:var(--accent2)">方法3：交叉验证 (Cross-Validation)</strong> — 更可靠地评估和选择模型</div>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem">
+        <span style="font-size:1.5rem">⏹️</span>
+        <div><strong style="color:var(--accent3)">方法4：早停 (Early Stopping)</strong> — 在开始过拟合前停下来</div>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem">
+        <span style="font-size:1.5rem">🎲</span>
+        <div><strong style="color:var(--warning)">方法5：Dropout / 剪枝</strong> — 深度学习/决策树专用</div>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem">
+        <span style="font-size:1.5rem">🌲</span>
+        <div><strong style="color:var(--muted)">其他：集成学习、数据增强、特征选择</strong></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">27 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">方法1：增加训练数据</h2>
+    <h3 class="sub">更多数据是对抗过拟合最直接有效的方法之一</h3>
+    <div class="two-col">
+      <div>
+        <div class="body">
+          <p><strong>为什么更多数据有用？</strong></p>
+          <ul>
+            <li>数据越多，偶然的噪声就越容易被"冲淡"</li>
+            <li>模型能看到更多样的情况，更容易学到普遍规律</li>
+            <li>就像学生见的题型多了，自然不容易被某几道题带偏</li>
+          </ul>
+        </div>
+        <div class="hbox success">
+          <h4>✅ 例子</h4>
+          <p>如果你只见过1只白猫，很容易以为所有猫都是白的（过拟合）。但如果你见过1000只不同颜色、品种的猫，你自然能总结出"猫"的真正特征。</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h4>实际操作</h4>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li><strong>收集更多数据</strong>：如果条件允许，这是最好的办法</li>
+          <li><strong>数据增强</strong>：图像的翻转/旋转/裁剪、文本的同义词替换等（"人造"更多数据）</li>
+          <li><strong>注意</strong>：脏数据再多也没用，数据质量同样重要</li>
+        </ul>
+        <div class="hbox warn" style="margin-top:1rem">
+          <h4>⚠️ 现实情况</h4>
+          <p style="font-size:0.9rem">很多时候数据是昂贵的，不是想加就能加。这时候就需要下面的正则化方法。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">28 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">方法2：正则化 (Regularization)</h2>
+    <h3 class="sub">对抗过拟合最常用、最有效的武器——没有之一！</h3>
+    <div class="card accent" style="margin-bottom:1.5rem">
+      <h4 style="color:var(--accent)">🎯 正则化的核心思想</h4>
+      <p style="font-size:1.2rem;margin-top:0.5rem"><strong>惩罚模型复杂度！</strong>在原来的损失函数基础上，加一个"惩罚项"，让模型偏好更简单的参数，不要太"嚣张"。</p>
+    </div>
+    <div class="formula">
+      $$\displaystyle <div>J( \theta ) = 原来的损失函数(比如MSE) + \lambda \cdot 复杂度惩罚项$$
+    </div>
+      <span class="desc">
+      • J(θ) 是我们要最小化的总损失函数<br>
+      • λ (lambda) 是正则化强度：λ越大，惩罚越重，模型越简单<br>
+      • 惩罚项有不同形式：L1正则化和L2正则化
+      </span>
+    </div>
+    <div class="hbox purple">
+      <h4>💡 生活类比</h4>
+      <p>就像老师告诉学生："考试答对了固然好，但如果解题方法太复杂、太偏门，我也要扣分。我要的是能抓住本质的简单解法，不是奇技淫巧。"</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">29 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">正则化的核心思想：惩罚复杂度</h2>
+    <h3 class="sub">为什么简单的模型更好？奥卡姆剃刀原则</h3>
+    <div class="body">
+      <p>为什么我们要偏好简单模型？因为<strong style="color:var(--success)">简单模型泛化能力更强</strong>，这符合哲学上的"奥卡姆剃刀"原则：</p>
+    </div>
+    <div class="hbox success">
+      <h4>✂️ 奥卡姆剃刀 (Occam's Razor)</h4>
+      <p style="font-size:1.1rem"><em>"如无必要，勿增实体。"</em><br>如果两个模型对训练数据的拟合效果差不多，<strong>选择更简单的那个</strong>，因为简单模型更可能抓住真实规律，而不是被噪声干扰。</p>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="card">
+        <h4 style="color:var(--danger)">❌ 复杂模型的问题</h4>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>参数很多，曲线扭来扭去</li>
+          <li>可以拟合任何噪声</li>
+          <li>解释性差，像黑盒</li>
+          <li>换数据就不行</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--success)">✅ 简单模型的优势</h4>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>参数较小，曲线平滑</li>
+          <li>不容易被噪声影响</li>
+          <li>解释性强，容易理解</li>
+          <li>泛化能力更好</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">30 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">L2正则化 (Ridge / 岭回归)</h2>
+    <h3 class="sub">最常用的正则化：让权重变小，但不为0</h3>
+    <div class="formula">
+      $$J(w) = \text{MSE} + \lambda \sum_{i=1}^{n} w_i^2$$
+      <span class="desc">
+      岭回归（Ridge Regression）：惩罚项是所有权重的平方和<br>
+      • \(w_i\) 是模型的各个参数（权重）<br>
+      • 权重越大，惩罚越重（平方增长）<br>
+      • 偏好让权重都比较小、比较均匀
+      </span>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="card">
+        <h4 style="color:var(--accent)">L2正则化的效果</h4>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>让所有权重都变小，趋近于0但<strong style="color:var(--warning)">不会等于0</strong></li>
+          <li>模型更平滑，不会因为某个特征的微小变化产生剧烈输出</li>
+          <li>不会做特征选择，所有特征都保留（只是权重变小）</li>
+          <li>计算方便，有解析解，是最常用的正则化</li>
+        </ul>
+      </div>
+      <div class="hbox">
+        <h4>🔍 直觉理解</h4>
+        <p>L2就像"雨露均沾"：它不希望某几个权重特别大，而是让大家都小一点、均匀一点。这样模型不会过度依赖某几个特征，也就不容易被噪声带偏。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">31 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">L2正则化详解</h2>
+    <h3 class="sub">为什么让权重变小能防止过拟合？</h3>
+    <div class="body">
+      <p>过拟合时，模型的权重往往会变得很大——因为它要扭来扭去去拟合每个点，需要很大的参数才能让曲线剧烈弯曲。</p>
+    </div>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card" style="border-color:rgba(248,113,113,0.3)">
+        <h4 style="color:var(--danger)">❌ 没有正则化</h4>
+        <p style="font-size:0.95rem">权重可以无限大，曲线扭来扭去，完美穿过每个点（包括噪声点）→ 过拟合</p>
+        <div style="height:60px;display:flex;align-items:center;justify-content:center;color:var(--danger);font-size:1.5rem">🌀</div>
+      </div>
+      <div class="flow-arrow" style="font-size:1.5rem">→加L2→</div>
+      <div class="card accent" style="border-color:rgba(52,211,153,0.4)">
+        <h4 style="color:var(--success)">✅ L2正则化后</h4>
+        <p style="font-size:0.95rem">权重被限制住不能太大，曲线变平滑了，不会刻意去拟合噪声点 → 泛化好</p>
+        <div style="height:60px;display:flex;align-items:center;justify-content:center;color:var(--success);font-size:1.5rem">✨</div>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🎯 L2的作用总结</h4>
+      <p>
+      <strong>限制权重大小 → 限制模型复杂度 → 曲线变平滑 → 抗噪声能力增强 → 泛化能力提升！</strong><br>
+      就像给模型戴上了"紧箍咒"，不让它太放肆。
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">32 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">L1正则化 (Lasso)</h2>
+    <h3 class="sub">另一种正则化：可以让权重变为0，天然做特征选择</h3>
+    <div class="formula">
+      $$J(w) = \text{MSE} + \lambda \sum_{i=1}^{n} |w_i|$$
+      <span class="desc">
+      Lasso回归：惩罚项是所有权重的绝对值之和<br>
+      • 同样是惩罚大权重，但形式和L2不同<br>
+      • 一个重要特性：<strong style="color:var(--accent)">可以让一些权重精确等于0！</strong>
+      </span>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="card">
+        <h4 style="color:var(--accent2)">L1正则化的效果</h4>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>会让一部分权重<strong style="color:var(--success)">直接变成0</strong>，相当于把对应的特征扔掉了</li>
+          <li>天然具有<strong style="color:var(--accent)">特征选择</strong>的作用——自动帮你选出有用的特征</li>
+          <li>模型更稀疏，大部分权重是0，解释性更强</li>
+          <li>当你怀疑有很多无用特征时，L1很有用</li>
+        </ul>
+      </div>
+      <div class="hbox purple">
+        <h4>🔍 直觉理解</h4>
+        <p>L1就像"末位淘汰"：它不仅要让权重变小，还要干脆把一些不重要的特征的权重清零——这些特征直接被淘汰掉，模型更精简。</p>
+        <p style="margin-top:0.8rem">如果你有100个特征，L1可能会把其中80个没用的权重变成0，只留下20个重要特征。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">33 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">L1正则化详解</h2>
+    <h3 class="sub">为什么L1能产生稀疏解（权重为0）？</h3>
+    <div class="two-col">
+      <div>
+        <div class="card">
+          <h4>L1 vs L2 的惩罚形状</h4>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem">
+            <div style="text-align:center">
+              <div style="width:80px;height:80px;border:2px solid var(--accent);margin:0 auto;transform:rotate(45deg)"></div>
+              <p style="font-size:0.85rem;color:var(--accent2);margin-top:2.5rem">L1：菱形<br>更容易在角上接触（权重=0）</p>
+            </div>
+            <div style="text-align:center">
+              <div style="width:80px;height:80px;border-radius:50%;border:2px solid var(--accent);margin:0 auto"></div>
+              <p style="font-size:0.85rem;color:var(--accent);margin-top:1rem">L2：圆形<br>接触点通常不在坐标轴上</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="hbox purple">
+          <h4>🎯 不用太纠结数学细节</h4>
+          <p>简单记住结论：<br>• L1会让一部分权重变成0 → 特征选择<br>• L2让权重都变小但不为0 → 权重衰减</p>
+        </div>
+        <div class="hbox warn" style="margin-top:1rem">
+          <h4>Elastic Net：小孩子才做选择</h4>
+          <p>还有一种叫Elastic Net的正则化，同时加L1和L2，兼具两者的优点。实践中L2最常用，需要特征选择时用L1或Elastic Net。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">34 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">L1 vs L2正则化对比表</h2>
+    <h3 class="sub">两种正则化的区别和适用场景</h3>
+    <table class="cmp">
+      <tr>
+        <th>对比维度</th>
+        <th style="color:var(--accent2)">L1正则化 (Lasso)</th>
+        <th style="color:var(--accent)">L2正则化 (Ridge)</th>
+      </tr>
+      <tr>
+        <td><strong>惩罚项形式</strong></td>
+        <td>Σ |wᵢ| （绝对值和）</td>
+        <td>Σ wᵢ² （平方和）</td>
+      </tr>
+      <tr>
+        <td><strong>权重结果</strong></td>
+        <td style="color:var(--success)">部分权重 = 0（稀疏）</td>
+        <td>权重 ≈ 0但不等于0（稠密）</td>
+      </tr>
+      <tr>
+        <td><strong>特征选择</strong></td>
+        <td style="color:var(--success)"><strong>自带特征选择</strong></td>
+        <td>不做特征选择</td>
+      </tr>
+      <tr>
+        <td><strong>模型可解释性</strong></td>
+        <td style="color:var(--success)">更好（特征少了）</td>
+        <td>一般</td>
+      </tr>
+      <tr>
+        <td><strong>计算难度</strong></td>
+        <td>无解析解，需要迭代求解</td>
+        <td style="color:var(--success)">有解析解，计算方便</td>
+      </tr>
+      <tr>
+        <td><strong>适用场景</strong></td>
+        <td>特征很多、怀疑有很多无用特征</td>
+        <td style="color:var(--success)"><strong>默认首选、最常用</strong></td>
+      </tr>
+      <tr>
+        <td><strong>外号</strong></td>
+        <td>"稀疏惩罚"、"特征选择器"</td>
+        <td>"权重衰减"、"默认正则化"</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">35 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">λ (正则化强度) 的影响</h2>
+    <h3 class="sub">λ是超参数，需要调节：太大太小都不行</h3>
+    <table class="cmp">
+      <tr>
+        <th>λ的值</th>
+        <th>惩罚强度</th>
+        <th>模型复杂度</th>
+        <th>结果</th>
+      </tr>
+      <tr>
+        <td>λ = 0</td>
+        <td>无惩罚</td>
+        <td>不受限制</td>
+        <td style="color:var(--danger)">可能过拟合</td>
+      </tr>
+      <tr>
+        <td>λ 较小</td>
+        <td>轻度惩罚</td>
+        <td>稍微复杂</td>
+        <td>可能还行，注意过拟合</td>
+      </tr>
+      <tr style="background:rgba(52,211,153,0.05)">
+        <td><strong style="color:var(--success)">λ 合适</strong></td>
+        <td>适度惩罚</td>
+        <td><strong>适中</strong></td>
+        <td style="color:var(--success)"><strong>刚好拟合，泛化最好</strong></td>
+      </tr>
+      <tr>
+        <td>λ 较大</td>
+        <td>重度惩罚</td>
+        <td>太简单</td>
+        <td>可能欠拟合</td>
+      </tr>
+      <tr>
+        <td>λ → ∞</td>
+        <td>惩罚无穷大</td>
+        <td>所有权重→0</td>
+        <td style="color:var(--warning)">严重欠拟合（模型变成常数）</td>
+      </tr>
+    </table>
+    <div class="hbox warn">
+      <h4>⚠️ λ是需要调的超参数</h4>
+      <p>λ不是越大越好，也不是越小越好，需要通过交叉验证等方法找到合适的值。这是模型调参的重要部分。λ太小→过拟合；λ太大→欠拟合。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">36 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">方法3：交叉验证 (Cross-Validation)</h2>
+    <h3 class="sub">更可靠地评估模型性能、选择超参数</h3>
+    <div class="body">
+      <p><strong>问题：</strong>如果我们反复用测试集调参，相当于考试前偷看答案，最后得到的结果还是有水分。怎么办？</p>
+      <p><strong>答案：交叉验证！</strong></p>
+    </div>
+    <div class="card accent" style="margin:1rem 0">
+      <h4 style="color:var(--accent2)">🔄 K折交叉验证 (K-Fold CV) 思想</h4>
+      <div class="body" style="margin-top:0.5rem">
+        <ul>
+          <li>把<strong>训练集</strong>再分成K份（常用K=5或10）</li>
+          <li>每次用其中K-1份训练，剩下1份做"验证"来评估</li>
+          <li>重复K次，每次换不同的份做验证</li>
+          <li>最后把K次的结果取平均，得到更可靠的性能估计</li>
+          <li>测试集仍然"锁在保险柜里"，最后才用一次！</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>💡 为什么需要验证集？</h4>
+      <p>验证集是"模拟考试"：用来调参、选模型、选λ，不用碰真正的测试集（高考）。这样最后在测试集上的结果才是真实可信的。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">37 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">K折交叉验证原理图示</h2>
+    <h3 class="sub">以5折交叉验证为例</h3>
+    <div style="background:var(--bg2);border-radius:12px;padding:1.5rem;margin:1.5rem 0">
+      <div style="font-family:var(--mono);font-size:0.9rem;line-height:2.2">
+        <div style="margin-bottom:1rem;color:var(--muted)">训练集分成5份：Fold1, Fold2, Fold3, Fold4, Fold5</div>
+        <div style="margin:0.5rem 0"><span style="color:var(--accent)">第1次：</span>[<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>][<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>][<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>][<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>][<span style="background:rgba(248,113,113,0.2);padding:2px 8px;border-radius:4px">验证</span>] → 得到score1</div>
+        <div style="margin:0.5rem 0"><span style="color:var(--accent)">第2次：</span>[<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>][<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>][<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>][<span style="background:rgba(248,113,113,0.2);padding:2px 8px;border-radius:4px">验证</span>][<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>] → 得到score2</div>
+        <div style="margin:0.5rem 0"><span style="color:var(--accent)">第3次：</span>[<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>][<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>][<span style="background:rgba(248,113,113,0.2);padding:2px 8px;border-radius:4px">验证</span>][<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>][<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>] → 得到score3</div>
+        <div style="margin:0.5rem 0"><span style="color:var(--accent)">第4次：</span>[<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>][<span style="background:rgba(248,113,113,0.2);padding:2px 8px;border-radius:4px">验证</span>][<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>][<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>][<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>] → 得到score4</div>
+        <div style="margin:0.5rem 0"><span style="color:var(--accent)">第5次：</span>[<span style="background:rgba(248,113,113,0.2);padding:2px 8px;border-radius:4px">验证</span>][<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>][<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>][<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>][<span style="background:rgba(56,189,248,0.2);padding:2px 8px;border-radius:4px">训练</span>] → 得到score5</div>
+        <div style="margin-top:1rem;color:var(--success)">最终CV分数 = (score1+score2+score3+score4+score5) / 5  ← 更可靠！</div>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>✅ 交叉验证的好处</h4>
+      <p>每一份数据都做过一次验证，结果更稳定可靠，不会因为某一次训练/验证划分的偶然性得到错误结论。用CV分数来选择λ、选择模型，然后在全部训练集上重新训练，最后才在测试集上评估一次！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">38 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">方法4：早停 (Early Stopping)</h2>
+    <h3 class="sub">在训练过程中及时止损，在开始过拟合前停下来</h3>
+    <div class="body">
+      <p><strong>观察训练过程：</strong></p>
+      <ul>
+        <li>训练刚开始：训练误差和验证误差都在下降（模型在学真实规律）</li>
+        <li>到了某个点：训练误差继续下降，但验证误差开始上升（开始过拟合了！）</li>
+        <li>这个拐点就是最佳停止点——再训练下去就是死记硬背了</li>
+      </ul>
+    </div>
+    <div class="hbox danger">
+      <h4>⏹️ 早停策略</h4>
+      <p>训练过程中持续监控验证集误差。当验证误差连续多轮不再下降、甚至开始上升时，就停止训练！不要等训练误差收敛到0——那时候已经过拟合了。</p>
+    </div>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node">训练中...<br>两误差都降</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="border-color:var(--success);color:var(--success)">最佳点！<br>验证误差最低</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="border-color:var(--danger);color:var(--danger)">继续训...<br>验证误差升（过拟合）</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="border-color:var(--danger);color:var(--danger)">停下来！</div>
+    </div>
+    <div class="hbox">
+      <h4>💡 直觉</h4>
+      <p>就像复习考试：一开始复习能提分，复习到差不多了再继续"题海战术"反而会让你钻牛角尖，记住偏题怪题，这时候就该停下来了。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">39 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">方法5：Dropout / 剪枝</h2>
+    <h3 class="sub">特定模型的专用正则化方法</h3>
+    <div class="two-col">
+      <div class="card" style="border-color:rgba(192,132,252,0.3)">
+        <div class="card-icon" style="color:var(--accent3)">🎲</div>
+        <h4 style="color:var(--accent3)">Dropout（深度学习）</h4>
+        <p style="margin-bottom:0.8rem">神经网络中常用的正则化技巧</p>
+        <ul style="font-size:0.9rem;color:var(--muted)">
+          <li>训练时，每次迭代<strong style="color:var(--accent3)">随机"扔掉"一部分神经元</strong>（比如50%）</li>
+          <li>不让某些神经元每次都"上班"，防止它们之间形成固定的"作弊"依赖</li>
+          <li>相当于每次训练一个不同的"子网络"，最后推理时用所有神经元</li>
+          <li>效果类似集成学习，非常有效！</li>
+        </ul>
+        <div class="tags" style="margin-top:1rem"><span class="tag pi">深度学习</span><span class="tag p">神经网络</span></div>
+      </div>
+      <div class="card" style="border-color:rgba(251,191,36,0.3)">
+        <div class="card-icon" style="color:var(--warning)">✂️</div>
+        <h4 style="color:var(--warning)">剪枝（决策树）</h4>
+        <p style="margin-bottom:0.8rem">决策树/树模型防止过拟合的方法</p>
+        <ul style="font-size:0.9rem;color:var(--muted)">
+          <li>决策树如果不限制会长得很深，把每个样本都分对——过拟合</li>
+          <li><strong style="color:var(--warning)">预剪枝</strong>：训练时限制树的最大深度、叶子节点最少样本数等</li>
+          <li><strong style="color:var(--warning)">后剪枝</strong>：先训练一棵完整的树，再把没用的分支剪掉</li>
+          <li>限制树的复杂度，让它不要太"枝繁叶茂"</li>
+        </ul>
+        <div class="tags" style="margin-top:1rem"><span class="tag w">决策树</span><span class="tag">随机森林</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">40 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">其他方法</h2>
+    <h3 class="sub">还有很多对抗过拟合的武器</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="card-icon">🌲</div>
+        <h4 style="color:var(--success)">集成学习</h4>
+        <p>训练多个模型再把结果组合起来（比如随机森林、Bagging）。三个臭皮匠赛过诸葛亮，多个模型投票/平均能减少方差，降低过拟合风险。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🖼️</div>
+        <h4 style="color:var(--accent2)">数据增强</h4>
+        <p>在数据有限时"人造"更多数据：图像翻转/旋转/裁剪/加噪声、文本同义词替换/回译。让模型见过更多"变体"，不容易过拟合。在CV和NLP中非常常用！</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎯</div>
+        <h4 style="color:var(--accent3)">特征选择</h4>
+        <p>手动或自动去掉无关、冗余的特征。特征少了，模型复杂度自然降低，也就不容易过拟合。L1正则化其实就是自动特征选择。</p>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>💡 实践中怎么选？</h4>
+      <p><strong>最常用组合：</strong>正则化(L2默认) + 交叉验证选λ + 早停 + （深度学习加Dropout/树模型加剪枝） + 尽量多收集数据。这几招基本能解决绝大多数过拟合问题。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">41 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">方法速查表</h2>
+    <h3 class="sub">遇到问题时按表索骥</h3>
+    <table class="cmp">
+      <tr>
+        <th>问题</th>
+        <th>诊断信号</th>
+        <th>解决方法</th>
+      </tr>
+      <tr>
+        <td rowspan="3" style="color:var(--warning);vertical-align:middle"><strong>欠拟合</strong><br>(高偏差)</td>
+        <td rowspan="3" style="vertical-align:middle">训练误差高<br>测试误差也高</td>
+        <td>➕ 增加更好的特征</td>
+      </tr>
+      <tr><td>🤖 换更复杂的模型</td></tr>
+      <tr><td>⬇️ 减小正则化强度λ</td></tr>
+      <tr>
+        <td rowspan="6" style="color:var(--danger);vertical-align:middle"><strong>过拟合</strong><br>(高方差)</td>
+        <td rowspan="6" style="vertical-align:middle">训练误差很低<br>测试误差高<br>两者差距大</td>
+        <td>📊 增加更多训练数据</td>
+      </tr>
+      <tr><td>⚖️ <strong>加正则化（L2最常用）</strong></td></tr>
+      <tr><td>🔄 交叉验证可靠评估</td></tr>
+      <tr><td>⏹️ 早停（训练时监控验证误差）</td></tr>
+      <tr><td>🎲 Dropout（深度学习）/ 剪枝（决策树）</td></tr>
+      <tr><td>🌲 集成学习、数据增强、特征选择</td></tr>
+    </table>
+    <div class="hbox success">
+      <h4>✅ 记住</h4>
+      <p>实践中过拟合比欠拟合常见得多。正则化是你必须掌握的核心武器。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">42 / 44</div>
+  <div class="slide-content">
+    <h2 class="st">本集小结</h2>
+    <h3 class="sub">恭喜你学完了这一集！核心内容回顾</h3>
+    <div class="body">
+      <div class="hbox success">
+        <h4>🎯 核心概念</h4>
+        <p><strong>泛化能力</strong>是关键——训练误差低不算啥，测试误差低才是真的好。</p>
+      </div>
+      <div class="hbox warn">
+        <h4>📏 欠拟合（高偏差）</h4>
+        <p>模型太简单，训练测试都差 → 加特征、换复杂模型、减小正则化。</p>
+      </div>
+      <div class="hbox danger">
+        <h4>🌀 过拟合（高方差）</h4>
+        <p>模型太复杂，训练好测试差 → <strong>正则化</strong>（L2最常用）、加数据、交叉验证、早停。</p>
+      </div>
+      <div class="hbox purple">
+        <h4>⚖️ 偏差-方差权衡</h4>
+        <p>总误差 = 偏差² + 方差 + 不可约误差。偏差方差此消彼长，目标是找到平衡点让总误差最小。</p>
+      </div>
+      <div class="hbox">
+        <h4>⚒️ 解决方法</h4>
+        <p>L2正则化(Ridge)让权重变小，L1正则化(Lasso)做特征选择，K折交叉验证可靠评估，早停及时止损。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第8集 · 欠拟合与过拟合</div>
+  <div class="slide-number">43 / 44</div>
+  <div class="slide-content">
+    <h1 class="st">重要提醒</h1>
+    <h3 class="sub">在进入下一章之前，记住这几点</h3>
+    <div class="card accent" style="margin-bottom:1.5rem;border-color:rgba(52,211,153,0.4)">
+      <h4 style="color:var(--success)">✅ 机器学习的第一要务</h4>
+      <p style="font-size:1.2rem;margin-top:0.5rem"><strong>永远不要把测试集数据泄露到训练过程中！</strong>测试集只能用一次——在最后评估的时候。调参、选模型、选λ都要用验证集+交叉验证。</p>
+    </div>
+    <div class="two-col">
+      <div class="hbox warn">
+        <h4>🏋️ 训练不是越久越好</h4>
+        <p>训练太久会过拟合。要监控验证集性能，早停是个好策略。不要追求训练误差为0。</p>
+      </div>
+      <div class="hbox">
+        <h4>🎛️ λ是超参数</h4>
+        <p>正则化强度λ需要调，不是设一个值就完事。通过交叉验证选最合适的λ。</p>
+      </div>
+    </div>
+    <div class="hbox purple">
+      <h4>🌟 没有免费的午餐</h4>
+      <p>偏差方差权衡告诉我们：没有完美的模型，只有合适的权衡。理解了这一点，你就超越了大部分只会调包的"调参侠"。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-content">
+    <h1>第2章 完成！</h1>
+    <p class="cover-sub">第8集 · 欠拟合与过拟合 完<br><br>
+    你已经掌握了机器学习的核心难题和应对方法<br><br>
+    <strong style="color:var(--accent)">下一章：经典机器学习算法</strong><br>
+    我们将正式开始学习具体的算法：kNN、线性回归、逻辑回归、决策树……<br><br>
+    B站：机器学习入门教程系列 · BV1r9dYBiEjA</p>
+    <div style="margin-top:2rem">
+      <a href="ppt-09.html" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;text-decoration:none;border-radius:50px;font-weight:600;font-size:1.1rem;transition:transform .3s">开始第3章学习 →</a>
+    </div>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag g">泛化能力</span>
+      <span class="tag d">过拟合</span>
+      <span class="tag">正则化</span>
+      <span class="tag p">偏差方差权衡</span>
+      <span class="tag pi">第2章完</span>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+});
+</script>
+</body></html>

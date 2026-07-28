@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>DL第13集 正则化/Dropout - ML学习站PPT</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#f43f5e;--accent2:#e11d48;--accent3:#fb7185;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--accent3);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent3);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(251,113,133,0.15) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(225,29,72,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(251,113,133,0.1);border:1px solid rgba(251,113,133,0.25);border-radius:50px;font-size:1rem;color:var(--accent3);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:700px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(251,113,133,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:1.8rem 2rem;margin:1.5rem 0;text-align:center;font-size:clamp(1rem,1.8vw,1.25rem);line-height:2.2;overflow-x:auto}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:1rem;display:block;text-align:left;line-height:1.7}
+.katex{color:var(--accent3)}.katex .mord.text{color:var(--ink2)}
+.hbox{background:rgba(244,63,94,0.08);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1rem 0}
+.hbox h4{color:var(--accent);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(251,191,36,0.08);border-left-color:var(--warning)}.hbox.warn h4{color:var(--warning)}
+.hbox.danger{background:rgba(248,113,113,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.pink{background:rgba(225,29,72,0.08);border-left-color:var(--accent2)}.hbox.pink h4{color:var(--accent2)}
+.hbox.rose{background:rgba(251,113,133,0.08);border-left-color:var(--accent3)}.hbox.rose h4{color:var(--accent3)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.95rem}
+table.cmp th{background:var(--bg3);color:var(--accent3);padding:12px 14px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.9rem}
+table.cmp td{padding:10px 14px;border-bottom:1px solid var(--rule);color:var(--ink2);line-height:1.6}
+table.cmp tr:hover td{background:rgba(251,113,133,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent3);background:rgba(251,113,133,0.1);color:var(--accent3);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent)}
+.tag.p{color:var(--accent2)}.tag.pi{color:var(--accent3)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}.tag.d{color:var(--danger)}
+.code{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:1.5rem 2rem;margin:1.5rem 0;font-family:var(--mono);font-size:0.95rem;color:var(--ink2);line-height:1.8;overflow-x:auto}
+.code .kw{color:var(--accent)}.code .str{color:var(--success)}.code .cmt{color:var(--muted)}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent3),var(--accent2),var(--accent),var(--success));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent3);color:var(--accent3)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent3)}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.end-slide .end-buttons{display:flex;gap:1.5rem;justify-content:center;margin-top:2.5rem;flex-wrap:wrap}
+.end-slide .end-btn{padding:14px 32px;border-radius:12px;font-size:1.05rem;font-weight:600;text-decoration:none;transition:all .3s}
+.end-slide .end-btn.primary{background:linear-gradient(135deg,var(--accent3),var(--accent2));color:white}
+.end-slide .end-btn.secondary{background:var(--bg2);border:1px solid var(--rule);color:var(--ink2)}
+.end-slide .end-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(251,113,133,0.2)}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col{grid-template-columns:1fr}.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="slides.html" style="font-weight:600;color:var(--accent3)">📊 PPT课件</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="chapter6.html">回到视频页</a>
+    <a href="ppt-28.html">← 上一集</a>
+    <a href="ppt-30.html">下一集 →</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">🧠 深度学习入门教程 · 第13集</div>
+    <h1 class="cover-title">过拟合克星：深度学习正则化</h1>
+    <p class="cover-sub">从L1/L2正则化到Dropout、数据增强、早停<br>BV1DHJ76SEmj · 时长 19分13秒</p>
+    <div class="tags">
+      <span class="tag pi">L2正则化</span>
+      <span class="tag p">Dropout</span>
+      <span class="tag g">数据增强</span>
+      <span class="tag w">早停</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">2 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">本集内容导览</h1>
+    <h3 class="sub">过拟合是深度学习的大敌，正则化是对抗过拟合的武器库</h3>
+    <div class="body">
+      <ul>
+        <li><strong style="color:var(--danger)">问题篇</strong>——为什么深度学习中过拟合更严重？过拟合的表现</li>
+        <li><strong style="color:var(--accent3)">基础篇</strong>——L2正则化（权重衰减）和L1正则化</li>
+        <li><strong style="color:var(--accent2)">核心篇</strong>——Dropout：随机失活，深度学习最经典的正则化</li>
+        <li><strong style="color:var(--success)">实践篇</strong>——Dropout为什么有效？p值选择？注意事项？</li>
+        <li><strong style="color:var(--warning)">扩展篇</strong>——数据增强、早停(Early Stopping)</li>
+        <li><strong style="color:var(--accent)">总结篇</strong>——正则化方法对比与实践建议</li>
+      </ul>
+    </div>
+    <div class="hbox rose">
+      <h4>💡 正则化的核心思想</h4>
+      <p>正则化(Regularization)的本质就是<strong>给模型加限制</strong>，不让它太"自由"，防止它死记硬背训练数据，从而提高在未知数据上的泛化能力。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">3 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">过拟合：深度学习的顽疾</h1>
+    <h3 class="sub">神经网络参数量巨大，过拟合问题比传统ML严重得多</h3>
+    <div class="hbox danger">
+      <h4>⚠️ 深度学习为什么更容易过拟合？</h4>
+      <p>神经网络的参数量动辄百万、千万甚至千亿级，而训练数据量往往有限。当模型容量远大于数据量时，模型有足够的"记忆力"把训练集全部记住，包括噪声和异常值，这就导致过拟合。</p>
+    </div>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="card-icon" style="color:var(--success)">✅</div>
+        <h4>欠拟合</h4>
+        <p>模型太简单，连训练集都学不好，训练误差大</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent3)">🎯</div>
+        <h4>刚好拟合</h4>
+        <p>训练误差和验证误差都小且接近，泛化最好</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--danger)">❌</div>
+        <h4>过拟合</h4>
+        <p>训练误差很小但验证误差大，泛化能力差</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">4 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">怎么判断过拟合了？</h2>
+    <h3 class="sub">看训练曲线，这是最直观的判断方法</h3>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--danger)">📉 过拟合的典型表现</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.8rem">
+          <li><strong>训练loss持续下降</strong>，越来越小</li>
+          <li><strong>验证loss先降后升</strong>，开始上升</li>
+          <li>训练准确率很高（接近100%）</li>
+          <li>验证准确率停滞甚至下降</li>
+          <li>两者之间的gap越来越大</li>
+        </ul>
+        <div class="hbox danger" style="margin-top:1rem;padding:0.8rem">
+          <p style="font-size:0.9rem">训练集表现很好，测试集表现很差——这就是过拟合的信号！</p>
+        </div>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent2)">💡 类比理解</h4>
+        <p style="margin-bottom:1rem">想象学生备考：</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li><strong style="color:var(--success)">欠拟合</strong>：连课后题都不会做</li>
+          <li><strong style="color:var(--accent3)">刚好</strong>：课后题会做，考试题也会做（理解了知识点）</li>
+          <li><strong style="color:var(--danger)">过拟合</strong>：把课后题答案全背下来了，但考试题稍微变一下就不会（死记硬背）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">5 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">解决过拟合的两大方向</h2>
+    <h3 class="sub">要么增加数据，要么限制模型复杂度</h3>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="card" style="border-left:4px solid var(--success)">
+        <div class="card-icon" style="color:var(--success)">📊</div>
+        <h4>方向1：增加数据（最有效）</h4>
+        <p style="margin-bottom:0.8rem">数据越多，模型越难过拟合。</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>收集更多真实数据</li>
+          <li><strong style="color:var(--success)">数据增强(Data Augmentation)</strong>——通过变换生成新样本</li>
+          <li>迁移学习——用预训练模型</li>
+          <li>合成数据、GAN生成数据</li>
+        </ul>
+      </div>
+      <div class="card accent" style="border-left:4px solid var(--accent2)">
+        <div class="card-icon" style="color:var(--accent2)">🛡️</div>
+        <h4>方向2：正则化（限制模型）</h4>
+        <p style="margin-bottom:0.8rem">给模型加约束，不让它太"狂野"。</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li><strong style="color:var(--accent3)">L1/L2正则化</strong>——惩罚大权重</li>
+          <li><strong style="color:var(--accent2)">Dropout</strong>——随机关掉神经元</li>
+          <li><strong style="color:var(--warning)">早停(Early Stopping)</strong>——验证集不提升就停</li>
+          <li>简化模型结构（减少层数/神经元）</li>
+          <li>BatchNorm也有正则化效果</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🎯 实践中</h4>
+      <p>通常是<strong>组合使用</strong>：数据增强 + Weight Decay + Dropout + Early Stopping 一起用，效果最好。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">6 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">L2正则化（权重衰减 Weight Decay）</h2>
+    <h3 class="sub">最经典、最常用的正则化方法</h3>
+    <div class="card" style="margin-bottom:1rem">
+      <h4 style="color:var(--accent)">📖 原理：在损失函数中加惩罚项</h4>
+      <p>不直接优化原始损失L，而是优化"原始损失 + 权重惩罚项"：</p>
+      <div class="formula" style="margin:1rem 0;padding:1.2rem">
+        L_total = L_data + λ * (1/2) * Σ w²
+      </div>
+      <p><strong>λ(lambda)</strong>是正则化强度超参数：λ越大，惩罚越重，模型越简单，越不容易过拟合。</p>
+    </div>
+    <div class="hbox pink">
+      <h4>💡 为什么叫"权重衰减"？</h4>
+      <p>梯度下降更新权重时：w = w - lr*(∂L/∂w + λw) = w(1 - lrλ) - lr*∂L/∂w。每次更新，w都会先乘以一个小于1的因子(1-lrλ)，相当于权重在"衰减"变小。</p>
+    </div>
+    <div class="hbox">
+      <h4>🎯 L2的作用</h4>
+      <p>让权重值尽可能小，更均匀地分布，不让某几个权重特别大（依赖少数特征）。模型更平滑，抗噪声能力更强。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">7 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">L1正则化</h2>
+    <h3 class="sub">产生稀疏权重，有特征选择效果</h3>
+    <div class="card" style="margin-bottom:1rem">
+      <h4 style="color:var(--accent2)">📖 L1正则化：惩罚权重的绝对值</h4>
+      <div class="formula" style="margin:1rem 0;padding:1.2rem">
+        L_total = L_data + λ * Σ |w|
+      </div>
+    </div>
+    <div class="three-col">
+      <div class="card">
+        <h4 style="color:var(--accent)">✨ 稀疏性</h4>
+        <p>L1倾向于让<strong>部分权重变成0</strong>，相当于自动做了特征选择——不重要的特征权重直接变成0，被"淘汰"。</p>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--warning)">📊 特征选择</h4>
+        <p>权重为0意味着对应的特征被忽略了。当特征很多、想知道哪些特征重要时，L1很有用。</p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--success)">🔍 鲁棒性</h4>
+        <p>对异常值不如L2敏感（因为是绝对值惩罚而不是平方）。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">8 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">L1 vs L2 正则化对比</h2>
+    <h3 class="sub">两种正则化有什么区别？什么时候用哪个？</h3>
+    <table class="cmp">
+      <tr>
+        <th>对比维度</th>
+        <th style="color:var(--accent)">L2正则化（权重衰减）</th>
+        <th style="color:var(--accent2)">L1正则化</th>
+      </tr>
+      <tr>
+        <td>惩罚项</td>
+        <td>λΣw²（平方和）</td>
+        <td>λΣ|w|（绝对值和）</td>
+      </tr>
+      <tr>
+        <td>对权重的影响</td>
+        <td style="color:var(--success)">让权重均匀变小，趋近于0但不为0</td>
+        <td style="color:var(--warning)">让部分权重变成0，产生稀疏解</td>
+      </tr>
+      <tr>
+        <td>特征选择</td>
+        <td>❌ 无</td>
+        <td>✅ 有（0权重=特征被忽略）</td>
+      </tr>
+      <tr>
+        <td>解的稳定性</td>
+        <td>稳定，每次训练结果差不多</td>
+        <td>不稳定，可能有多个解</td>
+      </tr>
+      <tr>
+        <td>计算难度</td>
+        <td>容易求导，处处可导</td>
+        <td>在w=0处不可导，需要次梯度</td>
+      </tr>
+      <tr>
+        <td>深度学习中使用频率</td>
+        <td style="color:var(--success)">⭐⭐⭐⭐⭐ 最常用（默认选L2/Weight Decay）</td>
+        <td>⭐⭐ 较少直接用</td>
+      </tr>
+      <tr>
+        <td>典型场景</td>
+        <td>大多数情况，防止过拟合</td>
+        <td>特征选择、稀疏模型、可解释性要求高</td>
+      </tr>
+    </table>
+    <div class="hbox rose">
+      <h4>💡 ElasticNet：L1+L2组合</h4>
+      <p>也可以同时加L1和L2惩罚，叫ElasticNet，结合两者的优点。但在深度学习中，L2/Weight Decay是绝对主流。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">9 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">Dropout：深度学习的大杀器</h1>
+    <h3 class="sub">Srivastava et al., 2014——Dropout: A Simple Way to Prevent Neural Networks from Overfitting</h3>
+    <div class="hbox success">
+      <h4>🎲 Dropout的核心思想：训练时随机"关闭"部分神经元</h4>
+      <p>每次前向传播时，以概率p随机把一部分神经元的输出置为0（相当于这些神经元"死掉"了，不参与这次计算）。每次迭代被关掉的神经元都是随机的，相当于每次都在训练一个不同的"子网络"。</p>
+    </div>
+    <div class="flow" style="margin:2rem 0">
+      <div class="flow-node" style="min-width:100px">输入层</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:120px">
+        隐藏层1<br>
+        <small style="color:var(--danger)">随机50%神经元被关掉!</small>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:120px">
+        隐藏层2<br>
+        <small style="color:var(--danger)">随机50%神经元被关掉!</small>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:100px">输出层</div>
+    </div>
+    <div class="hbox warn">
+      <h4>⚖️ 推理时的缩放：Inverted Dropout</h4>
+      <p>推理时<strong>不</strong>Dropout，所有神经元都用。但要乘以(1-p)缩放——因为训练时只有(1-p)比例的神经元活跃，推理时输出期望会变大，要除以(1-p)（即乘以(1-p)？不对，是乘以(1-p)保持期望一致）。PyTorch的nn.Dropout已经帮我们做了这个缩放！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">10 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">Dropout是怎么工作的？</h2>
+    <h3 class="sub">训练 vs 推理：两阶段行为完全不同</h3>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">🏋️</div>
+        <h4>训练阶段 (model.train())</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.8rem">
+          <li>以概率p随机选择神经元mask（0或1）</li>
+          <li>被选中的神经元输出置0</li>
+          <li><strong>同时</strong>存活的神经元输出除以(1-p)缩放（Inverted Dropout）</li>
+          <li>每次前向传播mask都重新随机生成</li>
+          <li>反向传播只更新存活的神经元</li>
+        </ul>
+        <div class="formula" style="margin:1rem 0;padding:1rem;font-size:1rem">
+          mask_i ~ Bernoulli(1-p)<br>
+          y_i = mask_i * x_i / (1-p)
+        </div>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">🧪</div>
+        <h4>推理阶段 (model.eval())</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.8rem">
+          <li><strong>不</strong>做随机丢弃！所有神经元都参与计算</li>
+          <li>输出不缩放（因为训练时已经做了Inverted缩放）</li>
+          <li>结果是确定性的（相同输入得到相同输出）</li>
+          <li>相当于所有子网络的集成平均近似</li>
+        </ul>
+        <div class="hbox danger" style="margin-top:1rem;padding:0.8rem">
+          <p style="font-size:0.9rem">⚠️ 推理时必须model.eval()关掉Dropout！否则结果随机，完全不对！</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">11 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">Dropout为什么有效？解释1——集成学习</h2>
+    <h3 class="sub">每次训练不同子网络，推理时相当于集成了大量子网络</h3>
+    <div class="hbox pink">
+      <h4>🎯 集成学习(Ensemble)的思想</h4>
+      <p>集成学习说"三个臭皮匠赛过诸葛亮"——训练多个不同模型，预测时平均它们的结果，泛化能力比单个模型强。但训练很多模型成本太高。</p>
+    </div>
+    <div class="card" style="margin:1.5rem 0">
+      <h4 style="color:var(--accent3)">✨ Dropout = 廉价的集成学习</h4>
+      <p>每次迭代随机丢弃不同的神经元，相当于每次都在训练一个<strong>不同的子网络</strong>（共享权重）。一个有n个神经元的网络，可能的子网络数量是2ⁿ个，天文数字！</p>
+      <p style="margin-top:1rem">推理时所有神经元都使用并缩放，相当于<strong>近似地把这些大量子网络的预测做了平均</strong>，达到集成学习的效果，而且几乎没有额外成本！</p>
+    </div>
+    <div class="hbox success">
+      <h4>🏆 实验验证</h4>
+      <p>Dropout确实能带来接近集成多个独立模型的效果，而且训练成本只增加一点点（只是多了生成mask和乘0的操作）。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">12 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">Dropout为什么有效？解释2——破坏共适应</h2>
+    <h3 class="sub">不让神经元之间形成"默契"，强迫每个神经元学到有用的特征</h3>
+    <div class="hbox warn">
+      <h4>🤝 什么是"共适应"(Co-adaptation)？</h4>
+      <p>没有Dropout时，神经元之间可能形成依赖：比如神经元A专门纠正神经元B的错误，两个神经元"配合"才能出正确结果。如果A被"拿走"了，B就完全没用了。这种脆弱的依赖导致泛化差。</p>
+    </div>
+    <div class="card" style="margin:1.5rem 0">
+      <h4 style="color:var(--accent2)}">🔨 Dropout如何打破共适应？</h4>
+      <p>因为任何神经元都可能随时被"关掉"，其他神经元不能依赖某几个特定的神经元。每个神经元都必须自己学到一些<strong>独立、有用的特征</strong>，不能指望"队友"来带飞。</p>
+      <p style="margin-top:1rem">这就像团队合作：如果每次随机有人请假，其他人必须都能独当一面，不能只依赖某几个大牛。最终团队整体战斗力更强！</p>
+    </div>
+    <div class="hbox rose">
+      <h4>🧬 类比：有性繁殖</h4>
+      <p>论文作者还用进化论类比：有性繁殖中基因随机重组，打破了基因间的共适应，产生更强壮的后代。Dropout类似，随机组合神经元，让网络更健壮。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">13 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">Dropout率p怎么选？</h2>
+    <h3 class="sub">p是丢弃概率，p越大正则化越强</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="big-num" style="font-size:3rem">p=0.1~0.2</div>
+        <h4>输入层</h4>
+        <p>输入层丢弃率要小，因为原始输入信息很重要，不能丢太多。通常p=0.1或0.2。</p>
+      </div>
+      <div class="card accent">
+        <div class="big-num" style="font-size:3rem">p=0.5</div>
+        <h4>隐藏层（最常用）</h4>
+        <p>隐藏层通常p=0.5，这是论文推荐的默认值。此时随机生成的子网络种类最多，集成效果最好。</p>
+      </div>
+      <div class="card">
+        <div class="big-num" style="font-size:3rem">p<0.5</div>
+        <h4>大网络/过拟合轻</h4>
+        <p>网络不大或过拟合不严重时p小一点；网络大、过拟合严重时p可以大一点（但一般不超过0.5）。</p>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>📌 注意</h4>
+      <p>p=0就是不使用Dropout。p越大正则化越强，但p太大会导致欠拟合（网络容量不够）。一般从p=0.5开始尝试，根据验证集效果调整。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">14 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">PyTorch中使用Dropout</h2>
+    <h3 class="sub">实战：在网络中加Dropout层</h3>
+    <div class="code">
+<span class="kw">class</span> <span class="str">MLPWithDropout</span>(nn.Module):<br>
+&nbsp;&nbsp;<span class="kw">def</span> <span class="str">__init__</span>(self, input_dim=784, hidden_dim=512, num_classes=10):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">super</span>().__init__()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.classifier = nn.Sequential(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.Linear(input_dim, hidden_dim),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.ReLU(),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.Dropout(p=<span class="str">0.5</span>),  <span class="cmt"># 隐藏层Dropout: p=0.5</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.Linear(hidden_dim, hidden_dim),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.ReLU(),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.Dropout(p=<span class="str">0.5</span>),  <span class="cmt"># 再加一层Dropout</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.Linear(hidden_dim, num_classes)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;)<br>
+<br>
+&nbsp;&nbsp;<span class="kw">def</span> <span class="str">forward</span>(self, x):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> self.classifier(x)<br>
+<br>
+<span class="cmt"># 训练时</span><br>
+model.train()  <span class="cmt"># 🔴 必须！启用Dropout和BN</span><br>
+<span class="cmt"># ... 训练代码 ...</span><br>
+<br>
+<span class="cmt"># 测试/推理时</span><br>
+model.eval()   <span class="cmt"># 🔴 必须！关闭Dropout和BN</span><br>
+<span class="kw">with</span> torch.no_grad():<br>
+&nbsp;&nbsp;<span class="cmt"># ... 推理代码 ...</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">15 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">Dropout使用注意事项</h2>
+    <h3 class="sub">实践中容易踩的坑</h3>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--danger)">🚨</div>
+        <h4>忘记model.eval()</h4>
+        <p>推理时忘记切换到eval模式，Dropout还在随机丢神经元，结果随机、不稳定，准确率大幅下降。这是最常见的新手错误！</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--warning)">📉</div>
+        <h4>Dropout位置</h4>
+        <p>Dropout通常放在<strong>激活函数之后</strong>（ReLU之后），下一层Linear之前。不要放在输出层之前（输出要给loss，不能丢）。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">🔄</div>
+        <h4>和BN一起用</h4>
+        <p>BN本身已有正则化效果，同时用Dropout时p不要太大。现在有争论BN+Dropout可能导致方差偏移，Transformer里一般不用Dropout在注意力权重上。</p>
+      </div>
+    </div>
+    <div class="hbox danger" style="margin-top:1.5rem">
+      <h4>⚠️ Dropout在CNN/Transformer中的使用</h4>
+      <p>CNN中Dropout用得比以前少了（BN+数据增强+Weight Decay已经足够），但全连接层还是会用。Transformer中用的是<strong>Attention Dropout</strong>和<strong>Hidden Dropout</strong>，p通常0.1。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">16 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">数据增强 (Data Augmentation)</h1>
+    <h3 class="sub">CV中最有效的正则化手段——"免费"获得更多数据</h3>
+    <div class="hbox success">
+      <h4>💡 核心思想</h4>
+      <p>对现有训练数据做各种变换，生成<strong>看起来不同但标签不变</strong>的新样本，相当于凭空扩充了数据集。数据越多，模型越难过拟合。</p>
+    </div>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <h4 style="color:var(--accent)">🖼️ 计算机视觉</h4>
+        <ul style="font-size:0.9rem;color:var(--muted);margin-top:0.5rem">
+          <li>随机水平/垂直翻转</li>
+          <li>随机裁剪(Random Crop)</li>
+          <li>随机旋转、缩放</li>
+          <li>颜色抖动（亮度/对比度/饱和度）</li>
+          <li>随机擦除(Random Erasing)</li>
+          <li>Mixup/CutMix（混合样本）</li>
+          <li>AutoAugment/RandAugment</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent2)">📝 NLP自然语言处理</h4>
+        <ul style="font-size:0.9rem;color:var(--muted);margin-top:0.5rem">
+          <li>同义词替换</li>
+          <li>随机插入/删除词语</li>
+          <li>回译（中→英→中）</li>
+          <li>词语顺序打乱</li>
+          <li>EDA（简单数据增强）</li>
+          <li>大模型生成增强数据</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--success)">📊 表格数据</h4>
+        <ul style="font-size:0.9rem;color:var(--muted);margin-top:0.5rem">
+          <li>加噪声（高斯噪声）</li>
+          <li>SMOTE（少数类过采样）</li>
+          <li>特征扰动</li>
+          <li>样本插值</li>
+          <li>表格数据增强相对难</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox rose">
+      <h4>🏆 为什么数据增强这么强？</h4>
+      <p>它让模型见过更多"变体"，强迫模型学到<strong>真正的、鲁棒的特征</strong>，而不是记住训练样本的细枝末节。现代CNN训练（如ResNet）都重度依赖数据增强。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">17 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">PyTorch中的数据增强</h2>
+    <h3 class="sub">用torchvision.transforms做图像增强</h3>
+    <div class="code">
+<span class="kw">from</span> torchvision <span class="kw">import</span> transforms<br>
+<br>
+<span class="cmt"># 训练集增强：多种变换组合</span><br>
+train_transform = transforms.Compose([<br>
+&nbsp;&nbsp;transforms.RandomCrop(<span class="str">32</span>, padding=<span class="str">4</span>),     <span class="cmt"># 随机裁剪（先padding再裁）</span><br>
+&nbsp;&nbsp;transforms.RandomHorizontalFlip(),       <span class="cmt"># 随机水平翻转（概率0.5）</span><br>
+&nbsp;&nbsp;transforms.ColorJitter(                  <span class="cmt"># 颜色抖动</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;brightness=<span class="str">0.2</span>, contrast=<span class="str">0.2</span>, saturation=<span class="str">0.2</span><br>
+&nbsp;&nbsp;),<br>
+&nbsp;&nbsp;transforms.ToTensor(),<br>
+&nbsp;&nbsp;transforms.Normalize((<span class="str">0.4914</span>, <span class="str">0.4822</span>, <span class="str">0.4465</span>),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="str">0.2023</span>, <span class="str">0.1994</span>, <span class="str">0.2010</span>))<br>
+])<br>
+<br>
+<span class="cmt"># 测试集：只做ToTensor和Normalize，不增强！</span><br>
+test_transform = transforms.Compose([<br>
+&nbsp;&nbsp;transforms.ToTensor(),<br>
+&nbsp;&nbsp;transforms.Normalize((<span class="str">0.4914</span>, <span class="str">0.4822</span>, <span class="str">0.4465</span>),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="str">0.2023</span>, <span class="str">0.1994</span>, <span class="str">0.2010</span>))<br>
+])
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 注意</h4>
+      <p>数据增强<strong>只在训练时用</strong>！测试/验证时不要做随机增强，只做确定性的预处理（如Normalize），否则验证结果不稳定。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">18 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">Early Stopping 早停</h1>
+    <h3 class="sub">不需要额外加层/改损失，通过监控验证集来防止过拟合</h3>
+    <div class="hbox warn">
+      <h4>📖 早停的做法</h4>
+      <p>训练过程中<strong>每个epoch结束后在验证集上评估</strong>，记录验证集loss/accuracy。如果验证集性能连续多个epoch都不再提升（甚至下降），就停止训练，选验证集表现最好的那个epoch的模型。</p>
+    </div>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node" style="min-width:100px">开始训练</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:120px">每个epoch后<br>验证集评估</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:140px">记录最佳<br>val_acc</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:150px">连续patience个epoch<br>没提升？</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:100px;border-left:4px solid var(--danger)">停止训练!</div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--success)">✅ 优点</h4>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>简单直观，不需要改模型/加正则化</li>
+          <li>不需要反复试λ值</li>
+          <li>不用训练到最后，节省时间</li>
+          <li>几乎是"免费"的正则化</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--warning)">📌 patience参数</h4>
+        <p>patience是"容忍度"：比如patience=5，意思是验证集5个epoch没提升就停。不要一看到一两次不提升就停，因为可能有波动。通常patience=5~20。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">19 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">PyTorch实现早停</h2>
+    <h3 class="sub">简单的Early Stopping代码模板</h3>
+    <div class="code">
+best_val_acc = <span class="str">0.0</span><br>
+patience = <span class="str">10</span><br>
+counter = <span class="str">0</span><br>
+best_model_state = <span class="kw">None</span><br>
+<br>
+<span class="kw">for</span> epoch <span class="kw">in</span> range(num_epochs):<br>
+&nbsp;&nbsp;<span class="cmt"># ... 训练一个epoch ...</span><br>
+<br>
+&nbsp;&nbsp;<span class="cmt"># 验证</span><br>
+&nbsp;&nbsp;model.eval()<br>
+&nbsp;&nbsp;val_acc = evaluate(model, val_loader)<br>
+<br>
+&nbsp;&nbsp;<span class="kw">if</span> val_acc > best_val_acc:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;best_val_acc = val_acc<br>
+&nbsp;&nbsp;&nbsp;&nbsp;counter = <span class="str">0</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;best_model_state = model.state_dict().copy()  <span class="cmt"># 保存最佳模型</span><br>
+&nbsp;&nbsp;<span class="kw">else</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;counter += <span class="str">1</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> counter >= patience:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print(<span class="str">f"Early stopping at epoch {epoch}"</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><br>
+<br>
+<span class="cmt"># 训练结束，加载最佳模型</span><br>
+model.load_state_dict(best_model_state)
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">20 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">其他正则化方法</h1>
+    <h3 class="sub">除了L2/Dropout/数据增强/早停，还有哪些正则化手段？</h3>
+    <div class="three-col" style="margin:1rem 0">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">⚖️</div>
+        <h4>Weight Decay</h4>
+        <p>即L2正则化，在优化器中设置weight_decay参数（如AdamW）。现代深度学习中最常用的正则化之一。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">📊</div>
+        <h4>BatchNorm</h4>
+        <p>BN层自带正则化效果（mini-batch统计量有噪声），有时加了BN可以减少Dropout的使用。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--success)">🔗</div>
+        <h4>标签平滑 Label Smoothing</h4>
+        <p>不让标签是硬的0/1，而是0.1/0.9，防止模型对预测过度自信，提升泛化。分类任务常用。</p>
+      </div>
+    </div>
+    <div class="three-col" style="margin-top:1rem">
+      <div class="card">
+        <div class="card-icon" style="color:var(--warning)">✂️</div>
+        <h4>权重裁剪 Weight Clipping</h4>
+        <p>强制权重不超过某个阈值（如|w|≤c）。GAN训练中会用。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--danger)">🎲</div>
+        <h4>Stochastic Depth</h4>
+        <p>残差网络中随机跳过整个残差块，类似Dropout但针对层。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">🧊</div>
+        <h4>DropConnect</h4>
+        <p>Dropout的变种：不是丢神经元输出，而是随机丢权重（连接）。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">21 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">正则化方法对比总结表</h2>
+    <h3 class="sub">各种正则化方法全方位对比</h3>
+    <table class="cmp">
+      <tr>
+        <th>方法</th>
+        <th>原理</th>
+        <th>强度超参数</th>
+        <th>使用频率</th>
+        <th>适用场景</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">L2/Weight Decay</strong></td>
+        <td>惩罚大权重</td>
+        <td>λ/weight_decay (如1e-4)</td>
+        <td style="color:var(--success)">⭐⭐⭐⭐⭐ 必用</td>
+        <td>所有场景默认加</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">Dropout</strong></td>
+        <td>训练时随机丢神经元</td>
+        <td>p (隐藏层0.5)</td>
+        <td>⭐⭐⭐⭐ 常用</td>
+        <td>MLP全连接层</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--success)">数据增强</strong></td>
+        <td>变换扩充数据集</td>
+        <td>增强策略组合</td>
+        <td style="color:var(--success)">⭐⭐⭐⭐⭐ CV必用</td>
+        <td>图像、文本、语音</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--warning)">Early Stopping</strong></td>
+        <td>验证集不提升就停</td>
+        <td>patience (5-20)</td>
+        <td>⭐⭐⭐⭐⭐ 推荐必用</td>
+        <td>所有场景</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent3)">L1正则化</strong></td>
+        <td>惩罚权重绝对值</td>
+        <td>λ</td>
+        <td>⭐⭐ 较少</td>
+        <td>特征选择</td>
+      </tr>
+      <tr>
+        <td><strong>BatchNorm</strong></td>
+        <td>归一化+噪声</td>
+        <td>-</td>
+        <td>⭐⭐⭐⭐ CNN常用</td>
+        <td>CNN卷积后</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--danger)">标签平滑</strong></td>
+        <td>软化标签</td>
+        <td>smoothing (0.1)</td>
+        <td>⭐⭐⭐ 分类常用</td>
+        <td>分类任务（特别是大模型）</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">22 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">实践建议：正则化组合拳</h2>
+    <h3 class="sub">怎么组合这些正则化方法效果最好？</h3>
+    <div class="card" style="margin-bottom:1.5rem">
+      <h4 style="color:var(--accent3)">🥇 CV图像任务标配</h4>
+      <p><strong>数据增强 + Weight Decay + BatchNorm + Early Stopping</strong>，视情况加Dropout。现代CNN（ResNet等）很多不用Dropout也能很好，因为前三个已经够强了。</p>
+    </div>
+    <div class="card accent" style="margin-bottom:1.5rem">
+      <h4 style="color:var(--accent2)">🥈 NLP/Transformer标配</h4>
+      <p><strong>Weight Decay + Attention Dropout(0.1) + Hidden Dropout(0.1) + Label Smoothing + Early Stopping</strong>。Transformer中Dropout用得比较克制（p=0.1而不是0.5）。</p>
+    </div>
+    <div class="hbox success">
+      <h4>🎯 新手推荐优先级</h4>
+      <p>1️⃣ <strong>先加Weight Decay</strong>（优化器里设weight_decay=1e-4）<br>
+      2️⃣ <strong>用Early Stopping</strong>（监控验证集，保存最佳模型）<br>
+      3️⃣ <strong>CV的话做数据增强</strong>（翻转/裁剪/颜色抖动）<br>
+      4️⃣ <strong>还过拟合？再加Dropout(p=0.5)</strong><br>
+      5️⃣ 还是不行？<strong>收集更多数据或简化模型</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">23 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">正则化强度怎么调？</h2>
+    <h3 class="sub">λ/p太强会欠拟合，太弱没效果——需要平衡</h3>
+    <div class="three-col">
+      <div class="card" style="border-top:3px solid var(--danger)">
+        <h4 style="color:var(--danger)">❌ 正则化太强</h4>
+        <ul style="font-size:0.9rem;color:var(--muted);margin-top:0.5rem">
+          <li>训练loss都降不下去</li>
+          <li>训练准确率低</li>
+          <li>验证loss也高</li>
+          <li><strong>这是欠拟合！</strong></li>
+          <li>解决：减小λ/减小p/减少增强</li>
+        </ul>
+      </div>
+      <div class="card accent" style="border-top:3px solid var(--success)">
+        <h4 style="color:var(--success)">✅ 正则化合适</h4>
+        <ul style="font-size:0.9rem;color:var(--muted);margin-top:0.5rem">
+          <li>训练loss稳步下降</li>
+          <li>验证loss也下降到一个稳定值</li>
+          <li>两者接近，gap小</li>
+          <li><strong>这是我们想要的！</strong></li>
+        </ul>
+      </div>
+      <div class="card" style="border-top:3px solid var(--warning)">
+        <h4 style="color:var(--warning)">⚠️ 正则化太弱</h4>
+        <ul style="font-size:0.9rem;color:var(--muted);margin-top:0.5rem">
+          <li>训练loss很低接近0</li>
+          <li>验证loss先降后升</li>
+          <li>两者gap很大</li>
+          <li><strong>这是过拟合！</strong></li>
+          <li>解决：加大λ/加大p/加增强/简化模型</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox rose">
+      <h4>💡 调参建议</h4>
+      <p>从<strong>弱正则化</strong>开始，逐渐加强。Weight Decay常用值：1e-4, 5e-4, 1e-3，从1e-4开始试。Dropout从p=0.3或0.5开始。不要一上来就用非常强的正则化，容易欠拟合。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">24 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">常见误区和坑</h2>
+    <h3 class="sub">新手用正则化容易犯的错误</h3>
+    <div class="hbox danger">
+      <h4>坑1：测试时做数据增强 / 忘记model.eval()</h4>
+      <p>验证/测试时还在做随机增强，或者Dropout还开着，导致验证结果不准、随机波动，无法正确判断模型好坏。验证集只做确定性的预处理！</p>
+    </div>
+    <div class="hbox warn">
+      <h4>坑2：一发现过拟合就疯狂加正则化</h4>
+      <p>加太多太强正则化会导致欠拟合，模型什么都学不到。先看看是不是训练epoch不够？学习率问题？数据问题？再调正则化强度。</p>
+    </div>
+    <div class="hbox pink">
+      <h4>坑3：只看训练loss不看验证loss</h4>
+      <p>训练loss一直降不代表模型好！一定要看验证集。训练loss降、验证loss升是最典型的过拟合信号。</p>
+    </div>
+    <div class="hbox">
+      <h4>坑4：Weight Decay和L2加重复了</h4>
+      <p>有些优化器（如PyTorch的Adam）的weight_decay其实就是L2，不用额外在损失函数里手动加L2惩罚，加两次就太强了。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">25 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">本集核心要点总结</h2>
+    <h3 class="sub">正则化方法核心知识点</h3>
+    <div class="hbox success">
+      <h4>🎯 过拟合判断</h4>
+      <p>训练loss持续下降但验证loss上升，两者gap大。解决方向：更多数据或限制模型复杂度（正则化）。</p>
+    </div>
+    <div class="hbox">
+      <h4>📐 L1 vs L2正则化</h4>
+      <p>L2（权重衰减）让权重均匀变小，最常用；L1产生稀疏权重，用于特征选择。在优化器中设置weight_decay参数即可。</p>
+    </div>
+    <div class="hbox rose">
+      <h4>🎲 Dropout</h4>
+      <p>训练时p=0.5随机关神经元，推理时全部打开并缩放。为什么有效？集成学习+破坏共适应。必须model.train()/model.eval()切换！</p>
+    </div>
+    <div class="hbox pink">
+      <h4>🌟 其他方法</h4>
+      <p>数据增强是CV最有效的正则化；Early Stopping简单免费几乎必用。实践中：Weight Decay + Early Stopping默认，CV加数据增强，MLP加Dropout。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-chapter">第13集 · 正则化/Dropout</div>
+  <div class="slide-number">26 / 27</div>
+  <div class="slide-content">
+    <h1>🎉 第13集学习完成！</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      正则化是对抗过拟合、提升泛化的必备技能<br><br>
+      <strong style="color:var(--accent3)">核心收获</strong><br>
+      理解L1/L2正则化的原理和区别<br>
+      掌握Dropout的原理、用法和注意事项<br>
+      了解数据增强、早停等正则化手段<br>
+      知道实战中怎么组合使用这些方法
+    </p>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag pi">✅ L2正则化</span>
+      <span class="tag p">✅ Dropout</span>
+      <span class="tag g">✅ 数据增强</span>
+      <span class="tag w">✅ 早停</span>
+    </div>
+    <div class="end-buttons">
+      <a href="ppt-28.html" class="end-btn secondary">← 上一集</a>
+      <a href="chapter6.html" class="end-btn secondary">📺 回到视频页</a>
+      <a href="ppt-30.html" class="end-btn primary">下一集：训练流程 →</a>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-number">27 / 27</div>
+  <div class="slide-content">
+    <h1>下集预告：如何训练DL模型</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      学了这么多组件，怎么真正训练一个模型？<br><br>
+      <strong style="color:var(--accent3)">完整训练流程8步走</strong><br>
+      <strong style="color:var(--accent2)">训练曲线诊断：各种症状原因</strong><br>
+      <strong style="color:var(--success)">超参数调优优先级</strong><br>
+      <strong style="color:var(--warning)">常见坑和经验总结</strong><br><br>
+      一集讲透深度学习训练！
+    </p>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag d">🏋️ 训练流程</span>
+      <span class="tag pi">📊 曲线诊断</span>
+      <span class="tag p">🔧 调参技巧</span>
+      <span class="tag g">✅ Sanity Check</span>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+});
+</script>
+</body></html>

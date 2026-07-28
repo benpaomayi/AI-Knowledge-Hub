@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>第13集 K-Means聚类 - ML学习站PPT</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#38bdf8;--accent2:#818cf8;--accent3:#c084fc;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--accent3);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent3);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(192,132,252,0.1) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(129,140,248,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(192,132,252,0.1);border:1px solid rgba(192,132,252,0.25);border-radius:50px;font-size:1rem;color:var(--accent3);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:700px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(192,132,252,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:1.8rem 2rem;margin:1.5rem 0;text-align:center;font-size:clamp(1rem,1.8vw,1.25rem);line-height:2.2;overflow-x:auto}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:1rem;display:block;text-align:left;line-height:1.7}
+.katex{color:var(--accent3)}.katex .mord.text{color:var(--ink2)}
+.hbox{background:rgba(192,132,252,0.08);border-left:4px solid var(--accent3);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1.5rem 0}
+.hbox h4{color:var(--accent3);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(251,191,36,0.08);border-left-color:var(--warning)}.hbox.warn h4{color:var(--warning)}
+.hbox.danger{background:rgba(248,113,113,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.blue{background:rgba(56,189,248,0.08);border-left-color:var(--accent)}.hbox.blue h4{color:var(--accent)}
+.hbox.purple{background:rgba(129,140,248,0.08);border-left-color:var(--accent2)}.hbox.purple h4{color:var(--accent2)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:1rem}
+table.cmp th{background:var(--bg3);color:var(--accent3);padding:12px 16px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.95rem}
+table.cmp td{padding:10px 16px;border-bottom:1px solid var(--rule);color:var(--ink2)}
+table.cmp tr:hover td{background:rgba(192,132,252,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent3);background:rgba(192,132,252,0.1);color:var(--accent3);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent3)}
+.tag.p{color:var(--accent2)}.tag.b{color:var(--accent)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}.tag.d{color:var(--danger)}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent3),var(--accent2),var(--accent));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent3);color:var(--accent3)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent3)}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.code{background:var(--bg);border:1px solid var(--rule);border-radius:14px;padding:1.5rem 2rem;margin:1.5rem 0;font-family:var(--mono);font-size:clamp(0.85rem,1.4vw,1rem);line-height:1.8;color:var(--ink2);overflow-x:auto;white-space:pre}
+.code .kw{color:var(--accent3)}.code .fn{color:var(--accent)}.code .str{color:var(--success)}.code .cm{color:var(--muted);font-style:italic}.code .num{color:var(--warning)}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:2rem;align-items:center;margin:2rem 0}
+.vs-side{padding:2rem;border-radius:16px;text-align:center}.vs-left{background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.2)}
+.vs-right{background:rgba(192,132,252,0.06);border:1px solid rgba(192,132,252,0.2)}
+.vs-divider{font-size:2rem;font-weight:800;color:var(--muted)}
+.iter-step{background:var(--bg2);border:1px solid var(--rule);border-radius:12px;padding:1.2rem 1.5rem;margin:0.8rem 0;display:flex;gap:1.2rem;align-items:flex-start}
+.iter-step .step-num{width:36px;height:36px;border-radius:50%;background:var(--accent3);color:var(--bg);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.iter-step .step-content h5{color:var(--accent3);font-size:1.05rem;margin-bottom:0.4rem}
+.iter-step .step-content p{color:var(--muted);font-size:0.95rem;line-height:1.6}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col,.vs{grid-template-columns:1fr}.vs-divider{text-align:center}.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="slides.html" style="font-weight:600;color:var(--accent3)">📊 PPT课件</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="ppt-12.html">上一章</a>
+    <a href="chapter4.html">回到视频页</a>
+    <a href="ppt-14.html">下一集 →</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">机器学习入门教程 · 第13集</div>
+    <h1 class="cover-title">K-Means聚类</h1>
+    <p class="cover-sub">无监督学习入门——让机器自动发现数据中的分组规律<br>BV17Nd5BrEQS · 时长 17分26秒</p>
+    <div class="tags">
+      <span class="tag">无监督学习</span>
+      <span class="tag g">聚类算法</span>
+      <span class="tag p">K-Means</span>
+      <span class="tag b">第4章</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">2 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">本集学习目标</h1>
+    <h3 class="sub">通过这一集，你将掌握无监督学习的经典算法</h3>
+    <div class="body">
+      <ul>
+        <li><strong>理解无监督学习的核心思想</strong>——没有标签时，机器能学到什么？</li>
+        <li><strong>掌握聚类(Clustering)的概念</strong>——什么是"物以类聚，人以群分"？</li>
+        <li><strong>理解K-Means算法原理</strong>——最经典、最常用的聚类算法是如何工作的？</li>
+        <li><strong>掌握K-Means的四步迭代流程</strong>——初始化、分配、更新、收敛</li>
+        <li><strong>学会确定K值</strong>——肘部法则和轮廓系数</li>
+        <li><strong>了解K-Means的优缺点及改进</strong>——K-Means++如何优化初始质心？</li>
+        <li><strong>能用sklearn实际调用K-Means</strong>——代码实现聚类分析</li>
+      </ul>
+    </div>
+    <div class="hbox">
+      <h4>🎯 学习建议</h4>
+      <p>这是我们进入第4章"无监督学习"的第一集。前面学的都是监督学习（有标签），现在我们要进入一个全新的领域——没有答案，让机器自己发现规律。重点理解K-Means的迭代思想，这是很多机器学习算法的共同范式。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">3 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">进入第4章：无监督学习</h1>
+    <h3 class="sub">从"有老师教"到"无师自通"——机器学习的另一大分支</h3>
+    <div class="flow" style="margin:2rem 0">
+      <div class="flow-node" style="min-width:150px">📚 第1-3章<br><small style="color:var(--muted)">监督学习</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:150px">🔮 第4章<br><small style="color:var(--accent3)">无监督学习</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:150px">🎮 后续章节<br><small style="color:var(--muted)">强化学习等</small></div>
+    </div>
+    <div class="body">
+      <p>前面我们学的线性回归、逻辑回归、决策树、SVM、神经网络，都属于<strong style="color:var(--accent)">监督学习</strong>——训练数据有标签（有"正确答案"）。</p>
+      <p>但现实中，<strong style="color:var(--accent3)">大部分数据是没有标签的</strong>：</p>
+      <ul>
+        <li>淘宝有上亿用户，但你不知道谁属于"高价值客户"</li>
+        <li>新闻网站有几十万篇文章，但你没给它们分好类别</li>
+        <li>图片里有很多像素，但你没标注哪个是前景哪个是背景</li>
+      </ul>
+    </div>
+    <div class="hbox success">
+      <h4>✨ 无监督学习的目标</h4>
+      <p>在没有标签、没有"正确答案"的情况下，让算法自动发现数据中隐藏的结构、模式和分组。这就像"无师自通"——给你一堆东西，你自己观察、总结、归类。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">4 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">回顾：监督学习 vs 无监督学习</h1>
+    <h3 class="sub">核心区别：训练数据有没有标签（答案）</h3>
+    <div class="vs">
+      <div class="vs-side vs-left">
+        <h3 style="color:var(--accent);margin-bottom:1rem">👨‍🏫 监督学习</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul style="font-size:0.95rem">
+            <li>训练数据<strong>有标签</strong>（有正确答案）</li>
+            <li>像"有老师教"——做题+对答案</li>
+            <li>目标：预测新数据的标签/值</li>
+            <li>典型任务：分类、回归</li>
+            <li>例子：判断邮件是否垃圾邮件</li>
+            <li>例子：预测房价</li>
+            <li>已学算法：线性回归、逻辑回归、SVM、神经网络……</li>
+          </ul>
+        </div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side vs-right">
+        <h3 style="color:var(--accent3);margin-bottom:1rem">🔍 无监督学习</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul style="font-size:0.95rem">
+            <li>训练数据<strong>无标签</strong>（没有正确答案）</li>
+            <li>像"无师自通"——自己观察总结</li>
+            <li>目标：发现数据中的隐藏结构</li>
+            <li>典型任务：聚类、降维、关联规则</li>
+            <li>例子：把用户自动分成几类群体</li>
+            <li>例子：把高维数据压缩可视化</li>
+            <li><strong style="color:var(--accent3)">今天开始学：K-Means聚类！</strong></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">5 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">什么是聚类(Clustering)？</h1>
+    <h3 class="sub">聚类就是"物以类聚，人以群分"——自动把相似的东西归为一类</h3>
+    <div class="body">
+      <p><strong style="color:var(--accent3)">聚类的定义：</strong>将物理或抽象对象的集合，分成由类似的对象组成的多个类（簇/Cluster）的过程。</p>
+      <p>简单说就是：<strong>相似度高的样本分到同一组，相似度低的样本分到不同组。</strong></p>
+    </div>
+    <div class="formula">
+      $$\displaystyle 相似的聚在一起，不同的分开$$
+      <span class="desc">这是人类最基本的认知能力之一。你走进一个房间，一眼就能分辨出哪些人是一伙的，哪些物品是一类的——聚类就是让机器也拥有这种能力。</span>
+    </div>
+    <div class="hbox purple">
+      <h4>💡 关键直觉</h4>
+      <p>聚类是一种<strong>探索性分析</strong>——你事先不知道有哪些类别，也不知道每个类别是什么，而是让算法告诉你数据里自然存在几个分组。这和分类（你提前知道类别）完全不同。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">6 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">聚类直觉：给你一堆混合水果自动分组</h1>
+    <h3 class="sub">想象这样一个场景——你不需要告诉机器"有苹果、香蕉、橘子"</h3>
+    <div class="card" style="margin-bottom:1.5rem">
+      <h4>🍎🍌🍊 场景：一筐混合水果</h4>
+      <p style="margin-bottom:1rem">想象桌子上有一堆水果混在一起：有红的苹果、黄的香蕉、橙的橘子，大小形状各不相同。现在让一个小孩来整理：</p>
+    </div>
+    <div class="flow" style="margin:1rem 0">
+      <div class="flow-node">👀 观察特征<br><small style="color:var(--muted)">颜色、大小、形状</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl">🤔 发现相似性<br><small style="color:var(--accent3)">红的圆的放一起</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">📦 自动分成几堆<br><small style="color:var(--muted)">苹果堆、香蕉堆、橘子堆</small></div>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="hbox blue">
+        <h4>✅ 小孩是怎么做的？</h4>
+        <p>他不需要你提前告诉他"有三种水果"，也不需要你给他"水果分类手册"——他只是看着这些水果，自然而然地把相似的放到一起。</p>
+      </div>
+      <div class="hbox success">
+        <h4>🤖 K-Means就是这么做的！</h4>
+        <p>给它一堆数据点，它根据数据点之间的"距离"（相似度），自动把近的点聚成一簇，远的点分开——不需要提前知道类别。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">7 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">聚类 vs 分类的区别</h1>
+    <h3 class="sub">这是很多初学者容易混淆的两个概念——核心区别：有没有预定类别</h3>
+    <table class="cmp">
+      <tr>
+        <th style="width:20%"></th>
+        <th style="width:40%">🏷️ 分类（Classification）</th>
+        <th style="width:40%">🎯 聚类（Clustering）</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">学习类型</strong></td>
+        <td><span class="tag b">监督学习</span></td>
+        <td><span class="tag">无监督学习</span></td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">是否有标签</strong></td>
+        <td>✅ 训练数据有标签（知道类别）</td>
+        <td>❌ 训练数据无标签（不知道类别）</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">类别来源</strong></td>
+        <td><strong>人预先定义好</strong>的类别</td>
+        <td><strong>算法自动发现</strong>的分组</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">目标</strong></td>
+        <td>把新样本分到已知类别中</td>
+        <td>探索数据，发现隐藏的分组结构</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">类比</strong></td>
+        <td>已经有"好人/坏人"的标准，判断新来的人是哪类</td>
+        <td>来了一群陌生人，你观察后发现可以分成几伙人</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">典型算法</strong></td>
+        <td>逻辑回归、SVM、决策树、随机森林</td>
+        <td><strong style="color:var(--accent3)">K-Means、层次聚类、DBSCAN</strong></td>
+      </tr>
+    </table>
+    <div class="hbox warn">
+      <h4>⚠️ 划重点</h4>
+      <p>分类是"已知有几类，判断新样本属于哪类"；聚类是"不知道有几类，让数据自己告诉我们有几类"。这是本质区别！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">8 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">聚类的应用场景</h1>
+    <h3 class="sub">聚类在工业界有非常广泛的实际应用</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="card-icon">👥</div>
+        <h4>客户分群</h4>
+        <p>电商/银行根据用户的消费行为、消费金额、活跃度等特征，把用户分成不同群体（如高价值客户、潜力客户、流失客户），做精准营销。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon">🖼️</div>
+        <h4>图像分割</h4>
+        <p>把图片中相似的像素聚成一类，实现前景背景分离、物体识别。比如医学影像中把肿瘤区域自动分割出来。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚨</div>
+        <h4>异常检测</h4>
+        <p>正常数据会聚成簇，那些离群的、不属于任何簇的点就是异常值。用于信用卡欺诈检测、网络入侵检测、工业故障检测。</p>
+      </div>
+    </div>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-icon">📄</div>
+        <h4>文档分类</h4>
+        <p>根据文档内容的相似度，自动把新闻、文章、网页聚成不同主题（体育、财经、科技、娱乐……），用于话题发现、内容推荐。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon">🎬</div>
+        <h4>推荐系统</h4>
+        <p>把相似用户聚成一类（用户聚类），或者把相似物品聚成一类（物品聚类），然后给你推荐"和你相似的人喜欢的东西"。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧬</div>
+        <h4>基因分析</h4>
+        <p>生物信息学中，根据基因表达模式对基因或样本聚类，发现不同的基因亚型、辅助疾病诊断。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">9 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">K-Means算法介绍</h1>
+    <h3 class="sub">最经典、最常用、也是最简单的聚类算法——没有之一</h3>
+    <div class="two-col">
+      <div>
+        <div class="card" style="margin-bottom:1rem">
+          <h4>📅 历史地位</h4>
+          <p>K-Means算法最早可以追溯到1955年，1967年由MacQueen正式提出。虽然已经过去了半个多世纪，但它至今仍然是<strong style="color:var(--accent3)">工业界应用最广泛的聚类算法</strong>。</p>
+        </div>
+        <div class="card accent">
+          <h4>⭐ 为什么这么流行？</h4>
+          <p>原理简单、容易理解、实现容易、计算速度快、聚类效果不错、对大数据友好——这些优点让它成为聚类算法的"入门第一课"和"首选基准"。</p>
+        </div>
+      </div>
+      <div class="body">
+        <p><strong>K-Means名字的含义：</strong></p>
+        <ul>
+          <li><strong style="color:var(--accent3)">K</strong>——表示你想把数据分成 <strong>K 个簇</strong>（这个K需要你提前指定）</li>
+          <li><strong style="color:var(--accent3)">Means</strong>——是"均值"的意思，每个簇的中心点是这个簇所有点的<strong>均值</strong>（质心）</li>
+        </ul>
+        <div class="hbox" style="margin-top:1.5rem">
+          <h4>💡 一句话总结K-Means</h4>
+          <p>给定K，算法通过迭代，找到K个中心点，让每个数据点到离它最近的中心点的距离平方和最小。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">10 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">K-Means的目标：将数据划分为K个簇</h1>
+    <h3 class="sub">我们希望达到什么效果？簇内紧密，簇间远离</h3>
+    <div class="body">
+      <p>假设我们有一堆数据点（比如二维平面上的点），我们希望算法把它们分成K个组（簇）：</p>
+    </div>
+    <div class="formula">
+      $$\displaystyle 好的聚类 = 簇内相似度高 + 簇间相似度低$$
+    </div>
+    <div class="two-col">
+      <div class="hbox success">
+        <h4>✅ 好的聚类效果</h4>
+        <p>• 同一个簇里的点紧紧挨在一起（距离近）<br>• 不同簇之间离得越远越好<br>• 簇的形状大致是球形/凸形<br>• 每个簇大小差不多时效果最好</p>
+      </div>
+      <div class="hbox danger">
+        <h4>❌ 不好的聚类效果</h4>
+        <p>• 同一簇里的点很分散<br>• 不同簇重叠在一起<br>• 出现极端大小的簇（一个簇很大，其他很小）<br>• 非球形的簇（K-Means不擅长）</p>
+      </div>
+    </div>
+    <div class="hbox purple">
+      <h4>🎯 K-Means的核心假设</h4>
+      <p>K-Means隐含假设"簇是球形的"，每个簇的中心就是均值点。这是它的优点（简单高效），也是它的局限（只能发现球形簇）——后面会详说。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">11 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">质心(Centroid)概念：每个簇的中心点</h1>
+    <h3 class="sub">质心是K-Means中最核心的概念——每个簇都有一个"代表点"</h3>
+    <div class="card" style="margin-bottom:1.5rem">
+      <h4>📍 什么是质心？</h4>
+      <p style="margin-bottom:0.8rem">质心就是一个簇里所有数据点的<strong>均值点</strong>——每一维特征都取这个簇所有点在该维的平均值。</p>
+      <p>质心代表了这个簇的"中心位置"，是这个簇的"代言人"。一个点属于哪个簇，就看它离哪个质心最近。</p>
+    </div>
+    <div class="formula">
+      $$\displaystyle \mu ₖ = (1/|Cₖ|) \cdot \sum _{x∈Cₖ} x$$
+      <span class="desc">
+        <strong>符号说明：</strong><br>
+        • μₖ —— 第k个簇的质心（Centroid）<br>
+        • Cₖ —— 第k个簇中的所有样本点的集合<br>
+        • |Cₖ| —— 第k个簇中的样本数量<br>
+        • 就是把簇里所有点加起来除以个数（求平均）
+      </span>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 注意</h4>
+      <p>质心不一定是一个真实存在的数据点！它是计算出来的"虚拟点"，代表这个簇的中心位置。就像"平均家庭有2.5个孩子"——没有哪个家庭真的有2.5个孩子，但这个均值有意义。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">12 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">目标函数：最小化簇内平方和</h1>
+    <h3 class="sub">K-Means要优化什么？让每个点到它所属质心的距离平方和最小</h3>
+    <div class="body">
+      <p>K-Means有一个明确的优化目标，叫做<strong style="color:var(--accent3)">簇内平方和</strong>（Within-Cluster Sum of Squares，简称WCSS），也叫<strong>惯性(Inertia)</strong>或<strong>失真(Distortion)</strong>。</p>
+    </div>
+    <div class="formula">
+      $$\displaystyle J = \sum _{k=1到K} \sum _{x∈Cₖ} || x - \mu ₖ ||²$$
+      <span class="desc">
+        <strong>目标函数（损失函数）解释：</strong><br>
+        • J —— 总的簇内平方和（我们要最小化它）<br>
+        • 外层Σ：对K个簇求和<br>
+        • 内层Σ：对第k个簇里的每个点x求和<br>
+        • ||x - μₖ||² —— 点x到它所属质心μₖ的欧氏距离平方<br>
+        • 直觉：每个点离自己簇中心越近，J越小，聚类越紧密
+      </span>
+    </div>
+    <div class="hbox blue">
+      <h4>📐 为什么用距离平方？</h4>
+      <p>和线性回归用MSE一样：1）数学性质好，容易求导优化；2）对远的点惩罚更大（鼓励把点聚得更紧）。注意K-Means用的是欧氏距离，所以它默认各特征尺度相同——实际使用前记得做特征标准化！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">13 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">K-Means算法四步流程</h1>
+    <h3 class="sub">算法非常简单，就是不断重复"分配"和"更新"两步直到收敛</h3>
+    <div class="flow" style="margin:2rem 0;flex-direction:column;gap:0.8rem;align-items:stretch">
+      <div class="flow-node hl" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem">
+        <span style="background:var(--accent3);color:var(--bg);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">1</span>
+        <div><strong>初始化质心</strong><br><small style="color:var(--muted)">随机选择K个点作为初始质心</small></div>
+      </div>
+      <div class="flow-arrow" style="text-align:center">↓</div>
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem">
+        <span style="background:var(--bg3);color:var(--ink);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">2</span>
+        <div><strong>分配簇（Assignment Step）</strong><br><small style="color:var(--muted)">每个样本分配给离它最近的质心</small></div>
+      </div>
+      <div class="flow-arrow" style="text-align:center">↓</div>
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem">
+        <span style="background:var(--bg3);color:var(--ink);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">3</span>
+        <div><strong>更新质心（Update Step）</strong><br><small style="color:var(--muted)">重新计算每个簇的均值作为新质心</small></div>
+      </div>
+      <div class="flow-arrow" style="text-align:center">↓ 重复2-3</div>
+      <div class="flow-node success" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem;background:rgba(52,211,153,0.1);border-color:var(--success)">
+        <span style="background:var(--success);color:var(--bg);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">4</span>
+        <div><strong style="color:var(--success)">收敛（Convergence）</strong><br><small style="color:var(--muted)">质心不再变化（或变化很小），停止迭代</small></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">14 / 29</div>
+  <div class="slide-content">
+    <h2 class="st">Step 1：初始化质心</h2>
+    <h3 class="sub">随机选择K个点作为初始质心——算法的起点</h3>
+    <div class="two-col">
+      <div class="body">
+        <p><strong>怎么做？</strong></p>
+        <ul>
+          <li>最简单的方法：从数据集中<strong>随机挑选K个样本点</strong>，直接作为初始质心</li>
+          <li>这K个点就是一开始K个簇的"中心"</li>
+        </ul>
+        <div class="hbox warn" style="margin-top:1.5rem">
+          <h4>⚠️ 问题：对初始值敏感！</h4>
+          <p>随机初始化可能会导致：<br>• 算法收敛到<strong>局部最优</strong>而不是全局最优<br>• 不同的随机种子得到不同的聚类结果<br>• 如果两个初始质心选得太近，可能得到不好的结果</p>
+        </div>
+      </div>
+      <div>
+        <div class="card accent">
+          <h4>💡 解决方案</h4>
+          <p style="margin-bottom:0.8rem">实践中通常怎么做？</p>
+          <ul style="font-size:0.95rem;color:var(--muted)">
+            <li><strong>多次运行</strong>：用不同的随机种子跑多次K-Means，选目标函数J最小的那次结果</li>
+            <li><strong>K-Means++</strong>：一种更聪明的初始化方法（后面专门讲），让初始质心尽量离得远</li>
+          </ul>
+        </div>
+        <div class="hbox" style="margin-top:1rem">
+          <h4>🎯 sklean中的默认行为</h4>
+          <p>sklearn的KMeans默认就用<strong>K-Means++</strong>初始化，而且默认跑10次(n_init=10)，选最好的一次——所以一般不用太担心初始化问题。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">15 / 29</div>
+  <div class="slide-content">
+    <h2 class="st">Step 2：分配簇——每个样本归到最近质心</h2>
+    <h3 class="sub">这一步也叫"Assignment Step"——给每个点"找老大"</h3>
+    <div class="body">
+      <p>有了K个质心之后，遍历数据集中的<strong>每一个样本点</strong>：</p>
+    </div>
+    <div class="formula">
+      $$\displaystyle 对于每个点x，找到离它最近的质心 \mu ₖ \ label(x) = argmin_{k} || x - \mu ₖ ||²$$
+      <span class="desc">
+        • 计算x到每个μₖ的距离（通常是欧氏距离）<br>
+        • 哪个质心离x最近，x就属于那个簇<br>
+        • 这一步结束后，每个点都有了自己的"簇标签"
+      </span>
+    </div>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node" style="min-width:140px">📌 点x</div>
+      <div class="flow-arrow">计算到→</div>
+      <div class="flow-node" style="min-width:100px">μ₁距离=5.2</div>
+      <div class="flow-node" style="min-width:100px">μ₂距离=1.8</div>
+      <div class="flow-node" style="min-width:100px">μ₃距离=7.3</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:160px">✅ 分配给簇2<br><small style="color:var(--accent3)">因为离μ₂最近</small></div>
+    </div>
+    <div class="hbox blue">
+      <h4>💡 这一步像什么？</h4>
+      <p>就像K个质心是"队长"，每个点选择加入离自己最近的那个队长的队伍。这一步完成后，平面就被划分成了K个区域——这叫Voronoi图（泰森多边形）。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">16 / 29</div>
+  <div class="slide-content">
+    <h2 class="st">Step 3：更新质心——重新计算每个簇的均值</h2>
+    <h3 class="sub">这一步也叫"Update Step"——队长挪位置，走到队伍的中心</h3>
+    <div class="body">
+      <p>分配完簇之后，每个簇里都有了一些点。现在对<strong>每个簇</strong>，重新计算质心：</p>
+    </div>
+    <div class="formula">
+      $$\displaystyle 新的 \mu ₖ = 这个簇里所有点的平均值（每一维都求平均）$$
+    </div>
+    <div class="card" style="margin:1.5rem 0">
+      <h4>📍 举个简单例子</h4>
+      <p>假设经过Step2，某个簇里有3个二维点：(1,2)、(3,4)、(5,6)</p>
+      <p style="margin-top:0.8rem">那新的质心就是：<br>
+      x坐标平均：(1+3+5)/3 = 3<br>
+      y坐标平均：(2+4+6)/3 = 4<br>
+      所以新质心是 (3,4)</p>
+    </div>
+    <div class="hbox purple">
+      <h4>🔄 直观理解</h4>
+      <p>Step2是"点选队长"，Step3是"队长走到队员中间"。点选最近的队长，队长挪到自己队员的中心位置——然后大家又重新选队长，队长又挪位置……如此反复。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">17 / 29</div>
+  <div class="slide-content">
+    <h2 class="st">Step 4：重复Step2-3直到收敛</h2>
+    <h3 class="sub">什么时候停止？质心不再变化（或变化很小）</h3>
+    <div class="body">
+      <p>不断重复"分配簇→更新质心"这两步，直到满足<strong>收敛条件</strong>：</p>
+    </div>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card success">
+        <h4>✅ 收敛条件1</h4>
+        <p><strong>质心不再变化</strong><br>更新后的新质心和上一次的质心完全一样</p>
+      </div>
+      <div class="card">
+        <h4>✅ 收敛条件2</h4>
+        <p><strong>质心变化极小</strong><br>新质心和旧质心的距离小于某个阈值（如1e-4）</p>
+      </div>
+      <div class="card">
+        <h4>✅ 收敛条件3</h4>
+        <p><strong>达到最大迭代次数</strong><br>比如最多迭代100次，到了就停（防止特殊情况不收敛）</p>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>📉 一定会收敛吗？</h4>
+      <p>是的！K-Means的目标函数J在每一步迭代中都是<strong>单调不增</strong>的（只会变小或不变，不会变大），而J又是有下界的（≥0），所以算法一定会收敛到某个局部最优值。这在数学上是有保证的。</p>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 注意</h4>
+      <p>收敛到的是<strong>局部最优</strong>，不一定是全局最优。这就是为什么前面说K-Means对初始值敏感——好的初始化能让它收敛到更好的局部最优。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">18 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">K-Means迭代过程动画解释</h1>
+    <h3 class="sub">我们用文字一步步描述K-Means是怎么"动"起来的</h3>
+    <div class="iter-step">
+      <div class="step-num">0</div>
+      <div class="step-content">
+        <h5>初始状态：一堆散乱的点</h5>
+        <p>假设我们有一堆二维数据点，肉眼看大概能分成3堆（但算法不知道）。我们设K=3。</p>
+      </div>
+    </div>
+    <div class="iter-step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h5>第一次迭代：随机放3个质心</h5>
+        <p>随机选3个点作为初始质心μ₁、μ₂、μ₃——这3个位置可能很随意，甚至不在任何"堆"的中心。</p>
+      </div>
+    </div>
+    <div class="iter-step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h5>第一次分配：点选最近的质心</h5>
+        <p>每个点看自己离哪个μ最近，就归到那个簇。你会看到点被染成3种颜色，但此时分群可能很混乱，边界怪怪的。</p>
+      </div>
+    </div>
+    <div class="iter-step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h5>第一次更新：质心挪位置</h5>
+        <p>每个μ走到自己颜色点的平均位置——你会看到μ明显向各自的"点堆"移动了一段距离！</p>
+      </div>
+    </div>
+    <div class="iter-step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h5>第二次分配：重新选边站</h5>
+        <p>μ挪了位置，有些点发现自己现在离另一个μ更近了，就"叛变"到另一个簇——点的颜色又变了一些。</p>
+      </div>
+    </div>
+    <div class="iter-step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <h5>重复……直到稳定</h5>
+        <p>每次迭代，质心都会向真正的簇中心靠近一点，叛变的点越来越少……最后，μ不动了，点也不变色了——<strong style="color:var(--success)">收敛完成！</strong></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">19 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">K值如何确定？——肘部法则(Elbow Method)</h1>
+    <h3 class="sub">K-Means需要你提前指定K，但K选多少合适呢？第一个方法：肘部法则</h3>
+    <div class="body">
+      <p>K-Means有一个"参数"需要你决定：<strong>K=?</strong> 也就是你想分成几簇。这是K-Means最让人头疼的问题——K是超参数，没法从数据里直接学出来。</p>
+      <p><strong style="color:var(--accent3)">肘部法则</strong>是最常用的确定K的方法：</p>
+    </div>
+    <div class="flow" style="margin:1.5rem 0;flex-direction:column;gap:0.8rem;align-items:stretch">
+      <div class="flow-node" style="text-align:left;min-width:auto"><strong>Step 1：</strong>让K从1开始，依次取K=1,2,3,4,5,6,7……</div>
+      <div class="flow-node" style="text-align:left;min-width:auto"><strong>Step 2：</strong>对每个K值，都跑一次K-Means，记录下对应的目标函数值J（簇内平方和Inertia）</div>
+      <div class="flow-node" style="text-align:left;min-width:auto"><strong>Step 3：</strong>画一条"K-J"曲线（x轴是K，y轴是J）</div>
+      <div class="flow-node hl" style="text-align:left;min-width:auto"><strong>Step 4：</strong>找曲线的<strong style="color:var(--accent3)">拐点</strong>——那个像"手肘"一样的位置，对应的K就是最佳K</div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">20 / 29</div>
+  <div class="slide-content">
+    <h2 class="st">肘部法则详解：为什么选拐点？</h2>
+    <h3 class="sub">理解曲线形状背后的含义——K增大时J怎么变？</h3>
+    <div class="two-col">
+      <div class="body">
+        <p><strong>先想一个问题：K越大，J会怎么变？</strong></p>
+        <ul>
+          <li>K=1时：所有点都在一个簇，J很大</li>
+          <li>K增大时：每个簇更小，点离质心更近，<strong>J会一直下降</strong></li>
+          <li>K=N（样本数）时：每个点自己是一个簇，J=0</li>
+        </ul>
+        <p style="margin-top:1rem">那为什么不直接选K=N让J=0？因为那就失去聚类的意义了——我们要的是"有意义的分组"，不是每个点一组。</p>
+      </div>
+      <div>
+        <div class="card accent">
+          <h4>💡 拐点的含义</h4>
+          <p style="margin-bottom:0.8rem">观察K-J曲线：</p>
+          <ul style="font-size:0.95rem;color:var(--muted)">
+            <li>在拐点<strong>之前</strong>：K每增加1，J会<strong>大幅</strong>下降——因为增加簇能显著改善聚类效果</li>
+            <li>在拐点<strong>之后</strong>：K继续增加，J下降得<strong>很缓慢</strong>——收益递减，再分也只是把一个簇拆得更细，没有本质改善</li>
+            <li>那个"下降速度突然变慢"的拐点，就是"加簇不再带来明显收益"的点——这就是最佳K</li>
+          </ul>
+        </div>
+        <div class="hbox warn" style="margin-top:1rem">
+          <h4>⚠️ 局限</h4>
+          <p>肘部法则很直观，但有时候曲线很平滑，没有明显的"手肘"——这时候就需要其他方法（比如轮廓系数）。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">21 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">K值确定方法二：轮廓系数(Silhouette Score)</h1>
+    <h3 class="sub">肘部法则有主观性？轮廓系数是更"量化"的评价指标</h3>
+    <div class="body">
+      <p><strong style="color:var(--accent3)">轮廓系数</strong>不仅考虑"簇内紧不紧"，还考虑"簇间远不远"——比单纯看J更全面。</p>
+    </div>
+    <div class="formula">
+      $$\displaystyle 对每个样本点i，计算：s(i) = (b(i) - a(i)) / max(a(i), b(i)) \ 整体轮廓系数 = 所有点s(i)的平均值$$
+      <span class="desc">
+        <strong>符号说明：</strong><br>
+        • a(i) —— 点i到同簇其他点的平均距离（<strong>簇内紧凑度</strong>，越小越好）<br>
+        • b(i) —— 点i到最近的其他簇所有点的平均距离（<strong>簇间分离度</strong>，越大越好）<br>
+        • s(i)的取值范围是 [-1, 1]
+      </span>
+    </div>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card success">
+        <h4>✅ s ≈ 1</h4>
+        <p>点离自己簇很近，离其他簇很远——聚类效果非常好！</p>
+      </div>
+      <div class="card">
+        <h4>➖ s ≈ 0</h4>
+        <p>点在两个簇的边界上，聚类效果一般，有重叠。</p>
+      </div>
+      <div class="card danger">
+        <h4>❌ s < 0</h4>
+        <p>点离其他簇比自己簇还近——分错了！聚类效果很差。</p>
+      </div>
+    </div>
+    <div class="hbox blue">
+      <h4>🎯 怎么用轮廓系数选K？</h4>
+      <p>和肘部法则类似：尝试不同的K值，跑K-Means，计算每个K对应的平均轮廓系数，<strong>选轮廓系数最大的那个K</strong>——最客观！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">22 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">K-Means的优点</h1>
+    <h3 class="sub">为什么K-Means历经半个多世纪还这么流行？它有很多突出优点</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card accent">
+        <div class="card-icon">😀</div>
+        <h4>原理简单</h4>
+        <p>算法思想非常直观，容易理解，容易解释——"物以类聚，找中心点"，非技术人员也能听懂。聚类结果可解释性强。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <h4>速度快</h4>
+        <p>时间复杂度是O(n·K·t)，n是样本数，t是迭代次数（通常很小，几十次就收敛）。对大数据集非常友好，是最快的聚类算法之一。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h4>适合大数据</h4>
+        <p>不仅能处理中等规模数据，还有Mini-Batch K-Means变种，能处理百万级甚至更大规模的数据，可扩展性极好。</p>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🌟 其他优点</h4>
+      <p>
+        • 数学原理清晰，收敛性有理论保证<br>
+        • 实现简单，几乎所有机器学习库都有K-Means<br>
+        • 聚类结果是凸的/球形的，很多场景下效果不错<br>
+        • 参数少，主要就是调K一个参数<br>
+        • 可以作为其他算法的预处理步骤（比如先聚类再做分类）
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">23 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">K-Means的缺点</h1>
+    <h3 class="sub">没有银弹——K-Means也有明显的局限性，使用时要注意</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card danger">
+        <div class="card-icon">❓</div>
+        <h4>需预先指定K</h4>
+        <p>K值是超参数，需要人工选定。肘部法则/轮廓系数能帮忙，但不是全自动的。选不对K结果会很差。</p>
+      </div>
+      <div class="card warn">
+        <div class="card-icon">🎲</div>
+        <h4>对初始值敏感</h4>
+        <p>随机初始化可能收敛到不同的局部最优。虽然K-Means++和多次运行能缓解，但不能根本解决。</p>
+      </div>
+      <div class="card warn">
+        <div class="card-icon">⚠️</div>
+        <h4>对异常值敏感</h4>
+        <p>质心是均值点，异常值（离群点）会把质心"拉偏"。用之前最好做异常检测和处理，或者考虑用K-Medoids（用中位数代替均值）。</p>
+      </div>
+    </div>
+    <div class="hbox danger">
+      <h4>🔴 最大局限：只能发现球形簇</h4>
+      <p>
+        这是K-Means最本质的缺陷：它假设簇是凸的、球形的、各向同性的。<br>
+        • 对环形、月牙形、不规则形状的簇，K-Means完全分不出来<br>
+        • 对大小差异很大、密度差异很大的簇，效果也不好<br>
+        • 它用欧氏距离，默认各特征权重相同，必须先做特征缩放
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">24 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">K-Means++：优化初始质心选择</h1>
+    <h3 class="sub">既然随机初始化不好，那我们就聪明地选初始质心</h3>
+    <div class="body">
+      <p>2007年，Arthur和Vassilvitskii提出了<strong style="color:var(--accent3)">K-Means++</strong>，专门解决初始质心选择问题——这是一个小改进，但效果显著。</p>
+    </div>
+    <div class="card" style="margin:1.5rem 0">
+      <h4>💡 K-Means++的核心思想</h4>
+      <p style="margin-bottom:0.8rem">初始质心之间应该尽量<strong>离得远</strong>——不要把两个初始质心选在同一个簇里。</p>
+    </div>
+    <div class="flow" style="margin:1rem 0;flex-direction:column;gap:0.6rem;align-items:stretch">
+      <div class="flow-node" style="text-align:left;min-width:auto"><strong>Step 1：</strong>从数据点中<strong>随机选1个点</strong>作为第一个质心μ₁</div>
+      <div class="flow-node" style="text-align:left;min-width:auto"><strong>Step 2：</strong>计算每个点到最近已有质心的距离D(x)，一个点离已有质心越远，被选为下一个质心的<strong>概率越大</strong></div>
+      <div class="flow-node" style="text-align:left;min-width:auto"><strong>Step 3：</strong>按概率加权随机采样，选出下一个质心</div>
+      <div class="flow-node" style="text-align:left;min-width:auto"><strong>Step 4：</strong>重复Step2-3，直到选出K个质心</div>
+      <div class="flow-node hl" style="text-align:left;min-width:auto"><strong>Step 5：</strong>有了这K个"尽量分散"的初始质心后，再用标准K-Means继续迭代</div>
+    </div>
+    <div class="hbox success">
+      <h4>✅ K-Means++的效果</h4>
+      <p>理论上能保证O(log K)的近似比，实践中不仅大幅减少收敛到坏局部最优的概率，还能让迭代收敛更快。<strong>sklearn的KMeans默认就是用K-Means++初始化的</strong>（init='k-means++'），你基本不用自己做随机初始化了。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">25 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">其他聚类算法简介</h1>
+    <h3 class="sub">K-Means不是唯一选择——不同场景适合不同算法</h3>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-icon">🌳</div>
+        <h4>层次聚类 (Hierarchical Clustering)</h4>
+        <p style="margin-bottom:0.8rem">不需要提前指定K，它会构建一棵树（树状图/Dendrogram）：</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li><strong>自底向上（凝聚）</strong>：一开始每个点自己是一簇，然后不断合并最相似的两个簇</li>
+          <li><strong>自顶向下（分裂）</strong>：一开始所有点在一个簇，然后不断分裂</li>
+          <li>优点：能展示层次关系，不用提前选K</li>
+          <li>缺点：计算慢，不适合大数据；对异常值敏感</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <div class="card-icon">🔮</div>
+        <h4>DBSCAN <span class="tag g">能发现任意形状！</span></h4>
+        <p style="margin-bottom:0.8rem">基于密度的聚类——和K-Means思路完全不同：</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>把"稠密区域"视为簇，稀疏区域视为噪声</li>
+          <li><strong>不需要指定K！</strong>能自动发现簇的数量</li>
+          <li><strong>能发现任意形状的簇！</strong>环形、月牙形都能分</li>
+          <li>能自动识别异常点（噪声）</li>
+          <li>缺点：对密度不均匀的数据效果不好，调参（eps, min_samples）有点麻烦</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox purple">
+      <h4>📌 算法选择建议</h4>
+      <p>• 常规球形簇、大数据量、要速度 → <strong>K-Means</strong>（首选）<br>
+      • 需要层次结构、小数据 → <strong>层次聚类</strong><br>
+      • 簇形状不规则、有噪声、不知道K → <strong>DBSCAN</strong><br>
+      • 高维数据 → 先降维再聚类，或用谱聚类、高斯混合模型(GMM)</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">26 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">sklearn使用K-Means代码示例</h1>
+    <h3 class="sub">理论讲完了，来看看实际怎么用——三行代码搞定聚类</h3>
+    <div class="code"><span class="cm"># 导入KMeans</span>
+<span class="kw">from</span> sklearn.cluster <span class="kw">import</span> <span class="fn">KMeans</span>
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> <span class="fn">make_blobs</span>
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># 1. 生成模拟数据（4个簇）</span>
+X, y_true = <span class="fn">make_blobs</span>(n_samples=<span class="num">300</span>, centers=<span class="num">4</span>, cluster_std=<span class="num">0.60</span>, random_state=<span class="num">0</span>)
+
+<span class="cm"># 2. 创建KMeans模型，指定K=4，然后训练</span>
+kmeans = <span class="fn">KMeans</span>(n_clusters=<span class="num">4</span>, init=<span class="str">'k-means++'</span>, n_init=<span class="num">10</span>, max_iter=<span class="num">300</span>, random_state=<span class="num">42</span>)
+y_kmeans = kmeans.<span class="fn">fit_predict</span>(X)
+
+<span class="cm"># 3. 查看结果</span>
+<span class="fn">print</span>(<span class="str">"簇标签："</span>, y_kmeans)           <span class="cm"># 每个点分到哪个簇（0~3）</span>
+<span class="fn">print</span>(<span class="str">"质心坐标：\n"</span>, kmeans.cluster_centers_)  <span class="cm"># K个质心的位置</span>
+<span class="fn">print</span>(<span class="str">"目标函数J(Inertia)："</span>, kmeans.inertia_)  <span class="cm"># 簇内平方和</span></div>
+    <div class="hbox blue">
+      <h4>⚙️ 重要参数说明</h4>
+      <p>• n_clusters：K值，最重要的参数<br>
+      • init：初始化方法，默认'k-means++'（推荐），也可以'random'<br>
+      • n_init：跑多少次（不同随机种子），默认10次选最好的<br>
+      • max_iter：最大迭代次数，默认300（一般够了）</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">27 / 29</div>
+  <div class="slide-content">
+    <h2 class="st">肘部法则代码示例</h2>
+    <h3 class="sub">用代码画出K-Inertia曲线，找最佳K值</h3>
+    <div class="code"><span class="cm"># 肘部法则选择最佳K</span>
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">from</span> sklearn.cluster <span class="kw">import</span> <span class="fn">KMeans</span>
+
+inertias = []   <span class="cm"># 记录每个K对应的Inertia(J值)</span>
+K_range = <span class="fn">range</span>(<span class="num">1</span>, <span class="num">11</span>)   <span class="cm"># 尝试K=1到10</span>
+
+<span class="kw">for</span> k <span class="kw">in</span> K_range:
+    kmeans = <span class="fn">KMeans</span>(n_clusters=k, init=<span class="str">'k-means++'</span>, n_init=<span class="num">10</span>, random_state=<span class="num">42</span>)
+    kmeans.<span class="fn">fit</span>(X)
+    inertias.<span class="fn">append</span>(kmeans.inertia_)
+
+<span class="cm"># 画肘部法则曲线</span>
+plt.<span class="fn">figure</span>(figsize=(<span class="num">8</span>, <span class="num">4</span>))
+plt.<span class="fn">plot</span>(K_range, inertias, <span class="str">'bo-'</span>)
+plt.<span class="fn">xlabel</span>(<span class="str">'Number of clusters (K)'</span>)
+plt.<span class="fn">ylabel</span>(<span class="str">'Inertia (WCSS)'</span>)
+plt.<span class="fn">title</span>(<span class="str">'The Elbow Method for choosing K'</span>)
+plt.<span class="fn">grid</span>(True)
+
+<span class="cm"># 如果你想加轮廓系数法：</span>
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> <span class="fn">silhouette_score</span>
+sil_scores = []
+<span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(<span class="num">2</span>, <span class="num">11</span>):  <span class="cm"># K至少为2才能算轮廓系数</span>
+    kmeans = <span class="fn">KMeans</span>(n_clusters=k, random_state=<span class="num">42</span>)
+    labels = kmeans.<span class="fn">fit_predict</span>(X)
+    sil_scores.<span class="fn">append</span>(<span class="fn">silhouette_score</span>(X, labels))
+<span class="cm"># 选sil_scores最大的那个K</span></div>
+    <div class="hbox success">
+      <h4>💡 实践提示</h4>
+      <p>实际项目中，建议肘部法则和轮廓系数结合起来用，再配合业务理解（比如你知道客户大概可以分几类）综合判断K值，不要完全依赖单一指标。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第13集 · K-Means聚类</div>
+  <div class="slide-number">28 / 29</div>
+  <div class="slide-content">
+    <h1 class="st">本集小结</h1>
+    <h3 class="sub">恭喜你完成了第13集！来回顾一下核心要点</h3>
+    <div class="body">
+      <div class="hbox">
+        <h4>🔮 无监督学习</h4>
+        <p>数据没有标签，算法自动发现隐藏结构。聚类是无监督学习最典型的任务。</p>
+      </div>
+      <div class="hbox purple">
+        <h4>🎯 聚类 vs 分类</h4>
+        <p>分类是监督学习，类别预先定义；聚类是无监督学习，类别自动发现——本质区别！</p>
+      </div>
+      <div class="hbox success">
+        <h4>⭐ K-Means核心思想</h4>
+        <p>K个质心，迭代执行"分配簇→更新质心"直到收敛，最小化簇内平方和J。原理简单、速度快、工业界最常用。</p>
+      </div>
+      <div class="hbox warn">
+        <h4>📐 K值选择</h4>
+        <p>肘部法则看拐点，轮廓系数看最大值，再结合业务知识综合判断。</p>
+      </div>
+      <div class="hbox danger">
+        <h4>⚠️ K-Means局限</h4>
+        <p>需提前指定K、对初始值/异常值敏感、只能发现球形簇。K-Means++优化初始化，DBSCAN适合非球形簇。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-content">
+    <h1>谢谢观看！</h1>
+    <p class="cover-sub">第13集 · K-Means聚类 完<br><br>
+    <strong style="color:var(--accent3)">下一集：继续探索无监督学习</strong><br><br>
+    B站：机器学习入门教程系列 · BV17Nd5BrEQS</p>
+    <div style="margin-top:2rem">
+      <a href="ppt-14.html" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg,var(--accent3),var(--accent2));color:white;text-decoration:none;border-radius:50px;font-weight:600;transition:transform .3s,box-shadow .3s">下一集 →</a>
+    </div>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag">无监督学习</span>
+      <span class="tag g">聚类</span>
+      <span class="tag p">K-Means</span>
+      <span class="tag b">第4章</span>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+});
+</script>
+</body></html>

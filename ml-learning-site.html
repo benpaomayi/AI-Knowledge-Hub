@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>机器学习入门教程 - ML学习站</title>
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --bg2: #111827;
+      --bg3: #1e293b;
+      --bg4: #334155;
+      --ink: #f8fafc;
+      --ink-muted: #cbd5e1;
+      --muted: #94a3b8;
+      --rule: rgba(56,189,248,0.15);
+      --accent: #38bdf8;
+      --accent2: #818cf8;
+      --accent3: #c084fc;
+      --dl1: #f97316;
+      --dl2: #f43f5e;
+      --dl3: #fbbf24;
+      --accent-glow: rgba(56,189,248,0.25);
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --font: -apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;
+      --mono: 'SF Mono','Fira Code','Cascadia Code',Consolas,monospace;
+      --max: 1280px;
+      --radius: 12px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+      --shadow-glow: 0 0 40px rgba(56,189,248,0.12);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{font-size:16px;scroll-behavior:smooth}
+    body{font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.7;overflow-x:hidden}
+    a{text-decoration:none;color:inherit}
+
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,14,26,0.88);backdrop-filter:blur(24px);border-bottom:1px solid var(--rule);padding:0 2rem}
+    .navbar-inner{max-width:var(--max);margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:70px}
+    .logo{display:flex;align-items:center;gap:12px;font-size:1.25rem;font-weight:700;color:var(--accent)}
+    .logo-icon{width:42px;height:42px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:0 4px 16px var(--accent-glow)}
+    .nav-links{display:flex;gap:2rem;list-style:none}
+    .nav-links a{color:var(--muted);font-weight:500;font-size:0.95rem;transition:all .3s;position:relative}
+    .nav-links a:hover{color:var(--accent)}
+    .nav-links a::after{content:'';position:absolute;bottom:-6px;left:0;width:0;height:2px;background:var(--accent);transition:width .3s;border-radius:2px}
+    .nav-links a:hover::after{width:100%}
+    .mobile-btn{display:none;background:none;border:none;color:var(--ink);font-size:1.5rem;cursor:pointer}
+
+    .hero{position:relative;min-height:100vh;display:flex;align-items:center;padding-top:70px;overflow:hidden}
+    .hero-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse at 30% 20%,rgba(56,189,248,0.08) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(129,140,248,0.08) 0%,transparent 50%),radial-gradient(ellipse at 50% 50%,rgba(192,132,252,0.05) 0%,transparent 70%)}
+    .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(56,189,248,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,0.03) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse at center,black 20%,transparent 70%)}
+    .particles{position:absolute;inset:0;overflow:hidden;z-index:0}
+    .particle{position:absolute;width:4px;height:4px;background:var(--accent);border-radius:50%;opacity:0;animation:float 18s infinite}
+    @keyframes float{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:.4;transform:scale(1)}90%{opacity:.4}100%{transform:translateY(-10vh) scale(0);opacity:0}}
+    .hero-content{position:relative;z-index:1;max-width:var(--max);margin:0 auto;padding:4rem 2rem;width:100%}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 18px;background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.25);border-radius:50px;font-size:0.88rem;color:var(--accent);font-weight:600;margin-bottom:1.5rem}
+    .hero-badge-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(56,189,248,0.4)}50%{opacity:.6;box-shadow:0 0 0 6px rgba(56,189,248,0)}}
+    .hero-title{font-size:clamp(2.2rem,5vw,4rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;letter-spacing:-0.02em}
+    .hero-title span{background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero-subtitle{font-size:1.2rem;color:var(--ink-muted);max-width:640px;line-height:1.8;margin-bottom:2.5rem}
+    .hero-stats{display:flex;gap:2.5rem;flex-wrap:wrap;margin-bottom:2.5rem}
+    .stat{text-align:center}
+    .stat-num{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2}
+    .stat-label{font-size:0.85rem;color:var(--muted);margin-top:4px}
+    .hero-btns{display:flex;gap:1rem;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 30px;border-radius:var(--radius);font-weight:600;font-size:1rem;transition:all .3s;cursor:pointer;border:none;font-family:var(--font)}
+    .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--bg);box-shadow:0 4px 24px var(--accent-glow)}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 36px var(--accent-glow)}
+    .btn-secondary{background:var(--bg3);color:var(--ink);border:1px solid var(--rule)}
+    .btn-secondary:hover{background:var(--bg4);border-color:var(--accent)}
+    .btn-outline{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+    .btn-outline:hover{background:rgba(56,189,248,0.1)}
+
+    .main{max-width:var(--max);margin:0 auto;padding:0 2rem}
+    section{padding:5rem 0}
+    .section-tag{display:inline-block;padding:6px 16px;background:rgba(56,189,248,0.1);color:var(--accent);border-radius:20px;font-size:0.82rem;font-weight:600;margin-bottom:1rem;border:1px solid rgba(56,189,248,0.2);letter-spacing:0.02em}
+    .section-title{font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:700;margin-bottom:1rem;letter-spacing:-0.01em}
+    .section-desc{font-size:1.05rem;color:var(--muted);max-width:680px;line-height:1.8}
+    .section-header{margin-bottom:3.5rem}
+
+    .course-overview{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+    .overview-visual{position:relative}
+    .overview-card{background:linear-gradient(135deg,rgba(30,41,59,0.8),rgba(30,41,59,0.4));backdrop-filter:blur(20px);border:1px solid var(--rule);border-radius:var(--radius-xl);padding:2.5rem;position:relative;overflow:hidden}
+    .overview-card::before{content:'';position:absolute;top:-50%;right:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent,rgba(56,189,248,0.06),transparent 30%);animation:rotate 12s linear infinite}
+    @keyframes rotate{to{transform:rotate(360deg)}}
+    .overview-card-inner{position:relative;z-index:1}
+    .ml-diagram{display:flex;flex-direction:column;gap:1rem}
+    .diagram-step{display:flex;align-items:center;gap:1rem;padding:1rem;background:rgba(10,14,26,0.5);border-radius:var(--radius);border:1px solid var(--rule)}
+    .diagram-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+    .diagram-icon.blue{background:rgba(56,189,248,0.15);color:var(--accent)}
+    .diagram-icon.purple{background:rgba(129,140,248,0.15);color:var(--accent2)}
+    .diagram-icon.pink{background:rgba(192,132,252,0.15);color:var(--accent3)}
+    .diagram-icon.green{background:rgba(52,211,153,0.15);color:var(--success)}
+    .diagram-arrow{text-align:center;color:var(--muted);font-size:1.2rem}
+    .diagram-text h4{font-size:0.95rem;margin-bottom:2px}
+    .diagram-text p{font-size:0.82rem;color:var(--muted)}
+
+    .chapters-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.5rem}
+    .chapter-card{background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius-lg);overflow:hidden;transition:all .4s;cursor:pointer;position:relative;group:true}
+    .chapter-card::before{content:'';position:absolute;inset:0;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,transparent,transparent);mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;opacity:0;transition:opacity .4s;pointer-events:none}
+    .chapter-card:hover::before{opacity:1;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3))}
+    .chapter-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-glow)}
+    .chapter-header{padding:1.5rem 1.5rem 0;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+    .chapter-ep{padding:4px 12px;background:rgba(56,189,248,0.1);color:var(--accent);border-radius:6px;font-size:0.78rem;font-weight:700;letter-spacing:0.02em;white-space:nowrap}
+    .chapter-badge{padding:4px 10px;border-radius:6px;font-size:0.72rem;font-weight:600;white-space:nowrap}
+    .badge-intro{background:rgba(52,211,153,0.12);color:var(--success)}
+    .badge-core{background:rgba(56,189,248,0.12);color:var(--accent)}
+    .badge-adv{background:rgba(129,140,248,0.12);color:var(--accent2)}
+    .badge-unsup{background:rgba(192,132,252,0.12);color:var(--accent3)}
+    .badge-dl5{background:rgba(249,115,22,0.12);color:var(--dl1)}
+    .badge-dl6{background:rgba(244,63,94,0.12);color:var(--dl2)}
+    .badge-dl7{background:rgba(251,191,36,0.12);color:var(--dl3)}
+    .chapter-dl-divider{grid-column:1/-1;display:flex;align-items:center;gap:1.5rem;margin:1rem 0 0.5rem}
+    .dl-divider-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--dl1),transparent)}
+    .dl-divider-label{padding:8px 24px;background:linear-gradient(135deg,rgba(249,115,22,0.15),rgba(244,63,94,0.1));border:1px solid rgba(249,115,22,0.3);border-radius:50px;font-size:0.95rem;font-weight:700;color:var(--dl1);white-space:nowrap;letter-spacing:0.05em}
+    .dl-card{border-color:rgba(249,115,22,0.12)}
+    .dl-card.dl5:hover::before{background:linear-gradient(135deg,var(--dl1),var(--dl2),var(--dl3))}
+    .dl-card.dl5:hover{box-shadow:0 0 40px rgba(249,115,22,0.18)}
+    .dl-card.dl6:hover::before{background:linear-gradient(135deg,var(--dl2),var(--dl1),var(--dl3))}
+    .dl-card.dl6:hover{box-shadow:0 0 40px rgba(244,63,94,0.18)}
+    .dl-card.dl7:hover::before{background:linear-gradient(135deg,var(--dl3),var(--dl1),var(--dl2))}
+    .dl-card.dl7:hover{box-shadow:0 0 40px rgba(251,191,36,0.18)}
+    .badge-summary{background:rgba(251,191,36,0.12);color:var(--warning)}
+    .chapter-body{padding:1.25rem 1.5rem 1.5rem}
+    .chapter-body h3{font-size:1.15rem;margin-bottom:0.6rem;line-height:1.4;font-weight:700}
+    .chapter-body p{font-size:0.88rem;color:var(--muted);line-height:1.7;margin-bottom:1rem}
+    .chapter-meta{display:flex;gap:1rem;padding-top:1rem;border-top:1px solid var(--rule);font-size:0.8rem;color:var(--muted)}
+    .chapter-meta span{display:flex;align-items:center;gap:4px}
+    .chapter-footer{padding:0 1.5rem 1.5rem;display:flex;align-items:center;justify-content:space-between}
+    .chapter-videos{display:flex;gap:6px;flex-wrap:wrap}
+    .vid-dot{width:28px;height:28px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;color:var(--muted);border:1px solid var(--rule)}
+    .chapter-go{display:flex;align-items:center;gap:6px;color:var(--accent);font-size:0.88rem;font-weight:600;transition:gap .3s}
+    .chapter-card:hover .chapter-go{gap:10px}
+
+    .path-timeline{position:relative}
+    .path-line{position:absolute;left:40px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--accent),var(--accent2),var(--accent3),var(--success))}
+    .path-item{display:flex;gap:2rem;margin-bottom:2rem;padding-left:0;position:relative}
+    .path-num{width:80px;height:80px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;z-index:1;border-radius:50%;position:relative}
+    .path-num::before{content:'';position:absolute;inset:0;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));opacity:0.15}
+    .path-num::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--bg);border:2px solid var(--accent)}
+    .path-num span{position:relative;z-index:1;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .path-content{flex:1;background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius-lg);padding:1.75rem;transition:all .3s}
+    .path-content:hover{border-color:var(--accent);transform:translateX(4px);box-shadow:var(--shadow-glow)}
+    .path-content h3{font-size:1.15rem;margin-bottom:0.5rem;display:flex;align-items:center;gap:10px}
+    .path-content h3 .p-dur{font-size:0.75rem;color:var(--muted);font-weight:400;padding:2px 8px;background:var(--bg3);border-radius:4px}
+    .path-content p{font-size:0.9rem;color:var(--muted);line-height:1.7;margin-bottom:1rem}
+    .path-topics{display:flex;gap:0.5rem;flex-wrap:wrap}
+    .topic{padding:4px 12px;background:var(--bg3);border-radius:20px;font-size:0.78rem;color:var(--accent);border:1px solid var(--rule)}
+
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+    .feature{background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius-lg);padding:2rem;transition:all .3s}
+    .feature:hover{border-color:var(--accent2);transform:translateY(-4px);box-shadow:0 12px 40px rgba(129,140,248,0.1)}
+    .feature-icon{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1.25rem}
+    .feature-icon.f1{background:linear-gradient(135deg,rgba(56,189,248,0.15),rgba(56,189,248,0.05));color:var(--accent)}
+    .feature-icon.f2{background:linear-gradient(135deg,rgba(129,140,248,0.15),rgba(129,140,248,0.05));color:var(--accent2)}
+    .feature-icon.f3{background:linear-gradient(135deg,rgba(192,132,252,0.15),rgba(192,132,252,0.05));color:var(--accent3)}
+    .feature-icon.f4{background:linear-gradient(135deg,rgba(52,211,153,0.15),rgba(52,211,153,0.05));color:var(--success)}
+    .feature-icon.f5{background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(251,191,36,0.05));color:var(--warning)}
+    .feature-icon.f6{background:linear-gradient(135deg,rgba(248,113,113,0.15),rgba(248,113,113,0.05));color:var(--danger)}
+    .feature h3{font-size:1.1rem;margin-bottom:0.6rem}
+    .feature p{font-size:0.88rem;color:var(--muted);line-height:1.7}
+
+    .cta-section{text-align:center;padding:5rem 2rem;background:linear-gradient(135deg,rgba(56,189,248,0.05),rgba(129,140,248,0.05),rgba(192,132,252,0.05));border-radius:var(--radius-xl);border:1px solid var(--rule);margin:3rem 0}
+    .cta-section h2{font-size:2rem;margin-bottom:1rem}
+    .cta-section p{color:var(--muted);margin-bottom:2rem;font-size:1.05rem}
+
+    footer{background:var(--bg2);border-top:1px solid var(--rule);padding:4rem 2rem 2rem;margin-top:2rem}
+    .footer-inner{max-width:var(--max);margin:0 auto}
+    .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
+    .footer-brand p{color:var(--muted);margin-top:1rem;font-size:0.88rem;line-height:1.7;max-width:320px}
+    .footer-col h4{font-size:0.95rem;margin-bottom:1.25rem;color:var(--ink)}
+    .footer-col ul{list-style:none}
+    .footer-col li{margin-bottom:0.6rem}
+    .footer-col a{color:var(--muted);font-size:0.88rem;transition:color .3s}
+    .footer-col a:hover{color:var(--accent)}
+    .footer-bottom{padding-top:2rem;border-top:1px solid var(--rule);text-align:center;color:var(--muted);font-size:0.82rem}
+
+    @media(max-width:1024px){
+      .course-overview{grid-template-columns:1fr}
+      .features{grid-template-columns:repeat(2,1fr)}
+      .footer-grid{grid-template-columns:1fr 1fr;gap:2rem}
+    }
+    @media(max-width:768px){
+      .nav-links{display:none}
+      .mobile-btn{display:block}
+      .hero-stats{gap:1.5rem}
+      .stat-num{font-size:1.8rem}
+      .features{grid-template-columns:1fr}
+      .chapters-grid{grid-template-columns:1fr}
+      .path-line{left:24px}
+      .path-num{width:50px;height:50px;font-size:1rem}
+      .footer-grid{grid-template-columns:1fr}
+      .section{padding:3rem 0}
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="ml-learning-site.html" class="logo">
+        <div class="logo-icon">🧠</div>
+        <span>ML学习站</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#overview">课程概览</a></li>
+        <li><a href="#path">学习路径</a></li>
+        <li><a href="#chapters">章节详解</a></li>
+        <li><a href="#features">课程特色</a></li>
+      </ul>
+      <button class="mobile-btn">☰</button>
+    </div>
+  </nav>
+
+  <section class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="particles" id="particles"></div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        B站机器学习与深度学习系统教程
+      </div>
+      <h1 class="hero-title">从零开始<br><span>掌握机器学习</span></h1>
+      <p class="hero-subtitle">34集精品视频，从人工智能基本概念到线性回归、逻辑回归、决策树、随机森林、XGBoost、K-Means、PCA，再到神经网络、反向传播、CNN、NLP与Transformer，系统掌握机器学习与深度学习核心算法与实战技能。</p>
+            <div class="hero-stats">
+              <div class="stat"><div class="stat-num">34</div><div class="stat-label">精品视频</div></div>
+              <div class="stat"><div class="stat-num">13h+</div><div class="stat-label">总时长</div></div>
+              <div class="stat"><div class="stat-num">15+</div><div class="stat-label">核心算法</div></div>
+              <div class="stat"><div class="stat-num">7</div><div class="stat-label">学习章节</div></div>
+            </div>
+      <div class="hero-btns">
+        <a href="#chapters" class="btn btn-primary">开始学习 →</a>
+        <a href="slides.html" class="btn btn-secondary">📊 PPT演示版</a>
+        <a href="#path" class="btn btn-outline">查看路径</a>
+        <a href="https://space.bilibili.com/291215958/lists/7468039?type=season" target="_blank" class="btn btn-outline">B站原视频</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="main">
+    <section id="overview">
+      <div class="course-overview">
+        <div>
+          <div class="section-tag">课程概览</div>
+          <h2 class="section-title">机器学习是什么？<br>机器如何学会思考？</h2>
+          <p class="section-desc" style="max-width:100%">本课程用通俗易懂的方式讲解机器学习与深度学习核心知识。从"什么是智能"出发，逐步深入到各类经典算法的原理与推导，配合代码实战，让你真正理解机器学习的本质。</p>
+          <div style="margin-top:2rem;display:flex;flex-direction:column;gap:1rem">
+            <div style="display:flex;gap:1rem;align-items:flex-start">
+              <div style="width:36px;height:36px;border-radius:10px;background:rgba(52,211,153,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--success);font-weight:700">1</div>
+              <div><h4 style="font-size:0.95rem;margin-bottom:4px">概念先行</h4><p style="font-size:0.85rem;color:var(--muted)">从"智能"的本质出发，理解机器学习的核心思想</p></div>
+            </div>
+            <div style="display:flex;gap:1rem;align-items:flex-start">
+              <div style="width:36px;height:36px;border-radius:10px;background:rgba(56,189,248,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);font-weight:700">2</div>
+              <div><h4 style="font-size:0.95rem;margin-bottom:4px">算法精讲</h4><p style="font-size:0.85rem;color:var(--muted)">线性回归→梯度下降→逻辑回归→决策树→集成学习</p></div>
+            </div>
+            <div style="display:flex;gap:1rem;align-items:flex-start">
+              <div style="width:36px;height:36px;border-radius:10px;background:rgba(129,140,248,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent2);font-weight:700">3</div>
+              <div><h4 style="font-size:0.95rem;margin-bottom:4px">实践导向</h4><p style="font-size:0.85rem;color:var(--muted)">数据预处理、模型评估、过拟合诊断全流程覆盖</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="overview-visual">
+          <div class="overview-card">
+            <div class="overview-card-inner">
+              <div class="ml-diagram">
+                <div class="diagram-step">
+                  <div class="diagram-icon blue">📊</div>
+                  <div class="diagram-text"><h4>数据收集与预处理</h4><p>清洗、归一化、特征工程</p></div>
+                </div>
+                <div class="diagram-arrow">↓</div>
+                <div class="diagram-step">
+                  <div class="diagram-icon purple">🧮</div>
+                  <div class="diagram-text"><h4>模型训练</h4><p>选择算法、梯度下降优化参数</p></div>
+                </div>
+                <div class="diagram-arrow">↓</div>
+                <div class="diagram-step">
+                  <div class="diagram-icon pink">📈</div>
+                  <div class="diagram-text"><h4>模型评估与调优</h4><p>交叉验证、正则化、处理过拟合</p></div>
+                </div>
+                <div class="diagram-arrow">↓</div>
+                <div class="diagram-step">
+                  <div class="diagram-icon green">🎯</div>
+                  <div class="diagram-text"><h4>预测与应用</h4><p>对未知数据做出预测</p></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="path">
+      <div class="section-header">
+        <div class="section-tag">学习路径</div>
+        <h2 class="section-title">科学路线，循序渐进</h2>
+        <p class="section-desc">按照认知规律设计的学习路径，每个章节环环相扣，从基础概念到核心算法再到实战技能</p>
+      </div>
+      <div class="path-timeline">
+        <div class="path-line"></div>
+        <div class="path-item">
+          <div class="path-num"><span>01</span></div>
+          <div class="path-content">
+            <h3>概念入门 <span class="p-dur">3集 · 52分钟</span></h3>
+            <p>理解什么是智能，机器学习的本质是什么，以及监督学习、非监督学习、强化学习三大范式的区别与联系。建立机器学习的宏观认知框架。</p>
+            <div class="path-topics">
+              <span class="topic">人工智能</span><span class="topic">机器学习定义</span><span class="topic">监督学习</span><span class="topic">非监督学习</span><span class="topic">强化学习</span>
+            </div>
+          </div>
+        </div>
+        <div class="path-item">
+          <div class="path-num"><span>02</span></div>
+          <div class="path-content">
+            <h3>线性回归与优化 <span class="p-dur">5集 · 120分钟</span></h3>
+            <p>从第一个机器学习模型——线性回归开始，学习最小二乘法、梯度下降优化算法、数据预处理技巧、模型评估指标，以及欠拟合与过拟合的诊断与解决方案。</p>
+            <div class="path-topics">
+              <span class="topic">线性回归</span><span class="topic">梯度下降</span><span class="topic">数据预处理</span><span class="topic">模型评估</span><span class="topic">正则化</span>
+            </div>
+          </div>
+        </div>
+        <div class="path-item">
+          <div class="path-num"><span>03</span></div>
+          <div class="path-content">
+            <h3>分类算法与集成学习 <span class="p-dur">4集 · 83分钟</span></h3>
+            <p>掌握最常用的分类模型——逻辑回归，然后学习直观易懂的决策树，再到集成学习的Bagging（随机森林）和Boosting（XGBoost/LightGBM/CatBoost）两大流派。</p>
+            <div class="path-topics">
+              <span class="topic">逻辑回归</span><span class="topic">Sigmoid</span><span class="topic">决策树</span><span class="topic">随机森林</span><span class="topic">XGBoost</span>
+            </div>
+          </div>
+        </div>
+        <div class="path-item">
+          <div class="path-num"><span>04</span></div>
+          <div class="path-content">
+            <h3>无监督学习与展望 <span class="p-dur">3集 · 62分钟</span></h3>
+            <p>学习K-Means聚类算法发现数据内在结构，用PCA主成分分析进行数据降维与可视化，最后回顾课程全貌，展望深度学习方向。</p>
+            <div class="path-topics">
+              <span class="topic">K-Means</span><span class="topic">聚类</span><span class="topic">PCA降维</span><span class="topic">特征分解</span><span class="topic">深度学习</span>
+            </div>
+          </div>
+        </div>
+        <div class="path-item">
+          <div class="path-num" style="background:linear-gradient(135deg,rgba(249,115,22,0.15),rgba(249,115,22,0.05));border-color:var(--dl1);color:var(--dl1)"><span>05</span></div>
+          <div class="path-content">
+            <h3>神经网络基础 <span class="p-dur" style="background:rgba(249,115,22,0.1);color:var(--dl1)">7集 · 163分钟</span></h3>
+            <p>从感知机出发，理解MLP多层感知机架构，掌握反向传播算法、激活函数、梯度下降在神经网络中的应用，构建神经网络的完整理论基础。</p>
+            <div class="path-topics">
+              <span class="topic" style="border-color:rgba(249,115,22,0.2);color:var(--dl1)">感知机</span><span class="topic" style="border-color:rgba(249,115,22,0.2);color:var(--dl1)">MLP</span><span class="topic" style="border-color:rgba(249,115,22,0.2);color:var(--dl1)">反向传播</span><span class="topic" style="border-color:rgba(249,115,22,0.2);color:var(--dl1)">激活函数</span><span class="topic" style="border-color:rgba(249,115,22,0.2);color:var(--dl1)">梯度下降</span>
+            </div>
+          </div>
+        </div>
+        <div class="path-item">
+          <div class="path-num" style="background:linear-gradient(135deg,rgba(244,63,94,0.15),rgba(244,63,94,0.05));border-color:var(--dl2);color:var(--dl2)"><span>06</span></div>
+          <div class="path-content">
+            <h3>训练技巧与PyTorch实战 <span class="p-dur" style="background:rgba(244,63,94,0.1);color:var(--dl2)">7集 · 144分钟</span></h3>
+            <p>掌握损失函数选择、PyTorch手写数字识别实战，深入理解学习率设置、参数初始化、归一化、Dropout正则化等训练技巧，系统掌握DL模型训练全流程。</p>
+            <div class="path-topics">
+              <span class="topic" style="border-color:rgba(244,63,94,0.2);color:var(--dl2)">损失函数</span><span class="topic" style="border-color:rgba(244,63,94,0.2);color:var(--dl2)">PyTorch</span><span class="topic" style="border-color:rgba(244,63,94,0.2);color:var(--dl2)">学习率</span><span class="topic" style="border-color:rgba(244,63,94,0.2);color:var(--dl2)">BatchNorm</span><span class="topic" style="border-color:rgba(244,63,94,0.2);color:var(--dl2)">Dropout</span>
+            </div>
+          </div>
+        </div>
+        <div class="path-item">
+          <div class="path-num" style="background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(251,191,36,0.05));border-color:var(--dl3);color:var(--dl3)"><span>07</span></div>
+          <div class="path-content">
+            <h3>CNN计算机视觉与NLP大模型 <span class="p-dur" style="background:rgba(251,191,36,0.1);color:var(--dl3)">5集 · 115分钟</span></h3>
+            <p>学习CNN卷积神经网络核心原理（卷积层、池化层），理解残差连接如何解决深度网络退化问题，最后从NLP发展历程到Transformer架构与大模型，掌握AI前沿方向。</p>
+            <div class="path-topics">
+              <span class="topic" style="border-color:rgba(251,191,36,0.2);color:var(--dl3)">CNN</span><span class="topic" style="border-color:rgba(251,191,36,0.2);color:var(--dl3)">卷积层</span><span class="topic" style="border-color:rgba(251,191,36,0.2);color:var(--dl3)">残差连接</span><span class="topic" style="border-color:rgba(251,191,36,0.2);color:var(--dl3)">Transformer</span><span class="topic" style="border-color:rgba(251,191,36,0.2);color:var(--dl3)">大模型</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="chapters">
+      <div class="section-header">
+        <div class="section-tag">课程章节</div>
+        <h2 class="section-title">34集视频详解</h2>
+        <p class="section-desc">点击章节卡片进入详细学习页面，包含视频播放、知识点详解、代码示例与图示</p>
+      </div>
+      <div class="chapters-grid">
+        <a class="chapter-card" href="chapter1.html">
+          <div class="chapter-header">
+            <span class="chapter-ep">第1-3集</span>
+            <span class="chapter-badge badge-intro">概念篇</span>
+          </div>
+          <div class="chapter-body">
+            <h3>机器学习基础概念</h3>
+            <p>什么是智能？机器如何学会思考？详解机器学习的定义、核心思想，以及监督学习、非监督学习、强化学习三大类型。</p>
+            <div class="chapter-meta">
+              <span>⏱ 52分钟</span><span>📺 3集</span><span>🎯 入门必看</span>
+            </div>
+          </div>
+          <div class="chapter-footer">
+            <div class="chapter-videos">
+              <div class="vid-dot">1</div><div class="vid-dot">2</div><div class="vid-dot">3</div>
+            </div>
+            <div class="chapter-go">进入学习 →</div>
+          </div>
+        </a>
+
+        <a class="chapter-card" href="chapter2.html">
+          <div class="chapter-header">
+            <span class="chapter-ep">第4-8集</span>
+            <span class="chapter-badge badge-core">核心篇</span>
+          </div>
+          <div class="chapter-body">
+            <h3>线性回归与优化</h3>
+            <p>线性回归模型原理、梯度下降优化算法、数据预处理全攻略、模型评估方法、欠拟合与过拟合的诊断及解决策略。</p>
+            <div class="chapter-meta">
+              <span>⏱ 120分钟</span><span>📺 5集</span><span>🔢 公式推导</span>
+            </div>
+          </div>
+          <div class="chapter-footer">
+            <div class="chapter-videos">
+              <div class="vid-dot">4</div><div class="vid-dot">5</div><div class="vid-dot">6</div><div class="vid-dot">7</div><div class="vid-dot">8</div>
+            </div>
+            <div class="chapter-go">进入学习 →</div>
+          </div>
+        </a>
+
+        <a class="chapter-card" href="chapter3.html">
+          <div class="chapter-header">
+            <span class="chapter-ep">第9-12集</span>
+            <span class="chapter-badge badge-adv">进阶篇</span>
+          </div>
+          <div class="chapter-body">
+            <h3>分类算法与集成学习</h3>
+            <p>逻辑回归分类模型、决策树if-else逻辑、随机森林Bagging集成、XGBoost/LightGBM/CatBoost三大Boosting算法详解。</p>
+            <div class="chapter-meta">
+              <span>⏱ 83分钟</span><span>📺 4集</span><span>🌳 树模型</span>
+            </div>
+          </div>
+          <div class="chapter-footer">
+            <div class="chapter-videos">
+              <div class="vid-dot">9</div><div class="vid-dot">10</div><div class="vid-dot">11</div><div class="vid-dot">12</div>
+            </div>
+            <div class="chapter-go">进入学习 →</div>
+          </div>
+        </a>
+
+        <a class="chapter-card" href="chapter4.html">
+          <div class="chapter-header">
+            <span class="chapter-ep">第13-15集</span>
+            <span class="chapter-badge badge-unsup">进阶篇</span>
+          </div>
+          <div class="chapter-body">
+            <h3>无监督学习与课程总结</h3>
+            <p>K-Means聚类算法原理与应用、PCA主成分分析降维技术，最后全面总结机器学习知识体系，展望深度学习方向。</p>
+            <div class="chapter-meta">
+              <span>⏱ 62分钟</span><span>📺 3集</span><span>🔻 降维聚类</span>
+            </div>
+          </div>
+          <div class="chapter-footer">
+            <div class="chapter-videos">
+              <div class="vid-dot">13</div><div class="vid-dot">14</div><div class="vid-dot">15</div>
+            </div>
+            <div class="chapter-go">进入学习 →</div>
+          </div>
+        </a>
+
+        <div class="chapter-dl-divider">
+          <div class="dl-divider-line"></div>
+          <div class="dl-divider-label"><span>🔥</span> 深度学习篇 <span>🔥</span></div>
+          <div class="dl-divider-line"></div>
+        </div>
+
+        <a class="chapter-card dl-card dl5" href="chapter5.html">
+          <div class="chapter-header">
+            <span class="chapter-ep">DL第1-7集</span>
+            <span class="chapter-badge badge-dl5">神经网络</span>
+          </div>
+          <div class="chapter-body">
+            <h3>神经网络基础</h3>
+            <p>从深度学习概述、环境安装开始，掌握感知机模型、MLP多层感知机架构、反向传播算法、激活函数选择，以及神经网络中的梯度下降优化。</p>
+            <div class="chapter-meta">
+              <span>⏱ 163分钟</span><span>📺 7集</span><span>🧠 神经网络</span>
+            </div>
+          </div>
+          <div class="chapter-footer">
+            <div class="chapter-videos">
+              <div class="vid-dot" style="background:var(--dl1);color:#000">1</div><div class="vid-dot" style="background:var(--dl1);color:#000">2</div><div class="vid-dot" style="background:var(--dl1);color:#000">3</div><div class="vid-dot" style="background:var(--dl1);color:#000">4</div><div class="vid-dot" style="background:var(--dl1);color:#000">5</div><div class="vid-dot" style="background:var(--dl1);color:#000">6</div><div class="vid-dot" style="background:var(--dl1);color:#000">7</div>
+            </div>
+            <div class="chapter-go">进入学习 →</div>
+          </div>
+        </a>
+
+        <a class="chapter-card dl-card dl6" href="chapter6.html">
+          <div class="chapter-header">
+            <span class="chapter-ep">DL第8-14集</span>
+            <span class="chapter-badge badge-dl6">训练实战</span>
+          </div>
+          <div class="chapter-body">
+            <h3>训练技巧与PyTorch实战</h3>
+            <p>损失函数选择与原理、PyTorch手写数字识别实战，深入讲解学习率设置、参数初始化、BatchNorm归一化、Dropout正则化等训练技巧，最后总结DL模型训练全流程。</p>
+            <div class="chapter-meta">
+              <span>⏱ 144分钟</span><span>📺 7集</span><span>⚡ 训练技巧</span>
+            </div>
+          </div>
+          <div class="chapter-footer">
+            <div class="chapter-videos">
+              <div class="vid-dot" style="background:var(--dl2);color:#000">8</div><div class="vid-dot" style="background:var(--dl2);color:#000">9</div><div class="vid-dot" style="background:var(--dl2);color:#000">10</div><div class="vid-dot" style="background:var(--dl2);color:#000">11</div><div class="vid-dot" style="background:var(--dl2);color:#000">12</div><div class="vid-dot" style="background:var(--dl2);color:#000">13</div><div class="vid-dot" style="background:var(--dl2);color:#000">14</div>
+            </div>
+            <div class="chapter-go">进入学习 →</div>
+          </div>
+        </a>
+
+        <a class="chapter-card dl-card dl7" href="chapter7.html">
+          <div class="chapter-header">
+            <span class="chapter-ep">DL第15-19集</span>
+            <span class="chapter-badge badge-dl7">CV&NLP</span>
+          </div>
+          <div class="chapter-body">
+            <h3>CNN计算机视觉与NLP大模型</h3>
+            <p>CNN卷积神经网络完整讲解（为什么需要CNN、卷积层提取特征、池化层与分类），残差连接解决深度网络退化，最后从NLP发展到Transformer架构与大模型时代。</p>
+            <div class="chapter-meta">
+              <span>⏱ 115分钟</span><span>📺 5集</span><span>🌐 前沿方向</span>
+            </div>
+          </div>
+          <div class="chapter-footer">
+            <div class="chapter-videos">
+              <div class="vid-dot" style="background:var(--dl3);color:#000">15</div><div class="vid-dot" style="background:var(--dl3);color:#000">16</div><div class="vid-dot" style="background:var(--dl3);color:#000">17</div><div class="vid-dot" style="background:var(--dl3);color:#000">18</div><div class="vid-dot" style="background:var(--dl3);color:#000">19</div>
+            </div>
+            <div class="chapter-go">进入学习 →</div>
+          </div>
+        </a>
+        <a href="ppt-transformer.html" style="grid-column:1/-1;display:block;padding:2rem 2.5rem;border-radius:var(--radius);background:linear-gradient(135deg,rgba(139,92,246,0.1),rgba(99,102,241,0.05));border:1px solid rgba(139,92,246,0.3);text-decoration:none;color:var(--ink);position:relative;overflow:hidden;transition:all .3s">
+          <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(139,92,246,0.2),transparent 70%);pointer-events:none"></div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem">
+            <div style="width:44px;height:44px;background:linear-gradient(135deg,#8b5cf6,#6366f1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">👑</div>
+            <div>
+              <div style="font-size:0.75rem;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:0.08em">专题精讲 PPT</div>
+              <h3 style="font-size:1.2rem;margin:4px 0 0;background:linear-gradient(135deg,#c4b5fd,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Transformer架构深度解析</h3>
+            </div>
+          </div>
+          <p style="color:var(--muted);font-size:0.9rem;line-height:1.7;margin-bottom:1rem">41页幻灯片详细讲解：从RNN/LSTM瓶颈→Self-Attention(QKV)→Multi-Head Attention→位置编码→Encoder/Decoder→Masked Attention→BERT/GPT家族，彻底掌握大模型基石。</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem">
+            <span style="padding:4px 12px;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.25);border-radius:20px;font-size:0.78rem;color:#c4b5fd">Self-Attention</span>
+            <span style="padding:4px 12px;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.25);border-radius:20px;font-size:0.78rem;color:#c4b5fd">Multi-Head</span>
+            <span style="padding:4px 12px;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.25);border-radius:20px;font-size:0.78rem;color:#c4b5fd">BERT/GPT</span>
+            <span style="padding:4px 12px;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.25);border-radius:20px;font-size:0.78rem;color:#c4b5fd">41页PPT</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:0.82rem;color:var(--muted)">📊 独立专题课件</span>
+            <span style="color:#a78bfa;font-weight:600;font-size:0.9rem">进入专题 →</span>
+          </div>
+        </a>
+        <a href="ppt-deepseek.html" style="grid-column:1/-1;display:block;padding:2rem 2.5rem;border-radius:var(--radius);background:linear-gradient(135deg,rgba(6,182,212,0.1),rgba(14,165,233,0.05));border:1px solid rgba(6,182,212,0.3);text-decoration:none;color:var(--ink);position:relative;overflow:hidden;transition:all .3s">
+          <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(6,182,212,0.2),transparent 70%);pointer-events:none"></div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem">
+            <div style="width:44px;height:44px;background:linear-gradient(135deg,#06b6d4,#0ea5e9);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">🐋</div>
+            <div>
+              <div style="font-size:0.75rem;font-weight:700;color:#22d3ee;text-transform:uppercase;letter-spacing:0.08em">前沿专题 PPT</div>
+              <h3 style="font-size:1.2rem;margin:4px 0 0;background:linear-gradient(135deg,#67e8f9,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">DeepSeek-V3 论文精读 (arXiv:2412.19437)</h3>
+            </div>
+          </div>
+          <p style="color:var(--muted);font-size:0.9rem;line-height:1.7;margin-bottom:1rem">49页幻灯片深度解析DeepSeek-V3技术报告：MLA低秩联合压缩(56.9× KV Cache缩减)→解耦式RoPE→DeepSeekMoE(共享/路由专家)→Auxiliary-Loss-Free负载均衡→MTP多Token预测→FP8混合精度块级量化→DualPipe流水线→$5.58M训练成本分析。理解当前最强开源大模型的全部技术细节。</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem">
+            <span style="padding:4px 12px;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.25);border-radius:20px;font-size:0.78rem;color:#67e8f9">MLA推导</span>
+            <span style="padding:4px 12px;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.25);border-radius:20px;font-size:0.78rem;color:#67e8f9">DeepSeekMoE</span>
+            <span style="padding:4px 12px;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.25);border-radius:20px;font-size:0.78rem;color:#67e8f9">MTP</span>
+            <span style="padding:4px 12px;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.25);border-radius:20px;font-size:0.78rem;color:#67e8f9">FP8训练</span>
+            <span style="padding:4px 12px;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.25);border-radius:20px;font-size:0.78rem;color:#67e8f9">49页PPT</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:0.82rem;color:var(--muted)">📄 论文精读专题</span>
+            <span style="color:#22d3ee;font-weight:600;font-size:0.9rem">进入专题 →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="section-header">
+        <div class="section-tag">课程特色</div>
+        <h2 class="section-title">为什么选择这门课？</h2>
+      </div>
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon f1">💡</div>
+          <h3>通俗易懂</h3>
+          <p>不用堆砌复杂术语，而是从直觉出发讲解算法原理。"会if...else就能懂决策树"，降低学习门槛。</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon f2">🧮</div>
+          <h3>原理推导</h3>
+          <p>不仅教你怎么用，还讲清楚为什么。从损失函数到梯度下降，每个公式都有来龙去脉。</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon f3">🔄</div>
+          <h3>体系完整</h3>
+          <p>覆盖机器学习完整流程：数据预处理→模型训练→评估调优→预测应用，不遗漏关键环节。</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon f4">📊</div>
+          <h3>可视化讲解</h3>
+          <p>配合图表和动画演示算法运行过程，梯度下降如何收敛、决策树如何划分，一目了然。</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon f5">⚡</div>
+          <h3>工业实战</h3>
+          <p>涵盖XGBoost、LightGBM等工业界主流算法，不仅是学术理论，更是实际工作中能用的技能。</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon f6">🎯</div>
+          <h3>循序渐进</h3>
+          <p>15集视频由浅入深，从概念到算法到优化，每个知识点都建立在前序内容基础上。</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="cta-section">
+      <h2>准备好开始机器学习之旅了吗？</h2>
+      <p>从第一章开始，系统掌握机器学习核心知识</p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <a href="chapter1.html" class="btn btn-primary">从第一章开始 →</a>
+        <a href="slides.html" class="btn btn-secondary">📊 PPT演示版</a>
+        <a href="https://space.bilibili.com/291215958/lists/7468039?type=season" target="_blank" class="btn btn-outline">前往B站观看</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="ml-learning-site.html" class="logo"><div class="logo-icon">🧠</div><span>ML学习站</span></a>
+          <p>机器学习与深度学习系统学习站，让AI学习更简单、更系统。所有视频版权归原作者所有。</p>
+        </div>
+        <div class="footer-col">
+          <h4>快速导航</h4>
+          <ul>
+            <li><a href="#hero">首页</a></li>
+            <li><a href="#overview">课程概览</a></li>
+            <li><a href="#path">学习路径</a></li>
+            <li><a href="#chapters">章节详解</a></li>
+            <li><a href="slides.html">📊 PPT演示版</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>学习章节</h4>
+          <ul>
+            <li><a href="chapter1.html">基础概念</a></li>
+            <li><a href="chapter2.html">线性回归</a></li>
+            <li><a href="chapter3.html">分类算法</a></li>
+            <li><a href="chapter4.html">无监督学习</a></li>
+            <li><a href="chapter5.html">神经网络基础</a></li>
+            <li><a href="chapter6.html">训练技巧实战</a></li>
+            <li><a href="chapter7.html">CNN与NLP</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>相关链接</h4>
+          <ul>
+            <li><a href="https://space.bilibili.com/291215958/lists/7468039?type=season" target="_blank">B站机器学习合集</a></li>
+            <li><a href="https://space.bilibili.com/291215958/lists/7984530?type=season" target="_blank">B站深度学习合集</a></li>
+            <li><a href="https://space.bilibili.com/291215958" target="_blank">B站主页</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 ML学习站 | 本站仅作学习整理用途</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function(){
+      var c=document.getElementById('particles');
+      if(c){for(var i=0;i<35;i++){var p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'%';p.style.animationDelay=Math.random()*18+'s';p.style.animationDuration=(12+Math.random()*12)+'s';var s=2+Math.random()*3;p.style.width=s+'px';p.style.height=s+'px';c.appendChild(p)}}
+      document.querySelectorAll('a[href^="#"]').forEach(function(a){a.addEventListener('click',function(e){var h=this.getAttribute('href');if(h==='#')return;e.preventDefault();var t=document.querySelector(h);if(t)t.scrollIntoView({behavior:'smooth',block:'start'})})})
+    })();
+  </script>
+</body>
+</html>

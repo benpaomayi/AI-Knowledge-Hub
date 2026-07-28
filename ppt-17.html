@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>第17集 深度学习环境安装 - ML学习站PPT</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#f97316;--accent2:#fb923c;--accent3:#f59e0b;--accent-glow:rgba(249,115,22,0.25);--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--accent3);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent3);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(249,115,22,0.15) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(245,158,11,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.25);border-radius:50px;font-size:1rem;color:var(--accent);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--success),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:700px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(249,115,22,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:2rem;margin:1.5rem 0;font-family:var(--mono);font-size:clamp(0.95rem,1.5vw,1.1rem);color:var(--accent);line-height:1.8;overflow-x:auto}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:0.8rem;display:block}
+.hbox{background:rgba(249,115,22,0.08);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1rem 0}
+.hbox h4{color:var(--accent);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(251,191,36,0.08);border-left-color:var(--warning)}.hbox.warn h4{color:var(--warning)}
+.hbox.danger{background:rgba(248,113,111,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.orange{background:rgba(251,146,60,0.08);border-left-color:var(--accent2)}.hbox.orange h4{color:var(--accent2)}
+.hbox.amber{background:rgba(245,158,11,0.08);border-left-color:var(--accent3)}.hbox.amber h4{color:var(--accent3)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.95rem}
+table.cmp th{background:var(--bg3);color:var(--accent3);padding:12px 14px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.9rem}
+table.cmp td{padding:10px 14px;border-bottom:1px solid var(--rule);color:var(--ink2);line-height:1.6}
+table.cmp tr:hover td{background:rgba(249,115,22,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent3);background:rgba(249,115,22,0.1);color:var(--accent3);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent)}
+.tag.o{color:var(--accent2)}.tag.a{color:var(--accent3)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}.tag.d{color:var(--danger)}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent3),var(--accent2),var(--accent),var(--success));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent3);color:var(--accent3)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent3)}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.end-slide .end-buttons{display:flex;gap:1.5rem;justify-content:center;margin-top:2.5rem;flex-wrap:wrap}
+.end-slide .end-btn{padding:14px 32px;border-radius:12px;font-size:1.05rem;font-weight:600;text-decoration:none;transition:all .3s}
+.end-slide .end-btn.primary{background:linear-gradient(135deg,var(--accent3),var(--accent2));color:white}
+.end-slide .end-btn.secondary{background:var(--bg2);border:1px solid var(--rule);color:var(--ink2)}
+.end-slide .end-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(249,115,22,0.2)}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col{grid-template-columns:1fr}.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="slides.html" style="font-weight:600;color:var(--accent3)">📊 PPT课件</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="chapter5.html">回到视频页</a>
+    <a href="ppt-16.html">← 上一集</a>
+    <a href="ppt-18.html" style="color:var(--accent);font-weight:600">下一集 →</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">🔧 深度学习入门教程 · 第2集</div>
+    <h1 class="cover-title">深度学习环境搭建：Anaconda+PyTorch</h1>
+    <p class="cover-sub">工欲善其事，必先利其器！手把手教你安装配置Python环境和PyTorch框架<br>BV1db9dBEETc · 时长 11分14秒</p>
+    <div class="tags">
+      <span class="tag a">环境配置</span>
+      <span class="tag o">Anaconda</span>
+      <span class="tag">PyTorch</span>
+      <span class="tag g">Jupyter</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">2 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">本集内容导览</h1>
+    <h3 class="sub">从零开始，搭建你的第一个深度学习开发环境</h3>
+    <div class="body">
+      <ul>
+        <li><strong style="color:var(--accent)">为什么需要环境管理</strong>——版本冲突问题与解决方案</li>
+        <li><strong style="color:var(--accent2)">Anaconda/Miniconda介绍</strong>——Python发行版+包管理器+环境管理</li>
+        <li><strong style="color:var(--accent3)">Anaconda安装步骤</strong>——Windows/Mac/Linux全平台</li>
+        <li><strong style="color:var(--success)">Conda虚拟环境命令</strong>——创建、激活、删除环境</li>
+        <li><strong style="color:var(--warning)">pip vs conda区别</strong>——两个包管理器怎么选</li>
+        <li><strong style="color:var(--danger)">PyTorch安装</strong>——CPU版 vs GPU版（CUDA）</li>
+        <li><strong>验证安装</strong>、Jupyter使用、常见问题排查</li>
+      </ul>
+    </div>
+    <div class="hbox amber">
+      <h4>💪 跟着做！</h4>
+      <p>这集是实操课，<strong>建议你打开电脑跟着视频一步步操作</strong>。光看是记不住的，自己装一遍环境，踩两个坑，就真正学会了。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">3 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">为什么需要环境管理？</h1>
+    <h3 class="sub">做项目第一件事：隔离环境，避免"依赖地狱"</h3>
+    <div class="hbox danger">
+      <h4>😱 常见的"依赖地狱"场景</h4>
+      <p>• 项目A需要Python 3.8 + PyTorch 1.0，项目B需要Python 3.10 + PyTorch 2.0<br>
+      • 装了一个新库，把原来项目依赖的库版本给覆盖了<br>
+      • 把系统自带Python搞坏了，导致系统工具出问题<br>
+      • 换一台电脑，环境搭不起来，代码跑不动</p>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="card">
+        <h4 style="color:var(--danger)">❌ 不做环境管理</h4>
+        <p>所有包都装在全局环境，版本互相冲突，今天A项目跑了明天B项目崩。重装系统都解决不了问题。</p>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--success)">✅ 使用虚拟环境</h4>
+        <p>每个项目有独立的环境，互不干扰。想装什么版本就装什么版本，不会搞坏系统Python，换电脑也能一键复现。</p>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🎯 核心思想</h4>
+      <p>虚拟环境就是给每个项目一个"独立房间"，每个房间里的东西互不影响。Anaconda就是管理这些"房间"的工具。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">4 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">Anaconda vs Miniconda：怎么选？</h1>
+    <h3 class="sub">两个都是conda，只是预装包多少的区别</h3>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">🐍</div>
+        <h4>Anaconda（大而全）</h4>
+        <p style="margin-bottom:1rem">Python数据科学"全家桶"发行版</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>预装1500+数据科学包（numpy/pandas/sklearn/jupyter等）</li>
+          <li>安装包约800MB，安装后占空间几个GB</li>
+          <li>图形化界面Anaconda Navigator，对新手友好</li>
+          <li><strong style="color:var(--success)">适合：初学者、不想自己装包</strong></li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">⚡</div>
+        <h4>Miniconda（轻量级）</h4>
+        <p style="margin-bottom:1rem">精简版，只有Python+conda+少量基础包</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>只预装最基本的包，其他需要自己装</li>
+          <li>安装包约50MB，小巧轻便</li>
+          <li>纯命令行操作，没有图形界面</li>
+          <li><strong style="color:var(--accent)">适合：有基础、想自己控制包、节省空间</strong></li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox orange">
+      <h4>💡 新手建议</h4>
+      <p>第一次装直接选<strong>Anaconda</strong>就好，省事，不用一个个装常用包。等你熟悉了再考虑Miniconda。两者的conda命令是完全一样的，学会一个另一个自然就会。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">5 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">Anaconda安装步骤</h1>
+    <h3 class="sub">Windows/Mac/Linux都支持，跟着步骤走就行</h3>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node hl" style="min-width:120px">1. 下载安装包</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:120px">2. 运行安装</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:120px">3. PATH配置</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:120px">4. 验证安装</div>
+    </div>
+    <div class="hbox">
+      <h4>📥 第一步：下载安装包</h4>
+      <p>官网地址：<strong style="color:var(--accent)">https://www.anaconda.com/download</strong><br>
+      根据你的操作系统选：Windows/Mac（Intel/Apple Silicon）/Linux<br>
+      选<strong>Graphical Installer</strong>（图形安装包），下载对应Python版本（推荐3.10或3.11）。</p>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 国内网络慢？用清华镜像！</h4>
+      <p>官网下载在国内可能很慢，推荐使用清华镜像源：<br>
+      <strong style="color:var(--warning)">https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/</strong><br>
+      找到最新版本的Anaconda3，对应你的系统下载就行。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">6 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">安装过程注意事项（重点！）</h2>
+    <h3 class="sub">这几个选项选错了，后面会出问题</h3>
+    <div class="two-col">
+      <div>
+        <div class="hbox danger">
+          <h4>❌ Windows特别注意：PATH选项</h4>
+          <p>安装到"Advanced Installation Options"这一步时，<strong style="color:var(--danger)">一定要勾选"Add Anaconda3 to my PATH environment variable"</strong>！虽然它说"not recommended"，但勾上能省很多事。不勾的话终端找不到conda命令。</p>
+        </div>
+        <div class="hbox warn">
+          <h4>⚠️ 安装路径</h4>
+          <p>路径中<strong style="color:var(--warning)">不要有中文和空格</strong>！比如不要装在"D:\我的软件\Anaconda"，最好装在"D:\anaconda3"或"C:\anaconda3"这种纯英文路径下，避免出现奇怪的编码问题。</p>
+        </div>
+      </div>
+      <div>
+        <div class="hbox">
+          <h4>🍎 Mac/Linux用户</h4>
+          <p>Mac选对应芯片版本（Intel还是M1/M2/M3）。下载.pkg文件（Mac）或.sh文件（Linux），按向导一步步点继续就行，默认设置即可。Mac安装完需要重启终端才能用conda命令。</p>
+        </div>
+        <div class="hbox success">
+          <h4>✅ 验证安装成功</h4>
+          <p>安装完成后：<br>
+          Windows：打开"Anaconda Prompt"，输入conda --version<br>
+          Mac/Linux：打开终端，输入conda --version<br>
+          如果显示版本号（比如conda 23.x.x），就说明安装成功了！</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">7 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">Conda虚拟环境核心命令</h1>
+    <h3 class="sub">这几个命令记牢，环境管理不用愁</h3>
+    <div class="formula">
+      # 1. 创建虚拟环境（指定Python版本）<br>
+      conda create -n dl python=3.10<br><br>
+      # 2. 激活/进入环境（Windows用Anaconda Prompt）<br>
+      conda activate dl<br><br>
+      # 3. 退出当前环境<br>
+      conda deactivate<br><br>
+      # 4. 查看所有环境<br>
+      conda env list
+    </div>
+    <div class="hbox amber">
+      <h4>🎯 我们现在就来创建第一个环境！</h4>
+      <p>打开终端/Anaconda Prompt，输入上面第一条命令，创建一个叫dl（deep learning的缩写）的环境，Python版本用3.10（兼容性好）。输入y确认，等待安装完成。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">8 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">更多Conda常用命令</h2>
+    <h3 class="sub">这些命令以后会经常用到，先混个眼熟</h3>
+    <div class="formula">
+      # 查看当前环境安装了哪些包<br>
+      conda list<br><br>
+      # 在当前环境安装包<br>
+      conda install numpy pandas<br><br>
+      # 删除虚拟环境（先退出环境再删）<br>
+      conda remove -n dl --all<br><br>
+      # 导出环境配置（分享给别人/复现环境）<br>
+      conda env export > environment.yml<br><br>
+      # 从yml文件创建环境<br>
+      conda env create -f environment.yml
+    </div>
+    <div class="hbox">
+      <h4>💡 提示</h4>
+      <p>不用死记硬背，忘了可以随时查。但<strong>create/activate/deactivate</strong>这三个最常用的最好记下来。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">9 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">配置国内镜像源（必做！）</h1>
+    <h3 class="sub">解决conda/pip下载慢、超时失败的问题</h3>
+    <div class="hbox danger">
+      <h4>🐢 为什么配置镜像？</h4>
+      <p>conda默认从国外服务器下载包，在国内速度非常慢，几KB/s甚至超时失败。配置国内清华/中科大镜像源后，下载速度能提升几十上百倍！</p>
+    </div>
+    <div class="formula">
+      # 配置清华conda镜像（复制粘贴执行这4行命令）<br>
+      conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main<br>
+      conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free<br>
+      conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge<br>
+      conda config --set show_channel_urls yes
+    </div>
+    <div class="hbox success">
+      <h4>✅ 验证配置</h4>
+      <p>输入conda config --show channels，如果能看到刚才加的几个清华地址，说明配置成功。以后用conda install安装包就会走国内镜像，飞一般的速度！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">10 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">pip vs conda：两个包管理器的区别</h1>
+    <h3 class="sub">搞清楚什么时候用pip，什么时候用conda</h3>
+    <table class="cmp">
+      <tr>
+        <th>对比维度</th>
+        <th>pip</th>
+        <th>conda</th>
+      </tr>
+      <tr>
+        <td><strong>出身</strong></td>
+        <td>Python官方包管理器</td>
+        <td>Anaconda自带的包管理器</td>
+      </tr>
+      <tr>
+        <td><strong>支持语言</strong></td>
+        <td>只能管Python包</td>
+        <td>Python/C/C++/R等跨语言包</td>
+      </tr>
+      <tr>
+        <td><strong>虚拟环境</strong></td>
+        <td>需要配合virtualenv/venv</td>
+        <td>自带虚拟环境管理功能</td>
+      </tr>
+      <tr>
+        <td><strong>包数量</strong></td>
+        <td style="color:var(--success)">PyPI有几十万包，最全</td>
+        <td>Anaconda仓库相对少一些</td>
+      </tr>
+      <tr>
+        <td><strong>二进制包</strong></td>
+        <td>需要编译（wheel）</td>
+        <td style="color:var(--success)">预编译二进制，安装快</td>
+      </tr>
+      <tr>
+        <td><strong>检查依赖</strong></td>
+        <td style="color:var(--danger)">依赖检查不严格，可能装冲突</td>
+        <td style="color:var(--success)">严格检查依赖，确保兼容</td>
+      </tr>
+    </table>
+    <div class="hbox orange">
+      <h4>💡 实际使用建议</h4>
+      <p><strong>优先用conda装</strong>（numpy/pandas/scipy等科学计算包，PyTorch官方也推荐conda），<strong>conda没有的再用pip装</strong>。两者可以混用，不用太纠结。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">11 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">pip也配置国内镜像！</h1>
+    <h3 class="sub">pip下载慢？一行命令永久配置清华源</h3>
+    <div class="formula">
+      # 永久配置pip清华镜像（Windows/Mac/Linux通用）<br>
+      pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple<br><br>
+      # 临时使用镜像安装某个包（单次生效）<br>
+      pip install numpy -i https://pypi.tuna.tsinghua.edu.cn/simple
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 注意：一定要先激活环境！</h4>
+      <p>安装任何包之前，先确认你的命令行前面有（dl）这个环境名，说明你在dl虚拟环境里。如果没有，先执行<strong>conda activate dl</strong>激活环境，否则包会装到base环境去！</p>
+    </div>
+    <div class="hbox success">
+      <h4>✅ 检查环境的小技巧</h4>
+      <p>执行which python（Mac/Linux）或where python（Windows），看路径是不是在anaconda3/envs/dl/下面——如果是，说明环境激活正确。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">12 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">重头戏：安装PyTorch！</h1>
+    <h3 class="sub">最最核心的深度学习框架，跟着步骤来一定能装好</h3>
+    <div class="hbox">
+      <h4>🌐 第一步：打开PyTorch官网</h4>
+      <p>官网地址：<strong style="color:var(--accent)">https://pytorch.org</strong><br>
+      点击首页的"Install"按钮，进入安装配置页面。</p>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <h4 style="color:var(--accent2)">⚙️ 第二步：选择你的配置</h4>
+      <p style="margin-top:0.8rem">在安装页面上选择：</p>
+      <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.5rem">
+        <li><strong>PyTorch Build</strong>：选Stable（稳定版）就行，Preview是测试版不用选</li>
+        <li><strong>Your OS</strong>：选你的系统（Windows/Mac/Linux）</li>
+        <li><strong>Package</strong>：推荐用Conda或者Pip，新手选Conda更省心</li>
+        <li><strong>Language</strong>：选Python</li>
+        <li><strong>Compute Platform</strong>：这里是关键！见下页</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">13 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">CPU版 vs GPU版：怎么选？</h2>
+    <h3 class="sub">Compute Platform这里选对，速度差10-100倍！</h3>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--warning)">💻 CPU版</h4>
+        <p style="margin-bottom:1rem">Compute Platform选"CPU"</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li><strong>适合：</strong>没有NVIDIA显卡、Mac用户（M系列芯片也支持MPS加速）、只是入门学习</li>
+          <li><strong>优点：</strong>安装简单，不用装CUDA，兼容性好</li>
+          <li><strong>缺点：</strong>训练速度慢，大模型跑不动</li>
+          <li>入门学习小模型（如MNIST）足够用</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--success)">⚡ GPU版（推荐！）</h4>
+        <p style="margin-bottom:1rem">Compute Platform选CUDA版本（如CUDA 11.8、12.1）</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li><strong>适合：</strong>电脑有NVIDIA独立显卡（GTX/RTX系列）</li>
+          <li><strong>优点：</strong>训练速度快10-100倍，大模型必备</li>
+          <li><strong>注意：</strong>只有NVIDIA显卡支持CUDA！AMD/Intel显卡不行，Mac也不行</li>
+          <li><strong>选哪个CUDA版本？</strong>选11.8或12.1都行，PyTorch自带CUDA，不用你提前装！</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox amber">
+      <h4>🍎 Mac用户注意</h4>
+      <p>Mac没有NVIDIA显卡，但M1/M2/M3芯片支持<strong>Metal Performance Shaders (MPS)</strong>后端，PyTorch也能加速。选CPU版安装就行，PyTorch会自动识别MPS。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">14 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">执行安装命令</h2>
+    <h3 class="sub">选好配置后，复制"Run this Command"那行命令</h3>
+    <div class="hbox danger">
+      <h4>⚠️ 重要！先确认激活了dl环境！</h4>
+      <p>执行安装命令之前，再检查一下命令行前面有没有（dl）。如果没有，先conda activate dl。装错环境了后面会找不到包！</p>
+    </div>
+    <div class="formula" style="font-size:0.9rem">
+      # CPU版安装命令（示例）<br>
+      conda install pytorch torchvision torchaudio cpuonly -c pytorch<br><br>
+      # GPU版（CUDA 12.1）安装命令（示例）<br>
+      conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia<br><br>
+      # pip版本（如果conda慢可以用pip）<br>
+      pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+    </div>
+    <div class="hbox warn">
+      <h4>⏳ 耐心等待</h4>
+      <p>PyTorch比较大（几个GB），下载安装需要几分钟到十几分钟，取决于你的网速。不要中途关闭终端！看到done/finished就是安装完成了。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">15 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">CUDA与cuDNN是什么？</h1>
+    <h3 class="sub">GPU加速背后的功臣，了解一下</h3>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">⚡</div>
+        <h4>CUDA</h4>
+        <p>NVIDIA推出的<strong>并行计算平台和编程模型</strong>，让开发者能用NVIDIA的GPU做通用计算（不只是打游戏）。可以理解为"GPU的操作系统"，让程序能调用GPU的计算能力。<br><br>
+        <span style="color:var(--warning)">好消息：用conda装pytorch-cuda会自动安装CUDA运行时，你不需要单独装CUDA Toolkit！</span></p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">🚀</div>
+        <h4>cuDNN</h4>
+        <p>NVIDIA打造的<strong>深度神经网络加速库</strong>（CUDA Deep Neural Network library），针对卷积、池化、归一化等深度学习常用操作做了极致优化。<br><br>
+        <span style="color:var(--success)">同样，conda安装PyTorch的时候也会自动带上cuDNN，不用你单独装！</span></p>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>✅ 总结一下</h4>
+      <p>以前装PyTorch GPU版需要提前装对应版本的CUDA和cuDNN，很麻烦。现在用conda安装pytorch-cuda，它会把需要的CUDA和cuDNN都打包在环境里，和系统其他部分隔离，非常省心！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">16 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">验证安装：PyTorch装成功了吗？</h1>
+    <h3 class="sub">三行代码验证，确保一切正常</h3>
+    <div class="formula">
+      # 打开终端，激活dl环境，输入python进入交互式环境<br>
+      # 然后依次输入以下代码：<br><br>
+      import torch<br>
+      print(torch.__version__) &nbsp;&nbsp;<span class="desc"># 应该打印出版本号，比如2.1.0</span><br>
+      print(torch.cuda.is_available()) &nbsp;&nbsp;<span class="desc"># GPU版返回True，CPU版返回False</span>
+    </div>
+    <div class="hbox success">
+      <h4>🎉 如果看到这些，说明安装成功！</h4>
+      <p>第一行打印出版本号（如2.0.1、2.1.2），说明PyTorch能正常导入；<br>
+      第二行如果你装的是GPU版，应该返回<strong>True</strong>——说明PyTorch能识别并使用你的GPU！<br>
+      如果返回False，说明GPU没识别到，检查你是不是装了CPU版，或者显卡驱动/CUDA版本有问题。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">17 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">Mac用户：验证MPS加速</h2>
+    <h3 class="sub">M系列芯片的Mac也能用GPU加速！</h3>
+    <div class="formula">
+      import torch<br>
+      print(torch.__version__)<br>
+      print(torch.backends.mps.is_available()) &nbsp;&nbsp;<span class="desc"># M系列芯片应该返回True</span><br>
+      print(torch.backends.mps.is_built()) &nbsp;&nbsp;<span class="desc"># 确认PyTorch编译了MPS支持</span>
+    </div>
+    <div class="hbox orange">
+      <h4>🍎 MPS怎么用？</h4>
+      <p>以后写代码的时候，把device设为"mps"就行，就像N卡用"cuda"一样：<br>
+      device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")<br>
+      model = model.to(device)<br>
+      data = data.to(device)<br><br>
+      速度比纯CPU快不少，入门学习足够用了！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">18 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">再装几个常用的包</h1>
+    <h3 class="sub">这些工具做深度学习经常用，顺手装上</h3>
+    <div class="formula">
+      # 确保在dl环境里！<br>
+      conda activate dl<br><br>
+      # 数据处理和可视化<br>
+      conda install numpy pandas matplotlib scikit-learn<br><br>
+      # Jupyter Notebook（交互式编程神器）<br>
+      conda install jupyter notebook<br><br>
+      # 或者用更现代的JupyterLab<br>
+      conda install jupyterlab
+    </div>
+    <div class="hbox">
+      <h4>📦 还可以装这些（选装）</h4>
+      <p>opencv-python（图像处理）、transformers（HuggingFace大模型库）、datasets（数据集加载）、tqdm（进度条）、pillow（图像）、matplotlib画图已经在上面了。需要的时候再装就行。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">19 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">Jupyter Notebook：交互式编程利器</h1>
+    <h3 class="sub">学习深度学习必备工具，为什么大家都爱用？</h3>
+    <div class="three-col" style="margin-top:1rem">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">📝</div>
+        <h4>图文混排</h4>
+        <p>代码+文字说明+图片+公式+图表都能放在一个文档里，就像电子笔记本，非常适合学习和做实验记录。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">⚡</div>
+        <h4>逐段运行</h4>
+        <p>不用从头跑到尾，可以单独运行一个单元格（cell），改一段代码跑一段，调试超方便，变量也会保留。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">📊</div>
+        <h4>可视化友好</h4>
+        <p>画图（matplotlib）、显示图片、打印表格结果都直接嵌在文档里，数据分析/模型训练过程一目了然。</p>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🚀 怎么启动？</h4>
+      <p>在终端/Anaconda Prompt里，激活dl环境后输入：<strong style="color:var(--success)">jupyter notebook</strong><br>
+      会自动在浏览器打开Jupyter界面，点"New"→Python 3，就能新建一个notebook开始写代码了！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">20 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">Jupyter常用快捷键</h2>
+    <h3 class="sub">记住这几个快捷键，效率翻倍</h3>
+    <table class="cmp">
+      <tr>
+        <th>快捷键</th>
+        <th>功能</th>
+        <th>模式</th>
+      </tr>
+      <tr>
+        <td><strong>Shift + Enter</strong></td>
+        <td>运行当前单元格，跳到下一个</td>
+        <td>编辑/命令模式都可用</td>
+      </tr>
+      <tr>
+        <td><strong>Ctrl + Enter</strong></td>
+        <td>运行当前单元格，停在原地</td>
+        <td>编辑/命令模式都可用</td>
+      </tr>
+      <tr>
+        <td><strong>Alt + Enter</strong></td>
+        <td>运行当前单元格，在下面插入新cell</td>
+        <td>编辑/命令模式都可用</td>
+      </tr>
+      <tr>
+        <td><strong>a / b</strong></td>
+        <td>在上面(a)/下面(b)插入新cell</td>
+        <td>命令模式（按Esc进入，cell边框变蓝）</td>
+      </tr>
+      <tr>
+        <td><strong>d + d</strong></td>
+        <td>删除当前cell（连续按两次d）</td>
+        <td>命令模式</td>
+      </tr>
+      <tr>
+        <td><strong>m</strong></td>
+        <td>把cell变成Markdown（写文字说明）</td>
+        <td>命令模式</td>
+      </tr>
+      <tr>
+        <td><strong>y</strong></td>
+        <td>把cell变成Code（写代码）</td>
+        <td>命令模式</td>
+      </tr>
+    </table>
+    <div class="hbox">
+      <h4>💡 提示</h4>
+      <p>按<strong>h</strong>键可以查看所有快捷键。刚开始记不住没关系，用多了自然就熟了。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">21 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">常见问题1：网络问题/下载超时</h1>
+    <h3 class="sub">90%的安装问题都是网络导致的</h3>
+    <div class="hbox warn">
+      <h4>🐢 症状</h4>
+      <p>conda install/pip install的时候卡在"Solving environment"或者下载速度几KB/s，或者报HTTP error、timeout错误。</p>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <h4 style="color:var(--success)">✅ 解决方案</h4>
+      <div class="body" style="margin-top:0.8rem">
+        <ul>
+          <li><strong>方案1：配置国内镜像源</strong>——前面已经讲过，配置清华conda和pip镜像，这是首选方案</li>
+          <li><strong>方案2：换pip安装</strong>——如果conda还是慢，改用pip安装PyTorch，加国内镜像-i参数</li>
+          <li><strong>方案3：离线安装</strong>——去清华镜像手动下载whl文件，然后pip install 本地文件路径</li>
+          <li><strong>方案4：用手机热点</strong>——有些公司/校园网有限制，换手机4G/5G热点往往就好了</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox danger">
+      <h4>❌ 不要反复重试！</h4>
+      <p>如果下载失败了，不要马上重试，先换源或者检查网络。反复重试会让conda缓存很多损坏的包，反而更麻烦。必要时可以conda clean --all清缓存再试。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">22 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">常见问题2：CUDA不匹配/识别不到GPU</h1>
+    <h3 class="sub">torch.cuda.is_available()返回False？看这里</h3>
+    <div class="hbox danger">
+      <h4>🔍 一步步排查</h4>
+    </div>
+    <div class="card" style="margin-top:0.5rem">
+      <div class="body">
+        <ul>
+          <li><strong>第1步：确认你有NVIDIA显卡</strong>——任务管理器→性能，看有没有NVIDIA GPU。AMD/Intel核显不行，Mac也没有CUDA。</li>
+          <li><strong>第2步：确认驱动装好了</strong>——命令行输入nvidia-smi，能看到驱动版本和显卡信息说明正常。如果提示找不到命令，去NVIDIA官网装最新驱动。</li>
+          <li><strong>第3步：确认装的是GPU版PyTorch</strong>——conda list看pytorch后面有没有cuda字样，或者看你装的是不是cpuonly版本。如果装了CPU版，先卸载（conda remove pytorch）再重装GPU版。</li>
+          <li><strong>第4步：重启试试</strong>——刚装完驱动有时候需要重启电脑。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox amber">
+      <h4>💡 给新手的安心话</h4>
+      <p>就算GPU版暂时装不好也没关系，<strong>先用CPU版学</strong>，前几集的小例子CPU也能跑。环境问题不是核心知识点，不要在这里卡太久，先往前走，等熟悉了再回来折腾GPU。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">23 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">常见问题3：权限错误/命令找不到</h1>
+    <h3 class="sub">conda不是内部或外部命令？Permission denied？</h3>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--danger)">❌ "conda不是内部或外部命令"</h4>
+        <p style="margin-top:0.8rem">Windows用户常见，原因是没把conda加到PATH。<br><br>
+        解决方案：<br>
+        1. 用"Anaconda Prompt"而不是cmd<br>
+        2. 或者重装Anaconda，记得勾选Add to PATH<br>
+        3. 手动把Anaconda3和Anaconda3/Scripts加入系统环境变量PATH</p>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--warning)">⚠️ Permission denied / 权限错误</h4>
+        <p style="margin-top:0.8rem">Mac/Linux用户常见。<br><br>
+        解决方案：<br>
+        1. <strong>不要用sudo pip install！</strong>会装到系统Python去<br>
+        2. 确认你激活了虚拟环境，在自己的dl环境里装<br>
+        3. Mac如果提示权限问题，检查文件夹权限设置<br>
+        4. Windows用管理员身份运行Anaconda Prompt试试</p>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🔄 终极解决方案：重建环境</h4>
+      <p>如果环境搞乱了不知道怎么修，最简单的办法：conda deactivate退出环境，conda remove -n dl --all删掉旧环境，然后从头create一个新环境。反正也不麻烦，10分钟就能搞定，比排查问题还快。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">24 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">推荐开发工具：VS Code</h1>
+    <h3 class="sub">比Jupyter更强大的编辑器，写项目必备</h3>
+    <div class="hbox">
+      <h4>💻 为什么推荐VS Code？</h4>
+      <p>Jupyter适合学习和做小实验，但写大项目、写.py脚本文件，还是要一个专业的编辑器。VS Code是微软出的免费开源编辑器，轻量、插件丰富、支持Python和Jupyter，是现在最流行的开发工具。</p>
+    </div>
+    <div class="three-col" style="margin-top:1rem">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">📦</div>
+        <h4>必装插件</h4>
+        <p>Python（微软官方）、Pylance、Jupyter（VS Code里直接用notebook）</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">🔧</div>
+        <h4>选择解释器</h4>
+        <p>Ctrl+Shift+P→"Python: Select Interpreter"→选你dl环境里的python.exe，就配置好了</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">✨</div>
+        <h4>集成终端</h4>
+        <p>Ctrl+` 打开终端，自动激活环境，不用来回切窗口</p>
+      </div>
+    </div>
+    <div class="hbox orange">
+      <h4>💡 学习阶段用什么？</h4>
+      <p>看视频学基础、做小实验用<strong>Jupyter Notebook</strong>方便；后面写完整项目、写脚本用<strong>VS Code</strong>更高效。两个都装上，换着用。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">25 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">本集知识点总结</h1>
+    <h3 class="sub">环境搭好了，我们正式开始写代码！</h3>
+    <div class="card" style="margin-bottom:1rem">
+      <h4 style="color:var(--accent)">📚 核心知识点回顾</h4>
+      <div class="body" style="margin-top:1rem">
+        <ul>
+          <li><strong>虚拟环境</strong>：每个项目独立环境，避免版本冲突，用conda管理</li>
+          <li><strong>Anaconda</strong>：Python数据科学全家桶，包含conda包/环境管理器</li>
+          <li><strong>核心命令</strong>：conda create -n xxx python=3.x 创建环境，conda activate xxx 进入环境</li>
+          <li><strong>国内镜像</strong>：配置清华conda/pip镜像，解决下载慢问题</li>
+          <li><strong>PyTorch</strong>：去官网选配置，复制命令安装，GPU版选CUDA版本</li>
+          <li><strong>验证安装</strong>：import torch; print(torch.__version__); print(torch.cuda.is_available())</li>
+          <li><strong>Jupyter Notebook</strong>：交互式编程神器，适合学习和实验</li>
+          <li>环境搞乱了就删了重建，不要死磕bug耽误学习</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox amber">
+      <h4>🎯 下集预告</h4>
+      <p>环境准备好了，下一集我们正式进入深度学习模型部分——从最简单的<strong>感知机</strong>开始，这是深度学习的"Hello World"，也是所有神经网络的基本单元！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-chapter">第17集 · 深度学习环境安装</div>
+  <div class="slide-number">26 / 27</div>
+  <div class="slide-content">
+    <h1>🔧 环境搭建完成！</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      恭喜你完成了最"烦人"但也最关键的一步！<br><br>
+      <strong style="color:var(--accent)">工欲善其事必先利其器，现在你的DL开发环境已经ready了</strong><br><br>
+      如果遇到环境问题不要慌，搞坏了就重建环境，这是新手成长的必经之路
+    </p>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag a">✅ 环境配置完成</span>
+      <span class="tag o">🐍 PyTorch ready</span>
+      <span class="tag g">🚀 开始写代码</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-number">27 / 27</div>
+  <div class="slide-content">
+    <h1>🧠 下集预告：感知机</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      深度学习的"Hello World"——感知机模型<br><br>
+      理解生物神经元启发、感知机结构、学习算法<br>
+      用感知机实现逻辑门，发现它的关键局限：XOR问题<br><br>
+      <strong style="color:var(--accent3)">从最简单的模型开始，一步步理解神经网络</strong>
+    </p>
+    <div class="end-buttons">
+      <a href="slides.html" class="end-btn secondary">📊 PPT目录</a>
+      <a href="chapter5.html" class="end-btn secondary">🎬 回到视频页</a>
+      <a href="ppt-18.html" class="end-btn primary">第3集：感知机 →</a>
+    </div>
+    <div class="tags" style="justify-content:center;margin-top:3rem">
+      <span class="tag a">🔥 深度学习</span>
+      <span class="tag o">💪 继续前进</span>
+      <span class="tag g">🧠 从感知机开始</span>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+});
+</script>
+</body></html>

@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>DL第11集 参数初始化 - ML学习站PPT</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#f43f5e;--accent2:#e11d48;--accent3:#fb7185;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--accent3);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent3);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(251,113,133,0.15) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(225,29,72,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(251,113,133,0.1);border:1px solid rgba(251,113,133,0.25);border-radius:50px;font-size:1rem;color:var(--accent3);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:700px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(251,113,133,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:1.8rem 2rem;margin:1.5rem 0;text-align:center;font-size:clamp(1rem,1.8vw,1.25rem);line-height:2.2;overflow-x:auto}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:1rem;display:block;text-align:left;line-height:1.7}
+.katex{color:var(--accent3)}.katex .mord.text{color:var(--ink2)}
+.hbox{background:rgba(244,63,94,0.08);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1rem 0}
+.hbox h4{color:var(--accent);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(251,191,36,0.08);border-left-color:var(--warning)}.hbox.warn h4{color:var(--warning)}
+.hbox.danger{background:rgba(248,113,113,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.purple{background:rgba(225,29,72,0.08);border-left-color:var(--accent2)}.hbox.purple h4{color:var(--accent2)}
+.hbox.pink{background:rgba(251,113,133,0.08);border-left-color:var(--accent3)}.hbox.pink h4{color:var(--accent3)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.95rem}
+table.cmp th{background:var(--bg3);color:var(--accent3);padding:12px 14px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.9rem}
+table.cmp td{padding:10px 14px;border-bottom:1px solid var(--rule);color:var(--ink2);line-height:1.6}
+table.cmp tr:hover td{background:rgba(251,113,133,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent3);background:rgba(251,113,133,0.1);color:var(--accent3);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent)}
+.tag.p{color:var(--accent2)}.tag.pi{color:var(--accent3)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}.tag.d{color:var(--danger)}
+.code{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:1.5rem 2rem;margin:1.5rem 0;font-family:var(--mono);font-size:0.9rem;line-height:1.8;color:var(--ink2);overflow-x:auto}
+.code .kw{color:var(--accent3)}.code .fn{color:var(--accent)}.code .str{color:var(--success)}.code .cmt{color:var(--muted)}.code .num{color:var(--warning)}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent3),var(--accent2),var(--accent),var(--success));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent3);color:var(--accent3)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent3)}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.end-slide .end-buttons{display:flex;gap:1.5rem;justify-content:center;margin-top:2.5rem;flex-wrap:wrap}
+.end-slide .end-btn{padding:14px 32px;border-radius:12px;font-size:1.05rem;font-weight:600;text-decoration:none;transition:all .3s}
+.end-slide .end-btn.primary{background:linear-gradient(135deg,var(--accent3),var(--accent2));color:white}
+.end-slide .end-btn.secondary{background:var(--bg2);border:1px solid var(--rule);color:var(--ink2)}
+.end-slide .end-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(244,63,94,0.2)}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:1.5rem;align-items:center;margin:1.5rem 0}
+.vs-side{border-radius:16px;padding:1.5rem}
+.vs-divider{font-size:1.5rem;color:var(--muted);font-weight:700}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col{grid-template-columns:1fr}.hint{display:none}.vs{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="chapter6.html" style="font-weight:600;color:var(--accent3)">🧠 深度学习入门</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="chapter6.html">回到视频页</a>
+    <a href="ppt-26.html">← 上一集</a>
+    <a href="ppt-28.html">下一集 →</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">🧠 深度学习入门 · 第11集</div>
+    <h1 class="cover-title">参数初始化：调参高手的秘诀</h1>
+    <p class="cover-sub">为什么初始化这么重要？全零为什么不行？Xavier和He初始化到底在做什么？<br>BV17i7Q6HEFt · 时长 17分14秒</p>
+    <div class="tags">
+      <span class="tag pi">参数初始化</span>
+      <span class="tag p">Xavier/He</span>
+      <span class="tag">梯度消失</span>
+      <span class="tag d">梯度爆炸</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">2 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">本集内容导览</h1>
+    <h3 class="sub">初始化是训练的第一步——错了就从第一步输了</h3>
+    <div class="body">
+      <ul>
+        <li><strong style="color:var(--accent3)">为什么初始化重要</strong>——糟糕初始化→梯度消失/爆炸→训练不动</li>
+        <li><strong style="color:var(--danger)">全零初始化的灾难</strong>——对称性问题，所有神经元永远学一样的东西</li>
+        <li><strong style="color:var(--warning)">随机初始化也有讲究</strong>——方差太大太小都不行</li>
+        <li><strong style="color:var(--accent2)">Xavier/Glorot初始化</strong>——针对Sigmoid/Tanh设计</li>
+        <li><strong style="color:var(--accent)">He/Kaiming初始化</strong>——针对ReLU设计，现在最常用</li>
+        <li><strong style="color:var(--success)">其他话题</strong>——偏置初始化、BatchNorm、预训练初始化、实践指南</li>
+      </ul>
+    </div>
+    <div class="hbox pink">
+      <h4>🔑 本集核心</h4>
+      <p>很多人训练loss不下降第一反应是"学习率不对"，但其实有可能是初始化就错了。理解初始化原理，能帮你快速排查训练问题。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">3 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">为什么参数初始化这么重要？</h1>
+    <h3 class="sub">训练从初始参数开始——起点错了，后面怎么努力都没用</h3>
+    <div class="flow">
+      <div class="flow-node hl">🏁 初始化W,b</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">前向传播计算loss</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">反向传播算梯度</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">梯度下降更新W,b</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">🔁 循环...直到收敛</div>
+    </div>
+    <div class="three-col" style="margin-top:1.5rem">
+      <div class="card" style="border-color:var(--danger)">
+        <div class="card-icon" style="color:var(--danger)">💥</div>
+        <h4>梯度爆炸</h4>
+        <p>初始化太大→激活值饱和前z值太大→反向传播梯度越乘越大→更新太大→loss=NaN，训练直接崩溃。</p>
+      </div>
+      <div class="card" style="border-color:var(--warning)">
+        <div class="card-icon" style="color:var(--warning)">🫥</div>
+        <h4>梯度消失</h4>
+        <p>初始化太小→激活值接近0→Sigmoid/Tanh/ReLU梯度都接近0→参数几乎不更新→loss永远不下降。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--success)">🐢</div>
+        <h4>训练极慢</h4>
+        <p>初始化不好即使不消失不爆炸，也会让梯度方向不对、收敛很慢，别人10epoch训好你100epoch还不行。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">4 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">直观理解：在Loss Landscape上选起点</h2>
+    <h3 class="sub">梯度下降是从初始点开始"滚下山"——起点决定你能到哪个山谷</h3>
+    <div class="hbox">
+      <h4>🏔️ 损失函数地形</h4>
+      <p>高维空间中损失函数像起伏的山地，有很多山谷（局部最优）和一个最低山谷（全局最优）。梯度下降就是从起点往低处滚。</p>
+    </div>
+    <div class="vs">
+      <div class="vs-side" style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2)">
+        <h3 style="color:var(--success);margin-bottom:1rem">✅ 好的初始化</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul>
+            <li>在一个"斜坡"上，梯度方向合理</li>
+            <li>既不在"悬崖"上（梯度过大爆炸）</li>
+            <li>也不在"平原"上（梯度消失走不动）</li>
+            <li>能够顺利收敛到一个好的山谷</li>
+          </ul>
+        </div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side" style="background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2)">
+        <h3 style="color:var(--danger);margin-bottom:1rem">❌ 糟糕初始化</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul>
+            <li style="color:var(--danger)">在悬崖边→梯度爆炸直接飞出去</li>
+            <li style="color:var(--warning)">在平原上→梯度消失原地不动</li>
+            <li style="color:var(--danger)">在一个很差的局部最优坑里</li>
+            <li style="color:var(--danger)">所有神经元对称，永远学不到东西</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="hbox pink">
+      <h4>💡 注意</h4>
+      <p>现代优化器（Adam等）和Normalization层降低了对初始化的敏感度，但初始化仍然重要——好初始化让你更快收敛、效果更好。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">5 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">全零初始化：新手最容易犯的错</h2>
+    <h3 class="sub">"既然不知道权重初始多少，那就都设0吧？"——大错特错！</h3>
+    <div class="hbox danger">
+      <h4>🚨 为什么全零不行？——对称性问题(Symmetry Breaking)</h4>
+      <p>
+        如果所有W初始化为0：<br>
+        <strong>1. 前向传播：</strong>不管输入是什么，所有神经元的计算结果都完全一样→所有神经元输出相同<br>
+        <strong>2. 反向传播：</strong>所有神经元的梯度也完全相同→所有神经元参数更新量完全一样<br>
+        <strong>3. 更新后：</strong>所有神经元参数仍然完全一样→永远保持对称！<br><br>
+        <strong>结果：</strong>不管网络有多少层、多少神经元，本质上和只有1个神经元没区别，永远学不到不同特征！
+      </p>
+    </div>
+    <div class="code">
+<span class="cmt"># ❌ 绝对不要这么做！</span><br>
+nn.Linear.weight.data.<span class="fn">fill_</span>(<span class="num">0</span>)<br><br>
+<span class="cmt"># 为什么？让我们看一个简单网络：</span><br>
+<span class="cmt"># h1 = ReLU(W1·x + b1)  W1全0→h1全相同</span><br>
+<span class="cmt"># h2 = ReLU(W2·h1 + b2)  h1全相同→h2全相同</span><br>
+<span class="cmt"># 反向传播：∂L/∂W1所有行都一样→更新后W1还是对称</span><br>
+<span class="cmt"># 死循环！永远学不到东西！</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">6 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">随机初始化：打破对称性</h2>
+    <h3 class="sub">全零不行，那随机初始化总可以吧？——没那么简单！</h3>
+    <div class="hbox success">
+      <h4>✅ 随机初始化的作用</h4>
+      <p>从某个分布随机采样权重（如高斯分布/均匀分布），每个神经元初始参数不同，打破对称性，这样不同神经元才能学到不同特征。</p>
+    </div>
+    <div class="hbox danger">
+      <h4>⚠️ 但随机的方差很重要！</h4>
+      <p>不是随便随机就可以——<strong>随机的方差（标准差）大小直接影响训练成败</strong>：</p>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="card" style="border-color:var(--danger)">
+        <div class="card-icon" style="color:var(--danger)">📈</div>
+        <h4>方差太大（W太大）</h4>
+        <p>
+          • z = Wx + b 值很大<br>
+          • Sigmoid/Tanh进入饱和区→梯度≈0<br>
+          • ReLU可能一直激活或永远死<br>
+          • 多层累积后激活值爆炸→梯度爆炸<br>
+          • 症状：loss=NaN
+        </p>
+      </div>
+      <div class="card" style="border-color:var(--warning)">
+        <div class="card-icon" style="color:var(--warning)">📉</div>
+        <h4>方差太小（W太小）</h4>
+        <p>
+          • z = Wx + b 值很小，接近0<br>
+          • Sigmoid在z≈0附近梯度最大？但...<br>
+          • 多层后激活值越来越小→梯度也越来越小<br>
+          • 深层网络梯度消失→参数几乎不更新<br>
+          • 症状：loss完全不下降
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">7 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">方差问题演示：前向传播信号放大/缩小</h2>
+    <h3 class="sub">每一层都让信号方差保持一致——这就是Xavier/He初始化的核心思想</h3>
+    <div class="formula">
+      $$\displaystyle Var(z) = Var(W \cdot x) \approx n_in \cdot Var(W) \cdot Var(x)$$
+      <span class="desc">
+        假设输入x均值0方差1，W独立同分布均值0，那么z的方差约为 n_in × Var(W)。<br><br>
+        • 如果 Var(W) 太大 → 每层Var(z)×n_in×Var(W) > 1 → 信号越来越大（爆炸）<br>
+        • 如果 Var(W) 太小 → 每层Var(z)×n_in×Var(W) < 1 → 信号越来越小（消失）<br>
+        • <strong style="color:var(--accent3)">理想：Var(z) = Var(x)，信号既不放大也不缩小</strong>
+      </span>
+    </div>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node">x<br><small>Var=1</small></div>
+      <div class="flow-arrow">→ W₁ →</div>
+      <div class="flow-node" style="border-color:var(--accent3)">z₁<br><small>Var≈?</small></div>
+      <div class="flow-arrow">→ σ → W₂ →</div>
+      <div class="flow-node" style="border-color:var(--accent3)">z₂<br><small>Var≈?</small></div>
+      <div class="flow-arrow">→ σ → ... →</div>
+      <div class="flow-node" style="border-color:var(--success)">z_L<br><small>Var≈1（理想）</small></div>
+    </div>
+    <div class="hbox purple">
+      <h4>🎯 核心洞察</h4>
+      <p>我们希望每层输入输出方差保持一致，这样信号在深层网络中既不爆炸也不消失。Xavier和He初始化就是按这个思想推导出来的。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">8 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">Xavier/Glorot初始化（2010）</h2>
+    <h3 class="sub">Xavier Glorot和Yoshua Bengio在2010年提出，让前向反向传播方差都一致</h3>
+    <div class="hbox">
+      <h4>📜 历史背景</h4>
+      <p>2010年大家发现深层网络训练不动，很大原因是初始化不对。Xavier初始化是第一个被广泛使用的科学初始化方法，针对Sigmoid和Tanh激活函数设计。</p>
+    </div>
+    <div class="formula">
+      $$\displaystyle Xavier均匀初始化：W ~ U(-a, a)，其中 a = \sqrt{(6 / (n_in + n_out)) \ Xavier正态初始化：W ~ N(0, \sqrt{(2 / (n_in + n_out)))$$
+      <span class="desc">
+        n_in：该层输入神经元个数<br>
+        n_out：该层输出神经元个数<br>
+        推导时同时考虑前向传播和反向传播的方差一致，取了n_in和n_out的调和平均。
+      </span>
+    </div>
+    <div class="code">
+<span class="cmt"># PyTorch中Xavier初始化</span><br>
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn<br>
+<span class="kw">import</span> torch.nn.init <span class="kw">as</span> init<br><br>
+linear = nn.<span class="fn">Linear</span>(<span class="num">784</span>, <span class="num">256</span>)<br><br>
+<span class="cmt"># Xavier均匀初始化</span><br>
+init.<span class="fn">xavier_uniform_</span>(linear.weight)<br><br>
+<span class="cmt"># Xavier正态初始化</span><br>
+init.<span class="fn">xavier_normal_</span>(linear.weight)
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">9 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">Xavier初始化：适用场景与局限</h2>
+    <h3 class="sub">Xavier很好，但只在Sigmoid/Tanh上效果好，对ReLU不适用</h3>
+    <div class="hbox success">
+      <h4>✅ 适用场景</h4>
+      <p>
+        • 激活函数是 <strong>Sigmoid</strong> 或 <strong>Tanh</strong><br>
+        • 激活函数关于0对称、在0附近梯度近似为1<br>
+        • 2010-2015年左右的网络常用（AlexNet早期层还在用）
+      </p>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 为什么对ReLU不适用？</h4>
+      <p>
+        ReLU负半轴直接置0！这意味着大约一半的神经元输出为0，方差被砍半。<br>
+        Xavier推导时假设激活函数近似恒等映射（Tanh在0附近确实如此），但ReLU负半轴是0，方差不满足Xavier假设→用Xavier初始化ReLU网络，每层方差还是会衰减→深层还是梯度消失。
+      </p>
+    </div>
+    <div class="three-col">
+      <div class="card">
+        <h4 style="color:var(--accent)">Tanh/Sigmoid</h4>
+        <p style="color:var(--success)">✅ Xavier合适</p>
+      </div>
+      <div class="card" style="border-color:var(--danger)">
+        <h4 style="color:var(--danger)">ReLU</h4>
+        <p style="color:var(--danger)">❌ Xavier不合适</p>
+      </div>
+      <div class="card" style="border-color:var(--danger)">
+        <h4 style="color:var(--danger)">LeakyReLU/GELU</h4>
+        <p style="color:var(--danger)">❌ Xavier也不合适</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">10 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">He/Kaiming初始化（2015）</h2>
+    <h3 class="sub">何恺明等人在2015年提出，专门针对ReLU设计——现在最常用！</h3>
+    <div class="hbox pink">
+      <h4>🏆 为什么He初始化这么重要？</h4>
+      <p>2015年ResNet论文里用了He初始化，直接让152层超深网络能训起来！He初始化现在是使用ReLU/LeakyReLU网络的标配，PyTorch中nn.Linear等层默认就是He初始化的变体。</p>
+    </div>
+    <div class="formula">
+      $$\displaystyle He正态初始化：W ~ N(0, \sqrt{(2 / n_in)) \ He均匀初始化：W ~ U(-b, b)，其中 b = \sqrt{(6 / n_in)$$
+      <span class="desc">
+        n_in：该层输入神经元个数<br>
+        关键区别：Xavier是1/(n_in+n_out)，He是2/n_in！<br>
+        那个×2就是补偿ReLU负半轴置0导致的方差减半！
+      </span>
+    </div>
+    <div class="code">
+<span class="cmt"># PyTorch中He初始化（也叫Kaiming初始化）</span><br>
+linear = nn.<span class="fn">Linear</span>(<span class="num">784</span>, <span class="num">256</span>)<br><br>
+<span class="cmt"># He正态初始化（最常用）</span><br>
+init.<span class="fn">kaiming_normal_</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;linear.weight,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;mode=<span class="str">'fan_in'</span>,      <span class="cmt"># 默认就是fan_in，用n_in</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;nonlinearity=<span class="str">'relu'</span>  <span class="cmt"># 针对relu（默认）</span><br>
+)<br><br>
+<span class="cmt"># He均匀初始化</span><br>
+init.<span class="fn">kaiming_uniform_</span>(linear.weight)
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">11 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">He初始化：为什么是2/n_in？</h2>
+    <h3 class="sub">那个×2的因子是怎么来的？——补偿ReLU的方差减半</h3>
+    <div class="formula">
+      $$\displaystyle ReLU后：y = max(0, z) → Var(y) \approx ½ Var(z)$$
+      <span class="desc">
+        假设z对称分布在0周围（W零均值、x零均值时确实如此），ReLU后大约一半值变成0，另一半保留，方差大约减半。<br><br>
+        为了让Var(y) = Var(x)（信号方差不变）：<br>
+        Var(z) = n_in · Var(W) · Var(x)<br>
+        Var(y) = ½ Var(z) = ½ · n_in · Var(W) · Var(x) = Var(x)<br>
+        → Var(W) = 2/n_in<br>
+        所以W ~ N(0, √(2/n_in)) 就是He初始化！
+      </span>
+    </div>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node">x<br><small>Var=1</small></div>
+      <div class="flow-arrow">→ W(He) →</div>
+      <div class="flow-node hl" style="border-color:var(--accent)">z<br><small>Var=2</small></div>
+      <div class="flow-arrow">→ ReLU →</div>
+      <div class="flow-node" style="border-color:var(--success)">y<br><small>Var≈1（完美！）</small></div>
+      <div class="flow-arrow">→ 下一层 →</div>
+    </div>
+    <div class="hbox success">
+      <h4>✅ 完美补偿</h4>
+      <p>He初始化把W方差设为2/n_in，让z的方差是2，经过ReLU后方差砍半正好是1，完美保持方差不变！这样深层网络信号既不爆炸也不消失。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">12 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">Xavier vs He：一张表对比</h2>
+    <h3 class="sub">什么时候用哪个？看完就不会选错</h3>
+    <table class="cmp">
+      <tr>
+        <th>特性</th>
+        <th>Xavier/Glorot</th>
+        <th>He/Kaiming</th>
+      </tr>
+      <tr>
+        <td>提出年份</td>
+        <td>2010</td>
+        <td>2015</td>
+      </tr>
+      <tr>
+        <td>方差公式（正态）</td>
+        <td>√(2/(n_in+n_out))</td>
+        <td style="color:var(--accent)">√(2/n_in)</td>
+      </tr>
+      <tr>
+        <td>针对激活函数</td>
+        <td>Sigmoid、Tanh</td>
+        <td style="color:var(--success)">ReLU、LeakyReLU、PReLU、GELU</td>
+      </tr>
+      <tr>
+        <td>补偿ReLU</td>
+        <td style="color:var(--danger)">❌ 没有</td>
+        <td style="color:var(--success)">✅ ×2补偿方差减半</td>
+      </tr>
+      <tr>
+        <td>适用网络深度</td>
+        <td>较浅网络（<20层）</td>
+        <td style="color:var(--success)">深层网络（ResNet等100+层）</td>
+      </tr>
+      <tr>
+        <td>现在使用频率</td>
+        <td>较少（Tanh/Sigmoid很少用了）</td>
+        <td style="color:var(--accent3)">⭐ 最常用，ReLU网络标配</td>
+      </tr>
+      <tr>
+        <td>PyTorch函数</td>
+        <td>xavier_uniform_, xavier_normal_</td>
+        <td>kaiming_uniform_, kaiming_normal_</td>
+      </tr>
+    </table>
+    <div class="hbox pink">
+      <h4>🎯 简单记忆</h4>
+      <p><strong>用ReLU→He初始化</strong>，<strong>用Tanh/Sigmoid→Xavier</strong>。现在95%的情况你用ReLU，所以默认用He初始化就对了！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">13 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">偏置b怎么初始化？</h2>
+    <h3 class="sub">偏置简单多了——通常初始化为0就可以！</h3>
+    <div class="hbox success">
+      <h4>✅ 偏置b通常初始化为0</h4>
+      <p>
+        偏置不像权重W那样有对称性问题——因为W已经随机初始化打破对称了，b初始化为0不会导致对称问题。<br><br>
+        <strong>特殊情况：</strong><br>
+        • 有些LSTM/GRU偏置会设为1（让遗忘门一开始偏向记住）<br>
+        • ReLU网络有人建议b初始化为一个小正数（如0.01），避免初期太多神经元死亡，但不是必须
+      </p>
+    </div>
+    <div class="code">
+<span class="cmt"># ✅ 偏置初始化为0是标准做法</span><br>
+init.<span class="fn">zeros_</span>(linear.bias)<br><br>
+<span class="cmt"># PyTorch中nn.Linear默认就是：</span><br>
+<span class="cmt"># weight用Kaiming均匀初始化</span><br>
+<span class="cmt"># bias初始化为0（如果bias=True）</span><br><br>
+<span class="cmt"># 特殊情况：ReLU防止死亡ReLU可选</span><br>
+init.<span class="fn">constant_</span>(linear.bias, <span class="num">0.01</span>)  <span class="cmt"># 非必须</span>
+    </div>
+    <div class="hbox warn">
+      <h4>💡 注意</h4>
+      <p>偏置初始化不是重点，对结果影响很小，不用花太多精力纠结b怎么初始化——设0就好。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">14 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">BatchNorm：降低对初始化的敏感度</h2>
+    <h3 class="sub">有了BN层，初始化就没那么敏感了——但还是要合理初始化</h3>
+    <div class="hbox">
+      <h4>📊 Batch Normalization做了什么？</h4>
+      <p>BN层对每个mini-batch的输入做标准化：均值0方差1，再加上可学习的γ和β参数。这相当于每一层都把分布拉回"舒适区"，不会因为前面层的问题导致后面激活值爆炸/消失。</p>
+    </div>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node">输入z</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="border-color:var(--accent3)">BN标准化<br><small>→ 均值0方差1</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">γ·z_norm + β<br><small>（可学习缩放偏移）</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="border-color:var(--success)">激活函数</div>
+    </div>
+    <div class="two-col">
+      <div class="card accent">
+        <h4 style="color:var(--success)">✅ BN带来的好处</h4>
+        <p>
+          • 大幅降低对初始化的要求，初始化稍差也能训<br>
+          • 允许用更大学习率，训练更快<br>
+          • 自带一定正则化效果<br>
+          • ResNet等现代网络标配
+        </p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--warning)">⚠️ 但不能完全乱来</h4>
+        <p>
+          • BN不能救完全错误的初始化（比如全零、太大NaN）<br>
+          • 初始化好还是更快收敛<br>
+          • 有些网络没有BN（如Transformer底层、小网络）
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">15 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">预训练初始化：迁移学习</h2>
+    <h3 class="sub">最好的初始化：用别人在大数据集上训好的权重！</h3>
+    <div class="hbox pink">
+      <h4>🏆 迁移学习是现在的主流</h4>
+      <p>
+        与其随机初始化从头训，不如用在ImageNet等大数据集上预训练好的模型权重作为起点，再在你的小数据集上微调。这比随机初始化效果好太多，训练也快很多。
+      </p>
+    </div>
+    <div class="vs">
+      <div class="vs-side" style="background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2)">
+        <h3 style="color:var(--danger);margin-bottom:1rem">🎲 随机初始化</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul>
+            <li>从零开始学习所有特征</li>
+            <li>需要大量数据+大量算力</li>
+            <li>训练时间长，可能不收敛</li>
+            <li>小数据集容易过拟合</li>
+          </ul>
+        </div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side" style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2)">
+        <h3 style="color:var(--success);margin-bottom:1rem">🌟 预训练初始化</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul>
+            <li>已经学到通用特征（边缘、纹理、形状）</li>
+            <li>小数据集也能有好效果</li>
+            <li>训练快，收敛好，不容易过拟合</li>
+            <li style="color:var(--success)">⭐ 现在做项目首选！</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="hbox purple">
+      <h4>💡 注意</h4>
+      <p>微调时用预训练权重初始化，但注意学习率要小！参考上一集讲的差分学习率。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">16 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">初始化方法选择指南</h2>
+    <h3 class="sub">面对不同情况该用什么初始化？一张图说清楚</h3>
+    <div class="flow" style="flex-direction:column;gap:0.75rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node" style="text-align:left;padding-left:1.5rem">
+        <strong>开始做项目/训练网络</strong>
+      </div>
+      <div class="flow-arrow" style="text-align:center">↓</div>
+      <div class="flow-node" style="text-align:left;padding-left:1.5rem;border-left:4px solid var(--success)">
+        <strong style="color:var(--success)">有现成预训练模型？</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">→ 优先用预训练权重初始化！这是效果最好的选择</span>
+      </div>
+      <div class="flow-arrow" style="text-align:center">↓ 没有预训练，需要从头训</div>
+      <div class="flow-node" style="text-align:left;padding-left:1.5rem;border-left:4px solid var(--accent3)">
+        <strong style="color:var(--accent3)">激活函数是ReLU/LeakyReLU/GELU？</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">→ 用 <strong>He/Kaiming初始化</strong>（kaiming_normal_），95%的情况选这个</span>
+      </div>
+      <div class="flow-arrow" style="text-align:center">↓</div>
+      <div class="flow-node" style="text-align:left;padding-left:1.5rem;border-left:4px solid var(--accent)">
+        <strong style="color:var(--accent)">激活函数是Tanh/Sigmoid？</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">→ 用 <strong>Xavier/Glorot初始化</strong></span>
+      </div>
+      <div class="flow-arrow" style="text-align:center">↓</div>
+      <div class="flow-node hl" style="text-align:left;padding-left:1.5rem;border-left:4px solid var(--accent2)">
+        <strong style="color:var(--accent2)">偏置b？</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">→ 初始化为0就行，不用纠结</span>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🎯 一句话总结</h4>
+      <p>有预训练用预训练，没有预训练用ReLU网络→He初始化，b设0，用BN层更稳。就这么简单！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">17 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">错误初始化的典型症状</h2>
+    <h3 class="sub">训练出问题？看看是不是初始化的锅</h3>
+    <table class="cmp">
+      <tr>
+        <th>症状</th>
+        <th>可能的初始化问题</th>
+        <th>解决方案</th>
+      </tr>
+      <tr>
+        <td style="color:var(--danger)">第一个iteration loss就=NaN</td>
+        <td>W初始化太大，梯度爆炸</td>
+        <td>减小W方差；用He/Xavier；加梯度裁剪；降低lr</td>
+      </tr>
+      <tr>
+        <td style="color:var(--danger)">loss完全不下降，一直不变</td>
+        <td>W初始化太小→梯度消失；或全零初始化</td>
+        <td>检查是不是全零了！增大W方差；用He初始化</td>
+      </tr>
+      <tr>
+        <td style="color:var(--warning)">训练刚开始loss下降，很快就不动了</td>
+        <td>初始化有点小，初期有梯度后期消失</td>
+        <td>换He初始化；检查是否用对了激活函数对应的初始化</td>
+      </tr>
+      <tr>
+        <td style="color:var(--warning)">ReLU网络很多神经元永远输出0</td>
+        <td>"死亡ReLU"，初始化可能让z都偏负</td>
+        <td>He初始化；b可设为0.01；换LeakyReLU</td>
+      </tr>
+      <tr>
+        <td style="color:var(--accent)">loss剧烈震荡，极不稳定</td>
+        <td>W可能有点大；也可能是lr问题</td>
+        <td>检查初始化方差；降低lr；加BN；加梯度裁剪</td>
+      </tr>
+      <tr>
+        <td style="color:var(--accent2)">深层网络（>20层）训不动</td>
+        <td>没用对初始化，信号消失/爆炸了</td>
+        <td>用He初始化+BN层，这是深层网络标配！</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">18 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">PyTorch中的初始化函数</h2>
+    <h3 class="sub">torch.nn.init 提供了各种初始化方法</h3>
+    <div class="code">
+<span class="kw">import</span> torch.nn.init <span class="kw">as</span> init<br><br>
+<span class="cmt"># ========== 常用初始化 ==========</span><br>
+<span class="cmt"># 1. 均匀分布 U(a,b)</span><br>
+init.<span class="fn">uniform_</span>(tensor, a=<span class="num">0.0</span>, b=<span class="num">1.0</span>)<br><br>
+<span class="cmt"># 2. 正态分布 N(mean, std)</span><br>
+init.<span class="fn">normal_</span>(tensor, mean=<span class="num">0.0</span>, std=<span class="num">1.0</span>)<br><br>
+<span class="cmt"># 3. 常数初始化</span><br>
+init.<span class="fn">constant_</span>(tensor, val=<span class="num">0</span>)<br>
+init.<span class="fn">zeros_</span>(tensor)<br>
+init.<span class="fn">ones_</span>(tensor)<br><br>
+<span class="cmt"># ========== Xavier/Glorot ==========</span><br>
+init.<span class="fn">xavier_uniform_</span>(tensor)   <span class="cmt"># U(-√(6/(n_in+n_out)), ...)</span><br>
+init.<span class="fn">xavier_normal_</span>(tensor)    <span class="cmt"># N(0, √(2/(n_in+n_out)))</span><br><br>
+<span class="cmt"># ========== He/Kaiming（推荐！） ==========</span><br>
+init.<span class="fn">kaiming_uniform_</span>(tensor, mode=<span class="str">'fan_in'</span>, nonlinearity=<span class="str">'relu'</span>)<br>
+init.<span class="fn">kaiming_normal_</span>(tensor, mode=<span class="str">'fan_in'</span>, nonlinearity=<span class="str">'relu'</span>)<br><br>
+<span class="cmt"># ========== 其他 ==========</span><br>
+init.<span class="fn">orthogonal_</span>(tensor)  <span class="cmt"># 正交初始化，RNN/Transformer有时用</span><br>
+init.<span class="fn">sparse_</span>(tensor)      <span class="cmt"># 稀疏初始化</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">19 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">PyTorch层自带的默认初始化</h2>
+    <h3 class="sub">其实你不手动初始化，PyTorch也会做合理的默认初始化</h3>
+    <div class="hbox purple">
+      <h4>ℹ️ PyTorch nn.Linear 默认初始化</h4>
+      <p>
+        <strong>weight：</strong>Kaiming均匀初始化（He初始化的均匀版本）<br>
+        <strong>bias：</strong>初始化为0（如果bias=True）<br><br>
+        哎？那是不是不用手动初始化了？
+      </p>
+    </div>
+    <div class="hbox success">
+      <h4>✅ 大多数情况默认就够了</h4>
+      <p>
+        PyTorch的默认初始化已经挺合理了（针对ReLU设计的He均匀），普通MLP、简单CNN不手动初始化也能训。
+      </p>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 但有些情况需要手动初始化</h4>
+      <p>
+        • 你用的是Tanh/Sigmoid，Xavier可能更合适<br>
+        • 自定义层没有默认初始化<br>
+        • 想要可复现（设置随机种子+显式初始化更可控）<br>
+        • 深层网络想确保初始化正确（显式写出来更保险）<br>
+        • 读论文复现，论文指定了初始化方法
+      </p>
+    </div>
+    <div class="code">
+<span class="cmt"># 给整个模型做初始化的写法</span><br>
+<span class="kw">def</span> <span class="fn">init_weights</span>(m):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> <span class="fn">isinstance</span>(m, nn.Linear):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;init.<span class="fn">kaiming_normal_</span>(m.weight, nonlinearity=<span class="str">'relu'</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> m.bias <span class="kw">is not</span> <span class="kw">None</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;init.<span class="fn">zeros_</span>(m.bias)<br><br>
+model.<span class="fn">apply</span>(init_weights)  <span class="cmt"># 递归应用到所有层</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">20 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">随机种子：让结果可复现</h2>
+    <h3 class="sub">初始化是随机的，设置随机种子能让每次运行结果一样</h3>
+    <div class="hbox">
+      <h4>🎲 为什么需要设置种子？</h4>
+      <p>权重初始化是随机的，如果不设种子，每次运行初始权重都不一样——有时训得好有时训不好，很难调试和复现。设了种子，随机性固定，别人能复现你的结果。</p>
+    </div>
+    <div class="code">
+<span class="kw">import</span> torch<br>
+<span class="kw">import</span> numpy <span class="kw">as</span> np<br>
+<span class="kw">import</span> random<br><br>
+<span class="kw">def</span> <span class="fn">set_seed</span>(seed=<span class="num">42</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;random.<span class="fn">seed</span>(seed)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;np.random.<span class="fn">seed</span>(seed)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;torch.<span class="fn">manual_seed</span>(seed)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;torch.cuda.<span class="fn">manual_seed</span>(seed)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;torch.cuda.<span class="fn">manual_seed_all</span>(seed)  <span class="cmt"># 多GPU</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;torch.backends.cudnn.deterministic = <span class="kw">True</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;torch.backends.cudnn.benchmark = <span class="kw">False</span><br><br>
+<span class="fn">set_seed</span>(<span class="num">42</span>)  <span class="cmt"># 在程序最开始调用！</span>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 注意</h4>
+      <p>完全可复现性可能会让训练稍慢（cudnn.benchmark=False），但调试和发论文时非常重要。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">21 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">实践建议：初始化Checklist</h2>
+    <h3 class="sub">开始训练前，检查一下这些点</h3>
+    <div class="three-col">
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--success)">✅</div>
+        <h4>必做检查</h4>
+        <p>
+          □ 不是全零初始化<br>
+          □ 设置了随机种子可复现<br>
+          □ 用对了初始化方法（ReLU→He）<br>
+          □ 偏置初始化为0<br>
+          □ 有BN层（深层网络）
+        </p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">🌟</div>
+        <h4>推荐做</h4>
+        <p>
+          □ 有预训练优先用预训练<br>
+          □ 显式写出初始化代码<br>
+          □ 初始化后打印一下W的均值方差<br>
+          □ 前几个iteration观察loss是否合理
+        </p>
+      </div>
+      <div class="card" style="border-color:var(--danger)">
+        <div class="card-icon" style="color:var(--danger)">🚫</div>
+        <h4>不要做</h4>
+        <p>
+          ▢ 不要全零初始化W<br>
+          ▢ 不要W方差太大（如std=1）<br>
+          ▢ 不要W方差太小（如std=0.001）<br>
+          ▢ 不要初始化完就不管了，观察loss
+        </p>
+      </div>
+    </div>
+    <div class="code">
+<span class="cmt"># 初始化后可以打印检查一下</span><br>
+<span class="fn">print</span>(linear.weight.mean(), linear.weight.std())<br>
+<span class="cmt"># He初始化后std应该大约是√(2/n_in)，比如n_in=784时≈0.05</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">22 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">常见初始化误区</h2>
+    <h3 class="sub">这些坑你踩过吗？</h3>
+    <div class="hbox danger">
+      <h4>❌ 误区1："越大的W越好，梯度大学得快"</h4>
+      <p>错！W太大→z值太大→Sigmoid/Tanh饱和梯度≈0→反而学不动！ReLU也会爆炸。</p>
+    </div>
+    <div class="hbox danger">
+      <h4>❌ 误区2："越小的W越安全，不会爆炸"</h4>
+      <p>错！W太小→多层后信号越来越小→梯度消失→也学不动！</p>
+    </div>
+    <div class="hbox warn">
+      <h4>❌ 误区3："ReLU网络用Xavier也差不多吧？"</h4>
+      <p>不推荐！Xavier没考虑ReLU负半轴置0，深层网络用Xavier还是会梯度消失，用He！</p>
+    </div>
+    <div class="hbox warn">
+      <h4>❌ 误区4："有BN层就不用管初始化了，随便怎么设都行"</h4>
+      <p>错！BN能降低敏感度但救不了全零、NaN这种极端情况，合理初始化还是更快收敛。</p>
+    </div>
+    <div class="hbox">
+      <h4>❌ 误区5："预训练模型随便替换最后一层就行"</h4>
+      <p>注意！替换的最后一层也要合理初始化，别用太大值把前面预训练好的层带坏了，微调时学习率也要小。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">23 / 27</div>
+  <div class="slide-content">
+    <h2 class="st">初始化调试技巧</h2>
+    <h3 class="sub">训练前先做个"体检"——初始化好没好，跑前几步看看</h3>
+    <div class="flow" style="flex-direction:column;gap:0.75rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node" style="text-align:left;padding-left:1.5rem;border-left:4px solid var(--warning)">
+        <strong style="color:var(--warning)">Step 1：初始化后检查参数统计</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">打印各层W的mean和std，看是否符合预期（He初始化std≈√(2/n_in)）</span>
+      </div>
+      <div class="flow-node" style="text-align:left;padding-left:1.5rem;border-left:4px solid var(--accent)">
+        <strong style="color:var(--accent)">Step 2：看前向传播激活值</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">跑一个batch，看各层激活值是不是既不全0也不爆太大，Sigmoid/Tanh不要都在饱和区</span>
+      </div>
+      <div class="flow-node" style="text-align:left;padding-left:1.5rem;border-left:4px solid var(--accent2)">
+        <strong style="color:var(--accent2)">Step 3：看反向传播梯度</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">backward后看各层梯度的mean/std，不要全0也不要NaN/inf，也不要太大太小</span>
+      </div>
+      <div class="flow-node" style="text-align:left;padding-left:1.5rem;border-left:4px solid var(--accent3)">
+        <strong style="color:var(--accent3)">Step 4：看前10个epoch loss</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">loss应该开始下降，不是NaN，不是完全不动，不是剧烈震荡（轻微震荡正常）</span>
+      </div>
+      <div class="flow-node hl" style="text-align:left;padding-left:1.5rem;border-left:4px solid var(--success)">
+        <strong style="color:var(--success)">Step 5：过拟合一个小batch</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">取20个样本训练，模型应该能很快把loss降到接近0、准确率100%——这是验证初始化+模型+代码有没有bug的最佳方法！</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">24 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">初始化发展简史</h1>
+    <h3 class="sub">初始化方法是随着网络变深一步步发展来的</h3>
+    <div class="flow" style="flex-direction:column;gap:1rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node" style="text-align:left">
+        <strong style="color:var(--muted)">2006年之前</strong>：预训练+逐层初始化（DBN），没有好的直接初始化方法，深层网络训不动
+      </div>
+      <div class="flow-node" style="text-align:left;border-left:4px solid var(--accent)">
+        <strong style="color:var(--accent)">2010年：Xavier初始化</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">Glorot & Bengio，让前向反向方差一致，让训练几层到十几层网络成为可能，配合Sigmoid/Tanh</span>
+      </div>
+      <div class="flow-node" style="text-align:left;border-left:4px solid var(--accent3)">
+        <strong style="color:var(--accent3)">2015年：He/Kaiming初始化</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">何恺明等，针对ReLU设计，×2补偿方差，配合BN让100+层ResNet成为可能，现在最常用</span>
+      </div>
+      <div class="flow-node" style="text-align:left;border-left:4px solid var(--success)">
+        <strong style="color:var(--success)">2015年后：迁移学习成为主流</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">大家发现用预训练权重初始化比任何随机初始化方法都好，现在做项目优先用预训练</span>
+      </div>
+      <div class="flow-node" style="text-align:left">
+        <strong style="color:var(--muted)">现在</strong>：大模型时代，预训练初始化是唯一解；随机初始化只在从头训大模型时用，配合更好的优化器和归一化层
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">25 / 27</div>
+  <div class="slide-content">
+    <h1 class="st">本集知识点总结</h1>
+    <h3 class="sub">参数初始化核心要点回顾</h3>
+    <div class="two-col">
+      <div>
+        <div class="hbox danger">
+          <h4>🚫 绝对不要全零初始化W</h4>
+          <p>全零导致对称性问题，所有神经元永远学一样的东西，网络等于只有1个神经元。</p>
+        </div>
+        <div class="hbox warn">
+          <h4>⚠️ 随机初始化方差要合适</h4>
+          <p>太大→梯度爆炸NaN；太小→梯度消失loss不动。需要让每层信号方差保持一致。</p>
+        </div>
+        <div class="hbox">
+          <h4>📜 Xavier初始化（2010）</h4>
+          <p>√(2/(n_in+n_out))，针对Sigmoid/Tanh设计，现在用得少了。</p>
+        </div>
+      </div>
+      <div>
+        <div class="hbox pink">
+          <h4>⭐ He初始化（2015）</h4>
+          <p>√(2/n_in)，×2补偿ReLU方差减半，ReLU网络标配，现在最常用！</p>
+        </div>
+        <div class="hbox success">
+          <h4>🌟 最好的初始化：预训练</h4>
+          <p>有预训练模型就用预训练，比任何随机初始化都好，配合小lr微调。</p>
+        </div>
+        <div class="hbox purple">
+          <h4>🎯 实践建议</h4>
+          <p>偏置b设0；有BN层更稳；设种子可复现；前10步检查loss/激活/梯度。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-chapter">DL第11集 · 参数初始化</div>
+  <div class="slide-number">26 / 27</div>
+  <div class="slide-content">
+    <h1>🎯 初始化关键记住</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      初始化是训练的起点，错了从第一步就输了<br><br>
+      <strong style="color:var(--danger)">🚫 绝对不要全零初始化W！</strong><br><br>
+      <strong style="color:var(--accent3)">⭐ ReLU/LeakyReLU → He初始化 (kaiming_normal_)</strong><br>
+      <strong style="color:var(--accent)">Tanh/Sigmoid → Xavier初始化</strong><br>
+      偏置b初始化为0就行<br>
+      有预训练模型优先用预训练！<br>
+      BN层能降低对初始化的敏感度<br><br>
+      BV17i7Q6HEFt · 时长 17分14秒
+    </p>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag d">🚫 全零不行</span>
+      <span class="tag pi">⭐ He初始化</span>
+      <span class="tag p">📜 Xavier</span>
+      <span class="tag g">🌟 预训练最好</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-number">27 / 27</div>
+  <div class="slide-content">
+    <h1>深度学习基础篇回顾</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      到这里我们已经讲完了深度学习基础：<br>
+      神经网络、反向传播、损失函数、PyTorch实战、学习率、参数初始化<br><br>
+      <strong style="color:var(--accent2)">接下来我们会进入更实战的内容：</strong><br>
+      CNN卷积神经网络、RNN循环神经网络、Transformer、实战项目...<br>
+      敬请期待！
+    </p>
+    <div class="end-buttons">
+      <a href="chapter6.html" class="end-btn secondary">📺 回到视频页</a>
+      <a href="ppt-26.html" class="end-btn secondary">← 上一集：学习率</a>
+    </div>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag g">🎉 基础篇完成</span>
+      <span class="tag pi">🚀 接下来更精彩</span>
+      <span class="tag p">💪 继续加油</span>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+});
+</script>
+</body></html>

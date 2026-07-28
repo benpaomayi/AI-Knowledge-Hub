@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeepSeek-V3 论文精读 - ML学习站PPT</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#06b6d4;--accent2:#0ea5e9;--accent3:#22d3ee;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--accent3);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent3);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(34,211,238,0.15) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(14,165,233,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);border-radius:50px;font-size:1rem;color:var(--accent);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--success),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:800px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(6,182,212,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:1.8rem 2rem;margin:1.5rem 0;text-align:center;font-size:clamp(1rem,1.8vw,1.25rem);line-height:2.2;overflow-x:auto}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:1rem;display:block;text-align:left;line-height:1.7}
+.katex{color:var(--accent3)}.katex .mord.text{color:var(--ink2)}
+.hbox{background:rgba(6,182,212,0.08);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1rem 0}
+.hbox h4{color:var(--accent);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(251,191,36,0.08);border-left-color:var(--warning)}.hbox.warn h4{color:var(--warning)}
+.hbox.danger{background:rgba(248,113,113,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.purple{background:rgba(14,165,233,0.08);border-left-color:var(--accent2)}.hbox.purple h4{color:var(--accent2)}
+.hbox.pink{background:rgba(34,211,238,0.08);border-left-color:var(--accent3)}.hbox.pink h4{color:var(--accent3)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.95rem}
+table.cmp th{background:var(--bg3);color:var(--accent3);padding:12px 14px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.9rem}
+table.cmp td{padding:10px 14px;border-bottom:1px solid var(--rule);color:var(--ink2);line-height:1.6}
+table.cmp tr:hover td{background:rgba(6,182,212,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent3);background:rgba(34,211,238,0.1);color:var(--accent3);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent)}
+.tag.p{color:var(--accent2)}.tag.pi{color:var(--accent3)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}.tag.d{color:var(--danger)}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent3),var(--accent2),var(--accent),var(--success));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent3);color:var(--accent3)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent3)}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.end-slide .end-buttons{display:flex;gap:1.5rem;justify-content:center;margin-top:2.5rem;flex-wrap:wrap}
+.end-slide .end-btn{padding:14px 32px;border-radius:12px;font-size:1.05rem;font-weight:600;text-decoration:none;transition:all .3s}
+.end-slide .end-btn.primary{background:linear-gradient(135deg,var(--accent3),var(--accent2));color:white}
+.end-slide .end-btn.secondary{background:var(--bg2);border:1px solid var(--rule);color:var(--ink2)}
+.end-slide .end-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(6,182,212,0.2)}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:1.5rem;align-items:stretch;margin:1.5rem 0}
+.vs-side{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:1.5rem}
+.vs-side h3{margin-bottom:1rem;font-size:1.2rem}
+.vs-divider{display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:700;color:var(--muted)}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col{grid-template-columns:1fr}.vs{grid-template-columns:1fr}.vs-divider{padding:1rem 0}.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="slides.html" style="font-weight:600;color:var(--accent)">🐋 DeepSeek-V3 论文精读</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="chapter7.html">回到视频页</a>
+    <a href="ppt-transformer.html">← 上一专题</a>
+    <a href="slides.html" style="color:var(--success);font-weight:600">专题完结 ✅</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">📄 DeepSeek-V3 技术报告精读 · 论文深解</div>
+    <h1 class="cover-title">DeepSeek-V3 技术报告完全解析</h1>
+    <p class="cover-sub">arXiv:2412.19437 · 671B参数MoE模型 · 仅$5.58M训练成本<br>MLA · DeepSeekMoE · MTP · FP8训练 · Auxiliary-Loss-Free负载均衡</p>
+    <div class="tags">
+      <span class="tag">DeepSeek-V3</span>
+      <span class="tag p">MLA</span>
+      <span class="tag pi">MoE</span>
+      <span class="tag g">MTP</span>
+      <span class="tag w">FP8</span>
+      <span class="tag d">Auxiliary-Loss-Free</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DeepSeek-V3论文精读</div>
+  <div class="slide-number">2 / 49</div>
+  <div class="slide-content">
+    <h1 class="st">本专题总览</h1>
+    <h3 class="sub">一次完整的DeepSeek-V3技术报告深度解读</h3>
+    <div class="flow" style="flex-direction:column;gap:1rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node hl" style="text-align:left;min-width:auto;border-left:4px solid var(--accent);padding-left:1.5rem">
+        <strong style="color:var(--accent)">📌 论文总览</strong>
+        <span style="color:var(--muted);margin-left:1rem">V3的设计哲学与核心指标</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent2);padding-left:1.5rem">
+        <strong style="color:var(--accent2)">💡 MLA深度推导</strong>
+        <span style="color:var(--muted);margin-left:1rem">低秩联合压缩→解耦RoPE→KV Cache计算</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent3);padding-left:1.5rem">
+        <strong style="color:var(--accent3)">⚡ DeepSeekMoE架构</strong>
+        <span style="color:var(--muted);margin-left:1rem">共享专家+路由专家+细粒度分割</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--success);padding-left:1.5rem">
+        <strong style="color:var(--success)">🧩 Auxiliary-Loss-Free负载均衡</strong>
+        <span style="color:var(--muted);margin-left:1rem">动态偏置机制</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--warning);padding-left:1.5rem">
+        <strong style="color:var(--warning)">🏗️ Multi-Token Prediction (MTP)</strong>
+        <span style="color:var(--muted);margin-left:1rem">多Token预测目标</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--danger);padding-left:1.5rem">
+        <strong style="color:var(--danger)">🚀 FP8混合精度训练</strong>
+        <span style="color:var(--muted);margin-left:1rem">块级量化策略</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent);padding-left:1.5rem">
+        <strong style="color:var(--accent)">🔧 训练基础设施</strong>
+        <span style="color:var(--muted);margin-left:1rem">DualPipe+通信优化+内存优化</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent2);padding-left:1.5rem">
+        <strong style="color:var(--accent2)">📊 预训练数据</strong>
+        <span style="color:var(--muted);margin-left:1rem">14.8T tokens构建</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent3);padding-left:1.5rem">
+        <strong style="color:var(--accent3)">📏 长上下文扩展</strong>
+        <span style="color:var(--muted);margin-left:1rem">32K→128K</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--success);padding-left:1.5rem">
+        <strong style="color:var(--success)">🎯 后训练</strong>
+        <span style="color:var(--muted);margin-left:1rem">SFT+RL+知识蒸馏</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--warning);padding-left:1.5rem">
+        <strong style="color:var(--warning)">📈 性能评测与成本分析</strong>
+        <span style="color:var(--muted);margin-left:1rem">对标GPT-4o和Claude-3.5-Sonnet</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--danger);padding-left:1.5rem">
+        <strong style="color:var(--danger)">🔬 消融实验与V2对比</strong>
+        <span style="color:var(--muted);margin-left:1rem">验证每个设计选择的有效性</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DeepSeek-V3论文精读 · 论文总览</div>
+  <div class="slide-number">3 / 49</div>
+  <div class="slide-content">
+    <h1 class="st">DeepSeek-V3 论文总览</h1>
+    <h3 class="sub">arXiv:2412.19437 · 2024年12月27日提交</h3>
+    <div class="two-col">
+      <div>
+        <div class="card accent">
+          <h4 style="color:var(--accent3)">📄 基本信息</h4>
+          <p>
+            <strong>论文标题：</strong>DeepSeek-V3 Technical Report<br>
+            <strong>提交日期：</strong>2024年12月27日<br>
+            <strong>总参数量：</strong>671B<br>
+            <strong>激活参数：</strong>37B（每个token仅激活约5.5%）<br>
+            <strong>预训练数据：</strong>14.8T tokens<br>
+            <strong>训练时间：</strong>不到2个月<br>
+            <strong>训练GPU小时：</strong>2,664K H800 GPU小时
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="hbox success">
+          <h4>💰 训练成本：仅$5.58M</h4>
+          <p>总成本2.788M H800 GPU小时，按$2/GPU小时计算，仅为$5.58M。<br><br>
+          GPT-4训练成本估计$78M+，Llama-3-405B估计$25M+。<br><br>
+          <strong style="color:var(--success)">每活跃参数成本仅为GPT-4的约1/20！</strong></p>
+        </div>
+        <div class="hbox pink">
+          <h4>🏆 关键成就</h4>
+          <p>首个在如此大规模验证FP8训练有效性的模型；训练过程极其稳定，无任何不可恢复的损失激增。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DeepSeek-V3论文精读 · 论文总览</div>
+  <div class="slide-number">4 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">V3的核心设计哲学</h2>
+    <h3 class="sub">架构创新 × 工程优化 × 经济高效</h3>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">🧠</div>
+        <h4>架构创新</h4>
+        <p>MLA实现56.9× KV Cache压缩；DeepSeekMoE通过细粒度专家+共享专家实现高效推理；MTP多Token预测提升数据效率。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">⚙️</div>
+        <h4>工程优化</h4>
+        <p>Auxiliary-Loss-Free负载均衡；FP8混合精度训练；DualPipe计算通信重叠；高效的All-to-All通信内核。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--success)">💎</div>
+        <h4>经济高效</h4>
+        <p>仅$5.58M训练671B参数模型；性能对标GPT-4o和Claude-3.5-Sonnet；打破"大模型=烧钱"的刻板印象。</p>
+      </div>
+    </div>
+    <div class="hbox purple" style="margin-top:1.5rem">
+      <h4>🎯 性能对标</h4>
+      <p>在MMLU（88.5）、MATH-500（90.2）、HumanEval（92.8）、AIME 2024（39.2）等基准上媲美甚至超越GPT-4o和Claude-3.5-Sonnet。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DeepSeek-V3论文精读 · V2 vs V3</div>
+  <div class="slide-number">5 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">V3 vs V2 对比</h2>
+    <h3 class="sub">从V2到V3的全面升级</h3>
+    <table class="cmp">
+      <tr>
+        <th>维度</th>
+        <th>DeepSeek-V2</th>
+        <th>DeepSeek-V3</th>
+      </tr>
+      <tr>
+        <td><strong>总参数</strong></td>
+        <td>236B</td>
+        <td style="color:var(--accent3)">671B (2.85×)</td>
+      </tr>
+      <tr>
+        <td><strong>激活参数</strong></td>
+        <td>21B</td>
+        <td style="color:var(--accent3)">37B (1.76×)</td>
+      </tr>
+      <tr>
+        <td><strong>训练tokens</strong></td>
+        <td>8.1T</td>
+        <td style="color:var(--accent3)">14.8T (1.83×)</td>
+      </tr>
+      <tr>
+        <td><strong>架构</strong></td>
+        <td>MLA + DeepSeekMoE</td>
+        <td style="color:var(--accent3)">MLA + DeepSeekMoE + MTP</td>
+      </tr>
+      <tr>
+        <td><strong>负载均衡</strong></td>
+        <td>辅助损失</td>
+        <td style="color:var(--accent3)">Auxiliary-Loss-Free</td>
+      </tr>
+      <tr>
+        <td><strong>训练精度</strong></td>
+        <td>FP16/BF16</td>
+        <td style="color:var(--accent3)">FP8混合精度</td>
+      </tr>
+      <tr>
+        <td><strong>训练成本</strong></td>
+        <td>~$2M</td>
+        <td style="color:var(--accent3)">~$5.58M</td>
+      </tr>
+      <tr>
+        <td><strong>上下文</strong></td>
+        <td>128K</td>
+        <td>128K</td>
+      </tr>
+    </table>
+    <div class="hbox success">
+      <h4>📈 关键提升</h4>
+      <p>V3在参数量扩大2.85倍的情况下，训练成本仅增加2.79倍——这得益于FP8训练和DualPipe等工程优化，展示了极高的成本效率。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">MLA深度推导 · KV Cache瓶颈</div>
+  <div class="slide-number">6 / 49</div>
+  <div class="slide-content">
+    <h1 class="st">为什么需要MLA？</h1>
+    <h3 class="sub">标准MHA在Decoder-only推理中的KV Cache瓶颈</h3>
+    <div class="hbox danger">
+      <h4>❌ KV Cache的显存困境</h4>
+      <p>在自回归推理中，每个token的Key和Value都需要缓存，以便后续token计算注意力。KV Cache大小公式：<br><br>
+      <strong style="color:var(--danger)">每层 · 每token = 2 × n_h × d_h 个元素</strong><br><br>
+      假设d=7168, n_h=128, d_h=128：每层每token = 2 × 128 × 128 = <strong style="color:var(--danger)">32,768个元素</strong><br>
+      对于128K序列、61层：61 × 128K × 32,768 × 2 bytes ≈ <strong style="color:var(--danger)">巨大显存消耗</strong></p>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 现有方案的妥协</h4>
+      <p><strong>MQA（Multi-Query Attention）：</strong>所有头共享一组KV → KV Cache缩小n_h倍，但精度下降。<br>
+      <strong>GQA（Grouped-Query Attention）：</strong>分组共享KV → 平衡方案，但仍有精度损失。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">MLA深度推导 · KV Cache瓶颈</div>
+  <div class="slide-number">7 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">MLA的目标：鱼与熊掌兼得</h2>
+    <h3 class="sub">在MHA的精度下实现MQA级别的内存效率</h3>
+    <div class="vs">
+      <div class="vs-side" style="background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2)">
+        <h3 style="color:var(--danger);margin-bottom:1rem">MHA的问题</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul>
+            <li><strong>KV Cache巨大：</strong>2×n_h×d_h/token</li>
+            <li><strong>推理显存瓶颈：</strong>长序列下显存爆炸</li>
+            <li><strong>精度高：</strong>每个头独立学习</li>
+            <li><strong>冗余大：</strong>多头KV之间存在大量冗余</li>
+          </ul>
+        </div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side" style="background:rgba(6,182,212,0.06);border:1px solid rgba(6,182,212,0.2)">
+        <h3 style="color:var(--accent);margin-bottom:1rem">MLA的解决方案</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul>
+            <li><strong>KV Cache极小：</strong>d_c+d_R ≈ 576元素</li>
+            <li><strong>压缩比：</strong>约56.9:1</li>
+            <li><strong>精度超越MHA：</strong>低秩压缩反而有正则化效果</li>
+            <li><strong>去冗余：</strong>潜在空间捕捉KV的本质信息</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="hbox pink">
+      <h4>💡 核心洞察</h4>
+      <p>多头KV之间存在大量冗余——MLA通过低秩联合压缩，将KV映射到低维潜在空间，在潜在空间中缓存，推理时再恢复。这就像<strong style="color:var(--accent3)">将高清视频压缩为编码流，使用时再解码</strong>。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">MLA深度推导 · 低秩联合压缩</div>
+  <div class="slide-number">8 / 49</div>
+  <div class="slide-content">
+    <h1 class="st">MLA核心思想：低秩联合压缩</h1>
+    <h3 class="sub">将KV映射到低维潜在空间，在潜在空间中缓存</h3>
+    <div class="flow" style="flex-direction:column;gap:0.8rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node" style="text-align:left;min-width:auto">
+        <strong style="color:var(--accent)">步骤1：压缩阶段</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">c^{KV}_t = W^{DKV} · h_t，其中 W^{DKV} ∈ R^{d_c × d}，d_c ≪ d，将h_t从d维压缩到d_c维</span>
+      </div>
+      <div style="text-align:center;color:var(--muted)">↓</div>
+      <div class="flow-node" style="text-align:left;min-width:auto">
+        <strong style="color:var(--accent2)">步骤2：缓存潜在向量</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">仅缓存c^{KV}_t（低维潜在向量），而非完整的K和V</span>
+      </div>
+      <div style="text-align:center;color:var(--muted)">↓</div>
+      <div class="flow-node hl" style="text-align:left;min-width:auto">
+        <strong style="color:var(--accent3)">步骤3：恢复阶段</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">k_t = W^{UK} · c^{KV}_t, v_t = W^{UV} · c^{KV}_t，从低维潜在向量恢复到高维KV</span>
+      </div>
+    </div>
+    <div class="hbox purple">
+      <h4>📐 矩阵维度</h4>
+      <p>W^{DKV} ∈ R^{d_c × d}（下投影）→ W^{UK} ∈ R^{n_h·d_h × d_c}（上投影K）→ W^{UV} ∈ R^{n_h·d_h × d_c}（上投影V）<br>
+      d_c ≪ d（如d=7168, d_c=512），潜在空间远小于原始空间。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">MLA深度推导 · 低秩联合压缩</div>
+  <div class="slide-number">9 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">MLA的KV Cache压缩比</h2>
+    <h3 class="sub">量化MLA的显存节省效果</h3>
+    <div class="two-col">
+      <div>
+        <div class="card accent">
+          <h4 style="color:var(--accent3)">标准MHA</h4>
+          <p>
+            <strong>每token KV缓存：</strong><br>
+            2 × n_h × d_h = 2 × 128 × 128<br>
+            = <strong style="color:var(--danger);font-size:1.2rem">32,768 元素</strong>
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h4 style="color:var(--success)">MLA</h4>
+          <p>
+            <strong>每token KV缓存：</strong><br>
+            d_c + d_R = 512 + 64<br>
+            = <strong style="color:var(--success);font-size:1.2rem">576 元素</strong>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="big-num" style="text-align:center;margin:1.5rem 0">56.9 : 1</div>
+    <p style="text-align:center;color:var(--muted);font-size:1.1rem">压缩比 = 32,768 / 576 ≈ 56.9倍</p>
+    <div class="hbox pink">
+      <h4>💡 查询也可压缩</h4>
+      <p>c^{Q}_t = W^{DQ} · h_t → q_t = W^{UQ} · c^{Q}_t。关键优势：W^{UK}可以被W^{Q}吸收，进一步减少推理时的计算量。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">MLA深度推导 · 解耦式RoPE</div>
+  <div class="slide-number">10 / 49</div>
+  <div class="slide-content">
+    <h1 class="st">MLA与RoPE的冲突</h1>
+    <h3 class="sub">为什么需要解耦式RoPE？</h3>
+    <div class="hbox warn">
+      <h4>⚠️ RoPE回顾</h4>
+      <p>RoPE对Q和K施加位置相关的旋转矩阵：q_rot = R(pos) · q, k_rot = R(pos) · k。<br>
+      这使得注意力计算变为 q^T · k = (R · q)^T · (R · k) = q^T · R^T · R · k = q^T · k（旋转不变性）。</p>
+    </div>
+    <div class="hbox danger">
+      <h4>❌ 冲突原因</h4>
+      <p>标准MLA：q^T · k = (W^{UQ}·c^{Q})^T · (W^{UK}·c^{KV}) = (c^{Q})^T · (W^{UQ})^T · W^{UK} · c^{KV}<br>
+      <strong style="color:var(--success)">W^{UK}可以被W^{Q}吸收</strong> → 推理时不需要显式计算W^{UK}<br><br>
+      加RoPE后：q^T · k = (R·W^{UQ}·c^{Q})^T · (R·W^{UK}·c^{KV}) = (c^{Q})^T · (W^{UQ})^T · R^T · R · W^{UK} · c^{KV}<br>
+      <strong style="color:var(--danger)">R夹在W^{UQ}和W^{UK}之间，W^{UK}无法被吸收！</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">MLA深度推导 · 解耦式RoPE</div>
+  <div class="slide-number">11 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">解耦式RoPE方案</h2>
+    <h3 class="sub">引入额外的shared key和query专门用于RoPE</h3>
+    <div class="hbox success">
+      <h4>✅ 解耦方案</h4>
+      <p>引入额外的shared key和query专门用于RoPE：<br><br>
+      <strong>k^{R}_t = RoPE(W^{KR} · h_t)</strong> —— 专门用于RoPE的键，直接从h_t计算，不经过潜在空间<br>
+      <strong>q^{R}_t = RoPE(W^{QR} · c^{Q}_t)</strong> —— 专门用于RoPE的查询<br><br>
+      原始k^{C}_t = W^{UK} · c^{KV}_t（非RoPE）保持可被吸收的特性。</p>
+    </div>
+    <div class="formula">
+      $$K_t = \begin{bmatrix} k_t^{C} \\ k_t^{R} \end{bmatrix}, \quad Q_t = \begin{bmatrix} q_t^{C} \\ q_t^{R} \end{bmatrix}$$
+      <span class="desc">只有 \(k_t^{C}\) 部分的 \(W^{UK}\) 可以被 \(Q\) 的投影矩阵吸收，\(k_t^{R}\) 部分保持独立的位置编码能力。推理时仅需缓存 \(c_t^{KV}\)（潜在向量）和 \(k_t^{R}\)（RoPE键）。</span>
+    </div>
+    <div class="hbox pink">
+      <h4>💡 缓存策略</h4>
+      <p>推理时仅需缓存：c^{KV}_t（潜在向量）+ k^{R}_t（RoPE键），不需要缓存完整的K和V。c^{KV}_t维度为d_c，k^{R}_t维度为d_R，总计仅d_c + d_R。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">MLA深度推导 · 完整公式</div>
+  <div class="slide-number">12 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">MLA完整公式推导</h2>
+    <h3 class="sub">按论文编号逐步推导</h3>
+    <div class="formula" style="text-align:left">
+      $$\begin{aligned}
+      &\text{Step 1: 压缩KV} && c_t^{KV} = W^{DKV} \cdot h_t \\
+      &\text{Step 2: 恢复K（可压缩部分）} && k_t^{C} = W^{UK} \cdot c_t^{KV} \\
+      &\text{Step 3: RoPE K} && k_t^{R} = \text{RoPE}(W^{KR} \cdot h_t) \\
+      &\text{Step 4: 完整K} && k_t = \begin{bmatrix} k_t^{C} \\ k_t^{R} \end{bmatrix} \\
+      &\text{Step 5: 压缩Q} && c_t^{Q} = W^{DQ} \cdot h_t \\
+      &\text{Step 6: 恢复Q} && q_t^{C} = W^{UQ} \cdot c_t^{Q} \\
+      &\text{Step 7: RoPE Q} && q_t^{R} = \text{RoPE}(W^{QR} \cdot c_t^{Q}) \\
+      &\text{Step 8: 完整Q} && q_t = \begin{bmatrix} q_t^{C} \\ q_t^{R} \end{bmatrix} \\
+      &\text{Step 9: 恢复V} && v_t = W^{UV} \cdot c_t^{KV} \\
+      &\text{Step 10: 注意力} && o_t = \text{softmax}\!\left(\frac{q_t \cdot k^T}{\sqrt{d}}\right) \cdot v_t
+      \end{aligned}$$
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">MLA深度推导 · KV Cache计算</div>
+  <div class="slide-number">13 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">MLA的KV Cache压缩比计算</h2>
+    <h3 class="sub">以V3实际配置为例</h3>
+    <div class="hbox">
+      <h4>📐 V3实际配置参数</h4>
+      <p>d = 7168, n_h = 128, d_h = 128, d_c = 512（潜在维度）, d_R = 64（RoPE部分维度）</p>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="card accent">
+          <h4 style="color:var(--danger)">标准MHA</h4>
+          <p>每token KV缓存：<br>2 × 128 × 128 = <strong style="font-size:1.3rem;color:var(--danger)">32,768</strong><br><br>
+          61层 × 128K序列：<br>≈ 61 × 128K × 32,768 × 2B<br>= <strong style="color:var(--danger)">约512GB</strong></p>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h4 style="color:var(--success)">MLA</h4>
+          <p>每token KV缓存：<br>512 + 64 = <strong style="font-size:1.3rem;color:var(--success)">576</strong><br><br>
+          61层 × 128K序列：<br>≈ 61 × 128K × 576 × 2B<br>= <strong style="color:var(--success)">约9GB</strong></p>
+        </div>
+      </div>
+    </div>
+    <div class="hbox success" style="margin-top:1rem">
+      <h4>💾 显存节省</h4>
+      <p>从约512GB降至约9GB，<strong style="color:var(--success)">节省约98.2%的KV Cache显存</strong>。这使得在消费级GPU上运行长上下文推理成为可能。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">MLA深度推导 · 对比</div>
+  <div class="slide-number">14 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">MLA vs MHA vs GQA vs MQA</h2>
+    <h3 class="sub">全面对比四种注意力机制</h3>
+    <table class="cmp">
+      <tr>
+        <th>机制</th>
+        <th>KV Cache大小</th>
+        <th>建模精度</th>
+        <th>推理速度</th>
+      </tr>
+      <tr>
+        <td><strong>MHA</strong></td>
+        <td style="color:var(--danger)">2×n_h×d_h（最大）</td>
+        <td style="color:var(--success)">最高</td>
+        <td style="color:var(--danger)">最慢</td>
+      </tr>
+      <tr>
+        <td><strong>GQA</strong></td>
+        <td>2×g×d_h（中等）</td>
+        <td>中等</td>
+        <td>中等</td>
+      </tr>
+      <tr>
+        <td><strong>MQA</strong></td>
+        <td style="color:var(--success)">2×d_h（最小）</td>
+        <td style="color:var(--danger)">最低</td>
+        <td style="color:var(--success)">最快</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent3)">MLA</strong></td>
+        <td style="color:var(--accent3);font-weight:bold">d_c+d_R（极小）</td>
+        <td style="color:var(--accent3);font-weight:bold">超越MHA</td>
+        <td style="color:var(--accent3);font-weight:bold">接近MQA</td>
+      </tr>
+    </table>
+    <div class="hbox purple">
+      <h4>🎯 关键结论</h4>
+      <p>MLA同时实现了最小的KV Cache和最高的建模精度！低秩压缩不仅减少了显存，压缩过程本身还有正则化效果，使模型学习更本质的表示。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DeepSeekMoE架构</div>
+  <div class="slide-number">15 / 49</div>
+  <div class="slide-content">
+    <h1 class="st">DeepSeekMoE架构详解</h1>
+    <h3 class="sub">传统MoE回顾与DeepSeekMoE的两大创新</h3>
+    <div class="hbox">
+      <h4>📚 传统MoE回顾</h4>
+      <p>多个专家FFN（前馈神经网络），路由机制选择Top-K专家。每个token只激活部分专家，从而在保持总参数量巨大的同时控制计算量。</p>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="card accent">
+        <h4 style="color:var(--accent3)">创新1：细粒度专家分割</h4>
+        <p>将标准MoE的一个大专家分割为m个更小的专家 → 从N个标准专家变为mN个细粒度专家。<br><br>
+        每次激活更多但更小的专家（如Top-8 from 256），每个细粒度专家更专注，知识更专业化。</p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--accent2)">创新2：共享专家隔离</h4>
+        <p>设置K_s个共享专家（始终激活，不参与路由）+ K_r个路由专家（通过路由选择性激活）。<br><br>
+        共享专家处理通用知识，路由专家处理专门知识，避免路由专家被通用知识"污染"。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DeepSeekMoE架构</div>
+  <div class="slide-number">16 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">DeepSeekMoE的专家架构</h2>
+    <h3 class="sub">共享专家 + 路由专家的协同工作</h3>
+    <div class="flow" style="flex-direction:column;gap:1rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node hl" style="text-align:left;min-width:auto">
+        <strong style="color:var(--accent3)">输入 Token h_t</strong>
+      </div>
+      <div style="text-align:center;color:var(--muted)">↓</div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--success);padding-left:1rem">
+        <strong style="color:var(--success)">共享专家（K_s个，始终激活）</strong>
+        <span style="color:var(--muted);display:block;font-size:0.9rem">处理通用知识：语法、常识、基础推理</span>
+      </div>
+      <div style="text-align:center;color:var(--muted)">+</div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent);padding-left:1rem">
+        <strong style="color:var(--accent)">路由专家（K_r个，路由选择Top-K）</strong>
+        <span style="color:var(--muted);display:block;font-size:0.9rem">处理专门知识：数学、代码、特定领域</span>
+      </div>
+      <div style="text-align:center;color:var(--muted)">↓</div>
+      <div class="flow-node hl" style="text-align:left;min-width:auto">
+        <strong style="color:var(--accent3)">输出 h'_t = u_t + Σ共享专家 + Σ路由专家</strong>
+      </div>
+    </div>
+    <div class="hbox pink">
+      <h4>💡 设计精妙之处</h4>
+      <p>共享专家与路由专家的隔离确保了：通用知识不会挤占专门知识的专家容量，专门知识也不会稀释通用知识。这就像团队中有"通才"（共享专家）和"专才"（路由专家）。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DeepSeekMoE架构 · 路由机制</div>
+  <div class="slide-number">17 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">DeepSeekMoE路由机制</h2>
+    <h3 class="sub">sigmoid路由 + Top-K选择</h3>
+    <div class="formula">
+      $$s_{i,t} = \sigma\!\left(u_t^\top \cdot e_i\right)$$
+      <span class="desc">\(u_t\)：token 的隐状态；\(e_i\)：第 \(i\) 个专家的中心向量（可学习参数）。使用 sigmoid（而非 softmax）：每个专家独立判断是否相关，不与其他专家竞争。</span>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="card accent">
+          <h4 style="color:var(--accent)">Top-K选择</h4>
+          <p>选择s_{i,t}最高的K_r个路由专家。<br><br>
+          门控值归一化：<br>
+          g_{j,t} = s_{j,t} / Σ_{k∈TopK} s_{k,t}</p>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h4 style="color:var(--accent3)">最终输出</h4>
+          <p>h'_t = u_t + <strong style="color:var(--success)">Σ_{i=1}^{K_s} FFN_i(u_t)</strong> + <strong style="color:var(--accent)">Σ_{j∈TopK} g_{j,t} · FFN_j(u_t)</strong><br><br>
+          第一部分：共享专家（始终激活）<br>
+          第二部分：路由专家（加权求和）</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">Auxiliary-Loss-Free负载均衡</div>
+  <div class="slide-number">18 / 49</div>
+  <div class="slide-content">
+    <h1 class="st">Auxiliary-Loss-Free负载均衡</h1>
+    <h3 class="sub">传统MoE负载均衡的困境与V3的突破方案</h3>
+    <div class="hbox danger">
+      <h4>❌ 传统辅助损失的问题</h4>
+      <p>使用辅助损失（Auxiliary Loss）惩罚负载不均 → 辅助损失与主任务目标冲突，损害模型性能。<br>
+      梯度干扰：辅助损失的梯度干扰主任务梯度，类似"一边开车一边有人转方向盘"。</p>
+    </div>
+    <div class="hbox success">
+      <h4>✅ V3的无辅助损失方案</h4>
+      <p>为每个专家引入动态bias b_i，修正路由分数：s'_{i,t} = s_{i,t} + b_i<br><br>
+      训练后更新bias：<br>
+      • 如果专家i过载 → b_i -= γ（降低其被选中概率）<br>
+      • 如果专家i过轻 → b_i += γ（提高其被选中概率）<br>
+      γ是小步长（如0.001）</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">Auxiliary-Loss-Free负载均衡</div>
+  <div class="slide-number">19 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">Auxiliary-Loss-Free的关键特性</h2>
+    <h3 class="sub">为什么这个方案如此巧妙？</h3>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">🔒</div>
+        <h4>梯度解耦</h4>
+        <p>bias只影响路由选择，不影响专家输出。输出计算中无bias，不引入额外梯度，与主任务完全解耦。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">⚡</div>
+        <h4>计算开销小</h4>
+        <p>仅需维护每个专家的bias值（256个float），更新操作简单，几乎不增加计算开销。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--success)">🛡️</div>
+        <h4>互补序列级平衡损失</h4>
+        <p>极小的权重（α=0.001），仅防止极端不平衡。不同于传统的token-level辅助损失，不干扰梯度。</p>
+      </div>
+    </div>
+    <div class="hbox purple" style="margin-top:1.5rem">
+      <h4>🎯 核心思想</h4>
+      <p>负载均衡不应是训练目标的一部分，而应是<strong style="color:var(--accent2)">一个独立于训练的外部调节机制</strong>。就像交通信号灯——它调节车流但不影响每辆车的行驶目的地。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">Multi-Token Prediction (MTP)</div>
+  <div class="slide-number">20 / 49</div>
+  <div class="slide-content">
+    <h1 class="st">Multi-Token Prediction (MTP)</h1>
+    <h3 class="sub">从预测下一个Token到预测下D个Token</h3>
+    <div class="hbox">
+      <h4>📚 传统LLM vs MTP</h4>
+      <p><strong>传统LLM：</strong>每次只预测下一个Token（Next Token Prediction）——每个位置只有一个监督信号。<br>
+      <strong>MTP：</strong>每次预测接下来的D个Token（D=1为额外预测深度）——每个位置提供D个监督信号。</p>
+    </div>
+    <div class="flow" style="flex-direction:column;gap:0.8rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node hl" style="text-align:left;min-width:auto">
+        <strong style="color:var(--accent3)">主模型 → 预测第1个token（next token）</strong>
+      </div>
+      <div style="text-align:center;color:var(--muted)">↓</div>
+      <div class="flow-node" style="text-align:left;min-width:auto">
+        <strong style="color:var(--accent)">MTP Module 1 → 预测第2个token</strong>
+        <span style="color:var(--muted);display:block;font-size:0.9rem">接收主模型输出 + 共享Embedding + 共享输出Head</span>
+      </div>
+      <div style="text-align:center;color:var(--muted)">↓</div>
+      <div class="flow-node" style="text-align:left;min-width:auto">
+        <strong style="color:var(--accent2)">MTP Module 2 → 预测第3个token</strong>
+        <span style="color:var(--muted);display:block;font-size:0.9rem">接收MTP1输出，独立Transformer Block</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">Multi-Token Prediction (MTP)</div>
+  <div class="slide-number">21 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">MTP的训练与架构细节</h2>
+    <h3 class="sub">每个MTP模块的组成与训练目标</h3>
+    <div class="two-col">
+      <div>
+        <div class="card accent">
+          <h4 style="color:var(--accent3)">MTP模块组成</h4>
+          <p>
+            • 共享的Embedding层（与主模型共享）<br>
+            • 共享的输出Head（与主模型共享）<br>
+            • 独立的Transformer Block（参数不共享）<br>
+            • 因果注意力掩码（每个位置只能看到之前的位置）
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h4 style="color:var(--accent)">训练目标</h4>
+          <p>L_MTP = Σ_{k=1}^{D} CrossEntropy(p_k, y_{t+k})<br><br>
+          p_k是第k步的预测<br>
+          y_{t+k}是第t+k步的ground truth<br><br>
+          <strong style="color:var(--accent3)">每个位置提供D个监督信号</strong></p>
+        </div>
+      </div>
+    </div>
+    <div class="hbox pink">
+      <h4>💡 推理时的灵活性</h4>
+      <p>MTP模块在推理时可被<strong style="color:var(--accent3)">完全丢弃</strong>（不影响推理速度），也可用于推测性解码（Speculative Decoding）加速推理1.5-2倍。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">Multi-Token Prediction (MTP)</div>
+  <div class="slide-number">22 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">MTP的训练与推理优势</h2>
+    <h3 class="sub">为什么预测多个Token比一个更好？</h3>
+    <div class="two-col">
+      <div>
+        <div class="hbox success">
+          <h4>📈 训练优势</h4>
+          <p><strong>提高数据效率：</strong>每个token位置提供D个监督信号，等价于数据增强D倍。<br><br>
+          <strong>增强规划能力：</strong>迫使模型学习更长程的依赖关系，增强对未来token的"规划"能力。<br><br>
+          <strong>更好的表示：</strong>多步预测迫使隐状态包含更丰富的信息。</p>
+        </div>
+      </div>
+      <div>
+        <div class="hbox purple">
+          <h4>⚡ 推理优势（推测性解码）</h4>
+          <p><strong>快速生成候选：</strong>MTP模块快速生成D个候选token。<br><br>
+          <strong>主模型验证：</strong>主模型一次性验证所有候选token。<br><br>
+          <strong>加速推理：</strong>加速1.5-2倍，且不损失生成质量。</p>
+        </div>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>📊 实验结论</h4>
+      <p>MTP在所有benchmark上均有提升。D=1时性价比最高——仅增加约10%的训练开销，但带来显著的性能提升。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">FP8混合精度训练</div>
+  <div class="slide-number">23 / 49</div>
+  <div class="slide-content">
+    <h1 class="st">FP8混合精度训练</h1>
+    <h3 class="sub">为什么用FP8？挑战与策略</h3>
+    <div class="hbox success">
+      <h4>✅ 为什么用FP8？</h4>
+      <p><strong>FP16/BF16训练：</strong>每个值2 bytes。<br>
+      <strong>FP8训练：</strong>每个值1 byte，<strong style="color:var(--success)">显存减半，带宽减半</strong>。<br>
+      对于671B参数的模型，FP8意味着显存和通信开销的大幅降低。</p>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 核心挑战：FP8的表示范围有限</h4>
+      <p><strong>FP8 E4M3：</strong>指数4位，尾数3位，范围约±448 —— 精度高但范围小<br>
+      <strong>FP8 E5M2：</strong>指数5位，尾数2位，范围约±57344 —— 范围大但精度低<br><br>
+      直接使用全局量化因子会导致严重的精度损失，需要精细的量化策略。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">FP8混合精度训练</div>
+  <div class="slide-number">24 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">DeepSeek-V3的FP8策略</h2>
+    <h3 class="sub">块级量化 + 选择性精度</h3>
+    <div class="hbox">
+      <h4>🔧 块级量化（Block-wise Quantization）</h4>
+      <p>不使用全局量化因子（误差太大），使用块级量化：<br>
+      • <strong>激活值：</strong>1×128 tile-wise量化（每128个元素一个缩放因子）<br>
+      • <strong>权重：</strong>128×128 block-wise量化（每128×128块一个缩放因子）</p>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="card accent">
+          <h4 style="color:var(--accent)">FP8计算（主要收益）</h4>
+          <p>
+            • GEMM（矩阵乘法）→ FP8<br>
+            • 梯度累积 → FP8<br>
+            • 主要计算量，最大收益
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h4 style="color:var(--accent3)">BF16保留（精度敏感）</h4>
+          <p>
+            • Attention → BF16<br>
+            • LayerNorm/RMSNorm → BF16<br>
+            • Embedding → BF16
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="hbox pink">
+      <h4>🏆 里程碑意义</h4>
+      <p>首次在如此大规模（671B参数）上验证FP8训练的有效性。训练过程极其稳定，无任何因量化导致的loss spike。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">FP8混合精度训练</div>
+  <div class="slide-number">25 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">FP8量化的技术细节</h2>
+    <h3 class="sub">量化公式与在线scale计算</h3>
+    <div class="formula">
+      $$X_{\text{FP8}} = \mathrm{round}\!\left(\frac{X_{\text{BF16}}}{\text{scale}}\right)$$
+      <span class="desc">反量化：\(X' = X_{\text{FP8}} \times \text{scale}\)；\(\text{scale} = \max(|X_{\text{block}}|) / \max_{\text{FP8}}\)；在线计算 scale（per-tile / per-block），无需额外存储。</span>
+    </div>
+    <div class="two-col">
+      <div class="card accent">
+        <h4 style="color:var(--accent)">量化粒度</h4>
+        <p>
+          <strong>激活值：</strong>1×128 tile<br>
+          沿序列维度，每128个元素一个scale<br><br>
+          <strong>权重：</strong>128×128 block<br>
+          二维块级量化，更精细的控制
+        </p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--accent3)">梯度处理</h4>
+        <p>
+          梯度也使用FP8累积，减少显存和带宽。<br><br>
+          使用E5M2格式存储梯度（更大的动态范围），E4M3用于前向计算（更高的精度）。
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DualPipe算法</div>
+  <div class="slide-number">26 / 49</div>
+  <div class="slide-content">
+    <h1 class="st">DualPipe算法</h1>
+    <h3 class="sub">计算与通信的完美重叠</h3>
+    <div class="hbox danger">
+      <h4>❌ 传统流水线的问题</h4>
+      <p>分布式训练中：前向传播需要All-to-All通信（MoE专家路由），反向传播需要All-Reduce和All-to-All通信。<br>
+      传统流水线中计算和通信串行 → GPU经常空闲等待通信完成。</p>
+    </div>
+    <div class="hbox success">
+      <h4>✅ DualPipe核心思想</h4>
+      <p><strong>计算与通信完全重叠：</strong>双向流水线（前向和后向同时进行），将micro-batch切分为更细的chunk。<br>
+      当一个chunk在通信时，另一个chunk在计算 → <strong style="color:var(--success)">通信开销几乎完全隐藏</strong>。</p>
+    </div>
+    <div class="hbox purple">
+      <h4>📈 效果</h4>
+      <p>GPU利用率大幅提升，支持更精细的专家划分（减少全节点通信量），训练效率显著优于传统流水线并行。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DualPipe算法</div>
+  <div class="slide-number">27 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">DualPipe工作流程</h2>
+    <h3 class="sub">双向流水线的微观调度</h3>
+    <div class="flow" style="flex-direction:column;gap:0.5rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node hl" style="text-align:left;min-width:auto">
+        <strong style="color:var(--accent)">Chunk 1：前向计算</strong>
+        <span style="color:var(--muted);display:block;font-size:0.9rem">GPU忙于计算前向传播</span>
+      </div>
+      <div style="text-align:center;color:var(--muted)">同时</div>
+      <div class="flow-node" style="text-align:left;min-width:auto">
+        <strong style="color:var(--accent2)">Chunk 0：通信（All-to-All）</strong>
+        <span style="color:var(--muted);display:block;font-size:0.9rem">GPU同时进行上一个chunk的通信</span>
+      </div>
+      <div style="text-align:center;color:var(--muted)">↓</div>
+      <div class="flow-node hl" style="text-align:left;min-width:auto">
+        <strong style="color:var(--accent3)">Chunk 1：通信</strong>
+        <span style="color:var(--muted);display:block;font-size:0.9rem">Chunk 1前向完成，开始通信</span>
+      </div>
+      <div style="text-align:center;color:var(--muted)">同时</div>
+      <div class="flow-node" style="text-align:left;min-width:auto">
+        <strong style="color:var(--success)">Chunk 2：前向计算</strong>
+        <span style="color:var(--muted);display:block;font-size:0.9rem">GPU切换到下一个chunk的计算</span>
+      </div>
+    </div>
+    <p style="text-align:center;color:var(--muted);font-size:0.9rem">通过精细的chunk切分和双向调度，GPU永远不空闲</p>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">训练基础设施 · 通信优化</div>
+  <div class="slide-number">28 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">通信与内存优化</h2>
+    <h3 class="sub">高效的All-to-All通信与内存管理</h3>
+    <div class="two-col">
+      <div>
+        <div class="card accent">
+          <h4 style="color:var(--accent)">🔗 通信优化</h4>
+          <p>
+            <strong>跨节点：</strong>InfiniBand（IB）互连<br>
+            <strong>节点内：</strong>NVLink GPU直连<br>
+            <strong>定制化通信kernel：</strong>针对DeepSeekMoE的通信模式优化<br>
+            <strong>带宽利用：</strong>充分利用IB和NVLink带宽
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h4 style="color:var(--accent3)">💾 内存优化</h4>
+          <p>
+            <strong>减少中间状态：</strong>activation recomputation<br>
+            <strong>无张量并行（TP）：</strong>不依赖昂贵的TP<br>
+            <strong>ZeRO-1：</strong>仅分片优化器状态<br>
+            <strong>参数BF16：</strong>优化器状态FP32
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="hbox pink">
+      <h4>💡 设计哲学</h4>
+      <p>不依赖张量并行（TP）和流水线并行（PP），仅使用数据并行（DP）+ 专家并行（EP）+ ZeRO-1，大幅简化了分布式训练的复杂性。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">训练基础设施总览</div>
+  <div class="slide-number">29 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">训练基础设施总览</h2>
+    <h3 class="sub">2048块H800 GPU集群的协同工作</h3>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">🖥️</div>
+        <h4>硬件</h4>
+        <p>2048块NVIDIA H800 GPU<br>节点内NVLink<br>节点间InfiniBand</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">🔀</div>
+        <h4>分布式策略</h4>
+        <p>数据并行（DP）：64路<br>专家并行（EP）<br>ZeRO-1优化器分片<br>无TP，无PP</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--success)">⏱️</div>
+        <h4>训练效率</h4>
+        <p>训练时间：不到2个月<br>总GPU小时：2.788M<br>成本：约$5.58M<br>每GPU小时：$2</p>
+      </div>
+    </div>
+    <div class="hbox purple" style="margin-top:1.5rem">
+      <h4>💰 成本对比</h4>
+      <p>GPT-4训练成本估计$78M+（约14倍），Llama-3-405B估计$25M+（约4.5倍），DeepSeek-V3的成本效率在同类模型中遥遥领先。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">预训练数据</div>
+  <div class="slide-number">30 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">预训练数据构建</h2>
+    <h3 class="sub">14.8万亿tokens的构建策略</h3>
+    <div class="two-col">
+      <div>
+        <div class="card accent">
+          <h4 style="color:var(--accent)">📊 数据来源</h4>
+          <p>
+            • 网页文本（CommonCrawl等）<br>
+            • 代码（GitHub等）<br>
+            • 数学与科学文献<br>
+            • 多语言语料
+          </p>
+        </div>
+        <div class="card" style="margin-top:1rem">
+          <h4 style="color:var(--accent3)">🔍 质量过滤</h4>
+          <p>
+            • 文档级+段落级去重<br>
+            • 质量评分过滤<br>
+            • 敏感信息过滤<br>
+            • 语言识别与分类
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h4 style="color:var(--accent2)">⚖️ 数据混合策略</h4>
+          <p>
+            • 不同领域不同采样比例<br>
+            • 动态调整数据配比<br>
+            • 课程学习：先通用后专项<br>
+            • 平衡多语言与多领域
+          </p>
+        </div>
+        <div class="hbox pink" style="margin-top:1rem">
+          <h4>💡 数据哲学</h4>
+          <p>数据的质量比数量更重要。14.8T tokens不是简单的堆砌，而是经过精心筛选和配比的高质量训练数据。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">长上下文扩展</div>
+  <div class="slide-number">31 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">长上下文扩展：32K→128K</h2>
+    <h3 class="sub">两阶段扩展策略 + YaRN方法</h3>
+    <div class="flow">
+      <div class="flow-node hl">
+        <strong style="color:var(--accent)">第一阶段</strong><br>
+        <span style="font-size:0.9rem;color:var(--muted)">预训练baseline<br>32K上下文</span>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">
+        <strong style="color:var(--accent2)">第二阶段</strong><br>
+        <span style="font-size:0.9rem;color:var(--muted)">继续训练1000B tokens<br>32K→128K</span>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>🔧 YaRN方法</h4>
+      <p>修改RoPE的基频θ，分段频率缩放：<br>
+      • <strong>低压区（低频）：</strong>保持不动<br>
+      • <strong>高压区（高频）：</strong>线性插值<br>
+      • <strong>过渡区：</strong>NTK-aware缩放<br>
+      训练成本：仅119K H800 GPU小时（占总成本的4.3%）</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">后训练 · SFT</div>
+  <div class="slide-number">32 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">后训练：SFT监督微调</h2>
+    <h3 class="sub">150万条高质量指令数据</h3>
+    <div class="two-col">
+      <div>
+        <div class="card accent">
+          <h4 style="color:var(--accent)">📊 数据规模与来源</h4>
+          <p>
+            <strong>总量：</strong>150万条指令数据<br>
+            <strong>来源：</strong>人工标注 + 模型生成 + 数据增强<br>
+            <strong>训练轮数：</strong>1-2 epochs，避免过拟合<br>
+            <strong>学习率：</strong>比预训练低1-2个数量级
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h4 style="color:var(--accent3)">🎯 涵盖领域</h4>
+          <p>
+            • 推理（数学、逻辑）<br>
+            • 代码生成与调试<br>
+            • 创意写作<br>
+            • 角色扮演<br>
+            • 安全与对齐<br>
+            • 多语言对话
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">后训练 · 强化学习</div>
+  <div class="slide-number">33 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">后训练：强化学习（GRPO）</h2>
+    <h3 class="sub">Group Relative Policy Optimization</h3>
+    <div class="hbox">
+      <h4>🏆 奖励模型（RM）</h4>
+      <p>基于DeepSeek-V3 SFT checkpoint训练，使用comparison数据（人类偏好对比）。奖励信号涵盖：帮助性、安全性、准确性。</p>
+    </div>
+    <div class="flow" style="flex-direction:column;gap:0.8rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node" style="text-align:left;min-width:auto">
+        <strong style="color:var(--accent)">步骤1：生成多个候选回复</strong>
+      </div>
+      <div style="text-align:center;color:var(--muted)">↓</div>
+      <div class="flow-node" style="text-align:left;min-width:auto">
+        <strong style="color:var(--accent2)">步骤2：奖励模型评分</strong>
+      </div>
+      <div style="text-align:center;color:var(--muted)">↓</div>
+      <div class="flow-node hl" style="text-align:left;min-width:auto">
+        <strong style="color:var(--accent3)">步骤3：组内相对排序 + 策略优化</strong>
+      </div>
+    </div>
+    <div class="hbox purple">
+      <h4>📏 规则奖励</h4>
+      <p><strong>数学题：</strong>答案正确性（规则判断）| <strong>代码题：</strong>测试用例通过率（编译执行）| <strong>格式奖励：</strong>输出格式正确性</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">后训练 · 知识蒸馏</div>
+  <div class="slide-number">34 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">后训练：知识蒸馏</h2>
+    <h3 class="sub">从DeepSeek-R1系列蒸馏推理能力</h3>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">📝</div>
+        <h4>训练数据对齐</h4>
+        <p>R1的推理结果作为V3的目标输出，让V3学习R1的推理步骤和思维链。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">📊</div>
+        <h4>概率分布蒸馏</h4>
+        <p>R1的中间步骤概率分布指导V3，传递"思考过程"而非仅最终答案。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">🔄</div>
+        <h4>验证与反思机制</h4>
+        <p>R1的self-verification和reflection能力，让V3学会检查自己的推理过程。</p>
+      </div>
+    </div>
+    <div class="hbox success" style="margin-top:1.5rem">
+      <h4>✅ 蒸馏效果</h4>
+      <p>V3获得长链推理能力，同时保持通用对话能力。蒸馏让V3在不增加推理成本的情况下，获得了R1的深度推理能力。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">性能评测 · 推理能力</div>
+  <div class="slide-number">35 / 49</div>
+  <div class="slide-content">
+    <h1 class="st">DeepSeek-V3性能评测</h1>
+    <h3 class="sub">推理能力对标GPT-4o、Claude-3.5-Sonnet、Llama-3.1-405B</h3>
+    <table class="cmp">
+      <tr>
+        <th>Benchmark</th>
+        <th style="color:var(--accent3)">DeepSeek-V3</th>
+        <th>GPT-4o</th>
+        <th>Claude-3.5</th>
+        <th>Llama-3.1-405B</th>
+      </tr>
+      <tr>
+        <td><strong>MMLU</strong></td>
+        <td style="color:var(--accent3)">88.5</td>
+        <td>88.7</td>
+        <td>88.7</td>
+        <td>88.6</td>
+      </tr>
+      <tr>
+        <td><strong>MMLU-Pro</strong></td>
+        <td style="color:var(--accent3)">75.9</td>
+        <td>72.6</td>
+        <td>77.0</td>
+        <td>73.3</td>
+      </tr>
+      <tr>
+        <td><strong>GPQA</strong></td>
+        <td style="color:var(--accent3)">59.1</td>
+        <td>53.6</td>
+        <td>59.4</td>
+        <td>51.8</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--success)">MATH-500</strong></td>
+        <td style="color:var(--success);font-weight:bold">90.2</td>
+        <td>74.6</td>
+        <td>78.3</td>
+        <td>73.8</td>
+      </tr>
+      <tr>
+        <td><strong>HumanEval</strong></td>
+        <td style="color:var(--accent3);font-weight:bold">92.8</td>
+        <td>91.0</td>
+        <td>92.0</td>
+        <td>89.0</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">性能评测 · 推理能力</div>
+  <div class="slide-number">36 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">推理能力评测（续）</h2>
+    <h3 class="sub">代码与竞赛级数学</h3>
+    <table class="cmp">
+      <tr>
+        <th>Benchmark</th>
+        <th style="color:var(--accent3)">DeepSeek-V3</th>
+        <th>GPT-4o</th>
+        <th>Claude-3.5</th>
+        <th>Llama-3.1-405B</th>
+      </tr>
+      <tr>
+        <td><strong>LiveCodeBench</strong></td>
+        <td style="color:var(--accent3);font-weight:bold">40.5</td>
+        <td>34.2</td>
+        <td>36.3</td>
+        <td>31.4</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--warning)">AIME 2024</strong></td>
+        <td style="color:var(--warning);font-weight:bold">39.2</td>
+        <td>9.3</td>
+        <td>16.0</td>
+        <td>23.3</td>
+      </tr>
+    </table>
+    <div class="hbox success">
+      <h4>🏆 关键亮点</h4>
+      <p><strong>MATH-500：</strong>90.2分，远超GPT-4o（74.6）和Claude-3.5（78.3），数学推理能力出色。<br>
+      <strong>AIME 2024：</strong>39.2分，是GPT-4o（9.3）的4倍以上，竞赛级数学能力惊人。<br>
+      <strong>LiveCodeBench：</strong>40.5分，代码能力领先。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">性能评测 · 多语言与长文本</div>
+  <div class="slide-number">37 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">多语言与长文本能力</h2>
+    <h3 class="sub">中文与长上下文评测</h3>
+    <table class="cmp">
+      <tr>
+        <th>Benchmark（多语言）</th>
+        <th style="color:var(--accent3)">DeepSeek-V3</th>
+        <th>GPT-4o</th>
+      </tr>
+      <tr>
+        <td><strong>C-Eval（中文）</strong></td>
+        <td style="color:var(--accent3)">86.5</td>
+        <td>85.0</td>
+      </tr>
+      <tr>
+        <td><strong>CMMLU（中文）</strong></td>
+        <td style="color:var(--accent3)">85.8</td>
+        <td>83.7</td>
+      </tr>
+      <tr>
+        <td><strong>MMLU（多语言）</strong></td>
+        <td style="color:var(--accent3)">85.2</td>
+        <td>83.3</td>
+      </tr>
+    </table>
+    <table class="cmp">
+      <tr>
+        <th>Benchmark（长文本）</th>
+        <th style="color:var(--accent3)">DeepSeek-V3</th>
+        <th>GPT-4o</th>
+      </tr>
+      <tr>
+        <td><strong>LongBench v2</strong></td>
+        <td>48.7</td>
+        <td>48.1</td>
+      </tr>
+      <tr>
+        <td><strong>FRAMES</strong></td>
+        <td>72.5</td>
+        <td style="color:var(--danger)">80.5</td>
+      </tr>
+      <tr>
+        <td><strong>Needle In A Haystack</strong></td>
+        <td style="color:var(--success)">完美</td>
+        <td style="color:var(--success)">完美</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">训练成本分析</div>
+  <div class="slide-number">38 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">训练成本分析</h2>
+    <h3 class="sub">$5.58M的详细分解与行业对比</h3>
+    <table class="cmp">
+      <tr>
+        <th>阶段</th>
+        <th>GPU小时</th>
+        <th>占比</th>
+      </tr>
+      <tr>
+        <td><strong>预训练</strong></td>
+        <td>2,664K</td>
+        <td>95.5%</td>
+      </tr>
+      <tr>
+        <td><strong>上下文扩展</strong></td>
+        <td>119K</td>
+        <td>4.3%</td>
+      </tr>
+      <tr>
+        <td><strong>后训练</strong></td>
+        <td>5K</td>
+        <td>0.2%</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent3)">总计</strong></td>
+        <td style="color:var(--accent3);font-weight:bold">2,788K</td>
+        <td style="color:var(--accent3);font-weight:bold">100%</td>
+      </tr>
+    </table>
+    <table class="cmp">
+      <tr>
+        <th>模型</th>
+        <th>训练GPU小时</th>
+        <th>估计成本</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent3)">DeepSeek-V3</strong></td>
+        <td style="color:var(--accent3)">2.8M H800</td>
+        <td style="color:var(--success)">$5.58M</td>
+      </tr>
+      <tr>
+        <td><strong>Llama-3-405B</strong></td>
+        <td>30.8M H100</td>
+        <td>~$60M+</td>
+      </tr>
+      <tr>
+        <td><strong>GPT-4（估计）</strong></td>
+        <td>~100M H100</td>
+        <td>~$78M+</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">消融实验 · MLA</div>
+  <div class="slide-number">39 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">消融实验：MLA vs MHA vs GQA</h2>
+    <h3 class="sub">MLA在更小KV Cache下实现更好性能</h3>
+    <table class="cmp">
+      <tr>
+        <th>配置</th>
+        <th>MMLU</th>
+        <th>BBH</th>
+        <th>训练速度</th>
+        <th>KV Cache</th>
+      </tr>
+      <tr>
+        <td><strong>MHA</strong></td>
+        <td>85.0</td>
+        <td>68.1</td>
+        <td>1.0×</td>
+        <td>32,768</td>
+      </tr>
+      <tr>
+        <td><strong>GQA(8组)</strong></td>
+        <td>84.7</td>
+        <td>67.8</td>
+        <td>1.05×</td>
+        <td>2,048</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent3)">MLA</strong></td>
+        <td style="color:var(--accent3);font-weight:bold">85.2</td>
+        <td style="color:var(--accent3);font-weight:bold">68.5</td>
+        <td style="color:var(--accent3)">1.1×</td>
+        <td style="color:var(--success);font-weight:bold">576</td>
+      </tr>
+    </table>
+    <div class="hbox success">
+      <h4>✅ 结论</h4>
+      <p>MLA在KV Cache仅为MHA的1.8%的情况下，MMLU和BBH均超越MHA。低秩压缩不仅减少显存，还有正则化效果，使模型学习更本质的表示。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">消融实验 · MTP</div>
+  <div class="slide-number">40 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">消融实验：MTP的效果</h2>
+    <h3 class="sub">多Token预测在不同深度下的收益</h3>
+    <table class="cmp">
+      <tr>
+        <th>配置</th>
+        <th>MMLU</th>
+        <th>MATH</th>
+        <th>HumanEval</th>
+        <th>训练速度</th>
+      </tr>
+      <tr>
+        <td><strong>无MTP</strong></td>
+        <td>85.5</td>
+        <td>80.2</td>
+        <td>88.5</td>
+        <td>1.0×</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent3)">MTP(D=1)</strong></td>
+        <td style="color:var(--accent3)">86.1</td>
+        <td style="color:var(--accent3)">82.0</td>
+        <td style="color:var(--accent3)">90.2</td>
+        <td>0.95×</td>
+      </tr>
+      <tr>
+        <td><strong>MTP(D=2)</strong></td>
+        <td style="color:var(--accent3)">86.5</td>
+        <td style="color:var(--accent3)">83.1</td>
+        <td style="color:var(--accent3)">91.0</td>
+        <td>0.90×</td>
+      </tr>
+    </table>
+    <div class="hbox purple">
+      <h4>📊 结论</h4>
+      <p>MTP在所有benchmark上均有提升。D=1时性价比最高——仅增加约5%训练开销，但数学和代码能力提升显著。D=2进一步提升但边际收益递减。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">消融实验 · Auxiliary-Loss-Free</div>
+  <div class="slide-number">41 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">消融实验：负载均衡策略对比</h2>
+    <h3 class="sub">Auxiliary-Loss-Free在不损害性能的前提下实现负载均衡</h3>
+    <table class="cmp">
+      <tr>
+        <th>策略</th>
+        <th>MMLU</th>
+        <th>专家利用率</th>
+        <th>训练稳定性</th>
+      </tr>
+      <tr>
+        <td><strong>无负载均衡</strong></td>
+        <td>85.0</td>
+        <td style="color:var(--danger)">30%</td>
+        <td style="color:var(--danger)">不稳定</td>
+      </tr>
+      <tr>
+        <td><strong>辅助损失</strong></td>
+        <td style="color:var(--danger)">84.5</td>
+        <td style="color:var(--success)">85%</td>
+        <td style="color:var(--success)">稳定</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent3)">Aux-Loss-Free</strong></td>
+        <td style="color:var(--accent3);font-weight:bold">85.2</td>
+        <td style="color:var(--success)">82%</td>
+        <td style="color:var(--success)">稳定</td>
+      </tr>
+    </table>
+    <div class="hbox success">
+      <h4>✅ 结论</h4>
+      <p>Auxiliary-Loss-Free在保持高专家利用率（82%）的同时，MMLU分数（85.2）甚至高于无负载均衡（85.0），证明该方案完全避免了辅助损失对模型性能的损害。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DeepSeek-R1与V3的关系</div>
+  <div class="slide-number">42 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">DeepSeek-R1系列与V3的关系</h2>
+    <h3 class="sub">从基础模型到推理专家的演进</h3>
+    <div class="flow" style="flex-direction:column;gap:1rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node hl" style="text-align:left;min-width:auto">
+        <strong style="color:var(--accent)">DeepSeek-V3</strong>
+        <span style="color:var(--muted);margin-left:1rem">基础模型：MLA+MoE+MTP，通用能力</span>
+      </div>
+      <div style="text-align:center;color:var(--muted)">↓</div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent2);padding-left:1rem">
+        <strong style="color:var(--accent2)">R1-Zero</strong>
+        <span style="color:var(--muted);margin-left:1rem">纯RL训练，无SFT，展示RL的涌现能力</span>
+      </div>
+      <div style="text-align:center;color:var(--muted)">↓</div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent3);padding-left:1rem">
+        <strong style="color:var(--accent3)">R1</strong>
+        <span style="color:var(--muted);margin-left:1rem">SFT冷启动 + RL训练 + 蒸馏，推理专家</span>
+      </div>
+      <div style="text-align:center;color:var(--muted)">↓</div>
+      <div class="flow-node hl" style="text-align:left;min-width:auto">
+        <strong style="color:var(--success)">V3（蒸馏增强）</strong>
+        <span style="color:var(--muted);margin-left:1rem">从R1蒸馏推理能力，整合到通用模型</span>
+      </div>
+    </div>
+    <div class="hbox pink">
+      <h4>💡 R1的"aha moment"</h4>
+      <p>模型在RL训练中自发学会反思和验证——"Wait, let me re-evaluate..."——这是推理能力的涌现，完全由RL驱动而非人工编程。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">核心贡献总结</div>
+  <div class="slide-number">43 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">DeepSeek-V3的核心贡献总结</h2>
+    <h3 class="sub">架构创新 + 训练创新 + 经济贡献</h3>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">🏗️</div>
+        <h4>架构贡献</h4>
+        <p>1. MLA：56.9× KV Cache压缩<br>2. DeepSeekMoE：细粒度专家+共享专家<br>3. MTP：多Token预测提升效率</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">⚙️</div>
+        <h4>训练贡献</h4>
+        <p>4. Aux-Loss-Free负载均衡<br>5. FP8混合精度训练<br>6. DualPipe计算通信重叠</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--success)">💰</div>
+        <h4>经济贡献</h4>
+        <p>7. $5.58M训练671B模型<br>8. 仅为同类模型成本的1/10-1/20<br>打破"大模型=烧钱"的刻板印象</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">关键公式汇总</div>
+  <div class="slide-number">44 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">V3论文中的关键公式汇总</h2>
+    <h3 class="sub">一页掌握所有核心公式</h3>
+    <div class="formula" style="text-align:left">
+      $$\begin{aligned}
+      &1.\ \text{MLA压缩：} && c^{KV} = W^{DKV} \cdot h, \quad c^{Q} = W^{DQ} \cdot h \\
+      &2.\ \text{MLA恢复：} && k = W^{UK} \cdot c^{KV}, \quad q = W^{UQ} \cdot c^{Q} \\
+      &3.\ \text{解耦RoPE：} && k = \begin{bmatrix} k^{C} \\ k^{R} \end{bmatrix}, \quad q = \begin{bmatrix} q^{C} \\ q^{R} \end{bmatrix} \\
+      &4.\ \text{MoE路由：} && s_i = \sigma(u^\top \cdot e_i) \\
+      &5.\ \text{负载均衡：} && b_i \leftarrow b_i + \gamma \cdot \text{sign}(\text{负载偏差}) \\
+      &6.\ \text{MTP损失：} && L_{\text{MTP}} = \sum_{k=1}^{D} \text{CrossEntropy}(p_k, y_{t+k}) \\
+      &7.\ \text{FP8量化：} && X_{\text{FP8}} = \mathrm{round}\!\left(\frac{X_{\text{BF16}}}{\text{scale}}\right)
+      \end{aligned}$$
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">V3演进路线</div>
+  <div class="slide-number">45 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">V3→V3.1→V3.2-Exp→V3.2 演进路线</h2>
+    <h3 class="sub">V3论文的架构保持不变，后续版本在此之上优化效率</h3>
+    <div class="flow" style="flex-direction:column;gap:1rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node hl" style="text-align:left;min-width:auto;border-left:4px solid var(--accent);padding-left:1.5rem">
+        <strong style="color:var(--accent)">2024.12 · DeepSeek-V3</strong>
+        <span style="color:var(--muted);margin-left:1rem">基础架构，MLA+MoE+MTP，奠定技术基石</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent2);padding-left:1.5rem">
+        <strong style="color:var(--accent2)">2025.08 · V3.1-Terminus</strong>
+        <span style="color:var(--muted);margin-left:1rem">128K上下文优化，Agent能力增强</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent3);padding-left:1.5rem">
+        <strong style="color:var(--accent3)">2025.09 · V3.2-Exp</strong>
+        <span style="color:var(--muted);margin-left:1rem">DSA稀疏注意力实验，推理效率优化</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--success);padding-left:1.5rem">
+        <strong style="color:var(--success)">2025.12 · V3.2</strong>
+        <span style="color:var(--muted);margin-left:1rem">正式版，Agent能力突破，工具使用增强</span>
+      </div>
+    </div>
+    <div class="hbox purple">
+      <h4>💡 演进主线</h4>
+      <p>V3论文的MLA+MoE+MTP架构保持不变，后续版本的优化集中在上下文扩展、推理效率、Agent能力等方面，这证明了V3基础架构的优越性。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">论文阅读建议</div>
+  <div class="slide-number">46 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">DeepSeek-V3论文的阅读建议</h2>
+    <h3 class="sub">arXiv:2412.19437 论文结构导航</h3>
+    <div class="two-col">
+      <div>
+        <div class="card accent">
+          <h4 style="color:var(--accent)">📑 论文结构</h4>
+          <p>
+            <strong>Section 2：</strong>架构详解（MLA+MoE）<br>
+            <strong>Section 3：</strong>训练基础设施<br>
+            <strong>Section 4：</strong>预训练<br>
+            <strong>Section 5：</strong>后训练<br>
+            <strong>Section 6：</strong>评估<br>
+            <strong>Section 7：</strong>结论与局限
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h4 style="color:var(--accent3)">📖 推荐阅读顺序</h4>
+          <p>
+            1. 先读Section 2理解架构创新<br>
+            2. 再读Section 3理解如何高效训练<br>
+            3. 然后读Section 4-5了解数据和处理<br>
+            4. 最后读Section 6看效果
+          </p>
+        </div>
+        <div class="hbox pink" style="margin-top:1rem">
+          <h4>🎯 核心理解要点</h4>
+          <p>MLA为什么能压缩KV Cache？解耦RoPE的必要性？Auxiliary-Loss-Free的巧妙之处？FP8训练的挑战与解决方案？</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">重要术语表</div>
+  <div class="slide-number">47 / 49</div>
+  <div class="slide-content">
+    <h2 class="st">重要术语表</h2>
+    <h3 class="sub">V3论文中的核心术语一览</h3>
+    <div class="two-col">
+      <div class="body" style="font-size:0.95rem">
+        <ul>
+          <li><strong style="color:var(--accent)">MLA</strong> — Multi-head Latent Attention</li>
+          <li><strong style="color:var(--accent2)">DeepSeekMoE</strong> — 细粒度+共享专家MoE</li>
+          <li><strong style="color:var(--accent3)">MTP</strong> — Multi-Token Prediction</li>
+          <li><strong style="color:var(--success)">Auxiliary-Loss-Free</strong> — 无辅助损失负载均衡</li>
+          <li><strong style="color:var(--warning)">FP8 Mixed Precision</strong> — FP8混合精度训练</li>
+          <li><strong style="color:var(--danger)">Block-wise Quantization</strong> — 块级量化</li>
+          <li><strong style="color:var(--accent)">DualPipe</strong> — 双向流水线并行</li>
+        </ul>
+      </div>
+      <div class="body" style="font-size:0.95rem">
+        <ul>
+          <li><strong style="color:var(--accent2)">YaRN</strong> — Yet another RoPE extensioN</li>
+          <li><strong style="color:var(--accent3)">Decoupled RoPE</strong> — 解耦式RoPE</li>
+          <li><strong style="color:var(--success)">Shared Expert</strong> — 共享专家</li>
+          <li><strong style="color:var(--warning)">Routed Expert</strong> — 路由专家</li>
+          <li><strong style="color:var(--danger)">Fine-grained Expert Segmentation</strong></li>
+          <li><strong style="color:var(--accent)">GRPO</strong> — Group Relative Policy Optimization</li>
+          <li><strong style="color:var(--accent2)">Speculative Decoding</strong> — 推测性解码</li>
+          <li><strong style="color:var(--accent3)">ZeRO-1</strong> — 优化器状态分片</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">总结</div>
+  <div class="slide-number">48 / 49</div>
+  <div class="slide-content">
+    <h1 class="st">总结</h1>
+    <h3 class="sub">DeepSeek-V3：架构创新与工程优化的完美结合</h3>
+    <div class="body">
+      <ul>
+        <li><strong style="color:var(--accent3)">MLA：</strong>用低秩压缩实现56.9× KV Cache缩减，性能超越MHA</li>
+        <li><strong style="color:var(--accent)">MoE：</strong>671B参数但每个token仅激活37B，高效推理</li>
+        <li><strong style="color:var(--accent2)">MTP：</strong>多Token预测提升数据效率，支持推测性解码</li>
+        <li><strong style="color:var(--success)">Aux-Loss-Free：</strong>无需牺牲性能的负载均衡方案</li>
+        <li><strong style="color:var(--warning)">FP8训练：</strong>首次在超大规模验证，显存和带宽减半</li>
+        <li><strong style="color:var(--danger)">$5.58M训练成本：</strong>打破"大模型=烧钱"的刻板印象</li>
+      </ul>
+    </div>
+    <div class="hbox success" style="margin-top:1.5rem">
+      <h4>📄 论文地址</h4>
+      <p>arxiv.org/abs/2412.19437 — DeepSeek-V3 Technical Report</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-number">49 / 49</div>
+  <div class="slide-content">
+    <h1>🐋 恭喜掌握DeepSeek-V3论文！</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      你已经深入理解了DeepSeek-V3技术报告的全部核心创新<br><br>
+      <strong style="color:var(--accent3)">从MLA到DeepSeekMoE，从MTP到FP8训练</strong><br>
+      你已经掌握了当前最前沿的大模型架构技术<br><br>
+      现在去阅读原论文，去动手实践，去探索AI的更多可能！
+    </p>
+    <div class="end-buttons">
+      <a href="slides.html" class="end-btn secondary">📊 返回PPT目录</a>
+      <a href="chapter7.html" class="end-btn secondary">🎬 回到视频页</a>
+      <a href="https://github.com/deepseek-ai/DeepSeek-V3" class="end-btn primary">🐙 前往GitHub</a>
+    </div>
+    <div class="tags" style="justify-content:center;margin-top:3rem">
+      <span class="tag pi">🔥 DeepSeek-V3论文精读完成</span>
+      <span class="tag p">🧠 理解MLA/MoE/MTP/FP8</span>
+      <span class="tag g">🚀 继续探索AI前沿</span>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+});
+</script>
+</body></html>

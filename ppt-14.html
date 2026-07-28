@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>第14集 PCA主成分分析 - ML学习站PPT</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#38bdf8;--accent2:#818cf8;--accent3:#c084fc;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--accent3);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent3);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(192,132,252,0.1) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(129,140,248,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(192,132,252,0.1);border:1px solid rgba(192,132,252,0.25);border-radius:50px;font-size:1rem;color:var(--accent3);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:700px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(192,132,252,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:1.8rem 2rem;margin:1.5rem 0;text-align:center;font-size:clamp(1rem,1.8vw,1.25rem);line-height:2.2;overflow-x:auto}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:1rem;display:block;text-align:left;line-height:1.7}
+.katex{color:var(--accent3)}.katex .mord.text{color:var(--ink2)}
+.hbox{background:rgba(192,132,252,0.08);border-left:4px solid var(--accent3);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1.5rem 0}
+.hbox h4{color:var(--accent3);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(251,191,36,0.08);border-left-color:var(--warning)}.hbox.warn h4{color:var(--warning)}
+.hbox.danger{background:rgba(248,113,113,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.purple{background:rgba(129,140,248,0.08);border-left-color:var(--accent2)}.hbox.purple h4{color:var(--accent2)}
+.hbox.blue{background:rgba(56,189,248,0.08);border-left-color:var(--accent)}.hbox.blue h4{color:var(--accent)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:1rem}
+table.cmp th{background:var(--bg3);color:var(--accent3);padding:12px 16px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.95rem}
+table.cmp td{padding:10px 16px;border-bottom:1px solid var(--rule);color:var(--ink2)}
+table.cmp tr:hover td{background:rgba(192,132,252,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent3);background:rgba(192,132,252,0.1);color:var(--accent3);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent3)}
+.tag.p{color:var(--accent2)}.tag.b{color:var(--accent)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent3),var(--accent2),var(--accent));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent3);color:var(--accent3)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent3)}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.code{background:var(--bg);border:1px solid var(--rule);border-radius:14px;padding:1.5rem 2rem;margin:1.5rem 0;font-family:var(--mono);font-size:clamp(0.85rem,1.4vw,1rem);line-height:1.8;color:var(--ink2);overflow-x:auto;white-space:pre}
+.code .kw{color:var(--accent3)}.code .fn{color:var(--accent)}.code .str{color:var(--success)}.code .cm{color:var(--muted);font-style:italic}.code .num{color:var(--warning)}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:2rem;align-items:center;margin:2rem 0}
+.vs-side{padding:2rem;border-radius:16px;text-align:center}.vs-left{background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.2)}
+.vs-right{background:rgba(192,132,252,0.06);border:1px solid rgba(192,132,252,0.2)}
+.vs-divider{font-size:2rem;font-weight:800;color:var(--muted)}
+.visual-box{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;margin:1.5rem 0;min-height:200px;display:flex;align-items:center;justify-content:center}
+.dim-demo{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin:1rem 0}
+.dim-item{padding:1rem 1.5rem;background:var(--bg3);border-radius:12px;text-align:center;border:1px solid var(--rule)}
+.dim-item.hl{border-color:var(--accent3);background:rgba(192,132,252,0.1)}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col,.vs{grid-template-columns:1fr}.vs-divider{text-align:center}.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="slides.html" style="font-weight:600;color:var(--accent3)">📊 PPT课件</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="ppt-13.html">← 上一集</a>
+    <a href="chapter1.html">回到视频页</a>
+    <a href="ppt-15.html">下一集 →</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">机器学习入门教程 · 第14集</div>
+    <h1 class="cover-title">PCA主成分分析</h1>
+    <p class="cover-sub">降维与可视化——机器学习最后一个经典模型<br>BV1YMoDBuEm2 · 时长 22分19秒</p>
+    <div class="tags">
+      <span class="tag">无监督学习</span>
+      <span class="tag p">降维</span>
+      <span class="tag b">数据可视化</span>
+      <span class="tag g">特征工程</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">2 / 36</div>
+  <div class="slide-content">
+    <h1 class="st">本集学习目标</h1>
+    <h3 class="sub">通过这一集，你将掌握PCA的核心原理与应用</h3>
+    <div class="body">
+      <ul>
+        <li><strong>理解为什么需要降维</strong>——高维数据带来的四大问题</li>
+        <li><strong>掌握维度灾难的本质</strong>——高维空间中距离失效、数据稀疏</li>
+        <li><strong>理解PCA的核心思想</strong>——找到方差最大的方向（主成分）</li>
+        <li><strong>理解主成分的数学本质</strong>——协方差矩阵的特征值分解</li>
+        <li><strong>掌握方差解释率</strong>——如何选择保留多少个主成分</li>
+        <li><strong>记住使用PCA的注意事项</strong>——必须标准化、不是特征选择</li>
+        <li><strong>了解PCA的实际应用</strong>——可视化、去噪、特征压缩、Eigenface</li>
+        <li><strong>能用sklearn实现PCA</strong>——掌握代码调用方法</li>
+      </ul>
+    </div>
+    <div class="hbox">
+      <h4>🎯 学习建议</h4>
+      <p>PCA是无监督学习的经典算法，也是本系列讲解的最后一个传统机器学习模型。重点理解"为什么要找方差最大的方向"这个核心直觉，数学部分不用死记硬背，理解概念即可。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">3 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">什么是维度？</h2>
+    <h3 class="sub">维度 = 特征数量，就是描述一个样本用了多少个数字</h3>
+    <div class="body">
+      <p>简单来说：<strong style="color:var(--accent3)">数据有多少个特征，就是多少维</strong>。</p>
+    </div>
+    <div class="dim-demo">
+      <div class="dim-item">
+        <div style="font-size:2rem;font-weight:800;color:var(--success)">1D</div>
+        <div style="margin-top:0.5rem;color:var(--muted)">1个特征<br>身高</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="dim-item">
+        <div style="font-size:2rem;font-weight:800;color:var(--accent)">2D</div>
+        <div style="margin-top:0.5rem;color:var(--muted)">2个特征<br>身高 + 体重</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="dim-item">
+        <div style="font-size:2rem;font-weight:800;color:var(--accent2)">3D</div>
+        <div style="margin-top:0.5rem;color:var(--muted)">3个特征<br>身高 + 体重 + 年龄</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="dim-item hl">
+        <div style="font-size:2rem;font-weight:800;color:var(--accent3)">nD</div>
+        <div style="margin-top:0.5rem;color:var(--muted)">n个特征<br>身高+体重+年龄+...+收入</div>
+      </div>
+    </div>
+    <div class="hbox blue">
+      <h4>📌 现实中的高维数据</h4>
+      <p>
+        • 表格数据：几百上千个特征很常见<br>
+        • 图像数据：一张28×28的MNIST手写数字图片 = 784维<br>
+        • 文本数据：词袋模型/TF-IDF轻松上万维<br>
+        • 基因数据：基因表达数据可以达到几万维
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">4 / 36</div>
+  <div class="slide-content">
+    <h1 class="st">高维数据带来的问题</h1>
+    <h3 class="sub">维度不是越高越好——"维数越高，信息越丰富"是错觉</h3>
+    <div class="four-col" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0">
+      <div class="card" style="border-left:4px solid var(--danger)">
+        <h4 style="color:var(--danger)">💥 问题一：维度灾难</h4>
+        <p>高维空间中距离失效、数据极其稀疏，所需样本量指数增长。</p>
+      </div>
+      <div class="card" style="border-left:4px solid var(--warning)">
+        <h4 style="color:var(--warning)">👁️ 问题二：无法可视化</h4>
+        <p>人只能理解2D/3D，超过3维的数据我们根本"看"不见。</p>
+      </div>
+      <div class="card" style="border-left:4px solid var(--accent2)">
+        <h4 style="color:var(--accent2)">🔗 问题三：特征冗余与噪声</h4>
+        <p>很多特征高度相关，存在大量冗余信息，甚至引入噪声。</p>
+      </div>
+      <div class="card" style="border-left:4px solid var(--accent)">
+        <h4 style="color:var(--accent)">🐢 问题四：计算量大、训练慢</h4>
+        <p>维度越高，模型训练越慢，还容易过拟合。</p>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 这就是为什么需要降维</h4>
+      <p>降维就是在尽可能保留重要信息的前提下，把高维数据压缩到低维，一举解决上述四大问题。PCA是最经典、最常用的降维算法。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">5 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">问题一：维度灾难</h2>
+    <h3 class="sub">Curse of Dimensionality——高维空间的反直觉现象</h3>
+    <div class="body">
+      <p>"维度灾难"是指：当数据维度很高时，我们在低维空间积累的所有直觉全部失效，出现很多反常识的现象。</p>
+    </div>
+    <div class="big-num" style="text-align:center;font-size:clamp(2.5rem,6vw,4rem)">高维空间 ≠ 三维空间的简单推广</div>
+    <div class="hbox danger">
+      <h4>🎯 核心悖论</h4>
+      <p>理论上维度越高，能表达的信息越多；但实际上，维度高到一定程度后，数据变得极其稀疏，距离度量失效，机器学习模型的性能反而会下降——需要的样本量呈<strong>指数级</strong>增长！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">6 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">维度灾难详解（一）</h2>
+    <h3 class="sub">高维空间中距离失效——任意两点距离都差不多</h3>
+    <div class="two-col">
+      <div class="body">
+        <p><strong>现象1：距离度量失效</strong></p>
+        <p>在低维空间中，"近"和"远"差别很大；但在超高维空间中：</p>
+        <ul>
+          <li>任意两个样本点之间的距离<strong>几乎都相等</strong></li>
+          <li>"最近邻"和"最远邻"的距离差别可以忽略不计</li>
+          <li>KNN、聚类这类基于距离的算法直接"懵了"</li>
+        </ul>
+        <p style="margin-top:1rem"><strong>现象2：数据极度稀疏</strong></p>
+        <ul>
+          <li>1维：单位区间内放100个点很密</li>
+          <li>2维：单位正方形内放100个点就有点稀了</li>
+          <li>100维：单位超立方体内放100个点——几乎全是空的！</li>
+        </ul>
+      </div>
+      <div>
+        <div class="card">
+          <h4 style="color:var(--danger)">📊 样本量需求</h4>
+          <p style="margin-bottom:0.8rem">要保持同样的数据密度，所需样本数随维度呈<strong>指数增长</strong>：</p>
+          <div class="formula" style="margin:0;padding:1rem;font-size:0.95rem">
+      $$\displaystyle 1维：10个点 → 足够密 \ 2维：10² = 100个点 \ 3维：10³ = 1000个点 \ ... \ 100维：10¹⁰⁰个点！$$
+      <span class="desc">这比宇宙中的原子数还多，根本不可能收集到这么多样本。</span>
+    </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">7 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">问题二：无法可视化</h2>
+    <h3 class="sub">人类的眼睛只能看见2D/3D，高维数据我们"看不见"</h3>
+    <div class="body">
+      <p>数据可视化是理解数据最重要的手段，但我们被三维世界限制住了：</p>
+      <ul>
+        <li><strong>1D数据</strong>：画个数轴就能看</li>
+        <li><strong>2D数据</strong>：散点图，一目了然</li>
+        <li><strong>3D数据</strong>：可以画3D散点图，但已经开始眼花</li>
+        <li><strong>≥4维数据</strong>：直接"盲人摸象"，根本没法直观感受</li>
+      </ul>
+    </div>
+    <div class="hbox purple">
+      <h4>💡 降维 = 给数据"拍照片"</h4>
+      <p>PCA最常用的用途之一就是<strong>数据可视化</strong>：把几十上百维的数据降到2D或3D，画成散点图，我们就能直观看到数据的分布、簇、离群点等结构。就像给三维世界拍二维照片，虽然丢了深度信息，但核心内容还在。</p>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <h4>🖼️ 经典例子：MNIST手写数字</h4>
+      <p>MNIST每张图片是784维（28×28像素），用PCA降到2维后画出来，你会发现：<strong>同一个数字的样本会聚在一起，不同数字自然分开</strong>——这说明降维保留了最核心的分类信息。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">8 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">问题三：特征冗余与噪声</h2>
+    <h3 class="sub">特征越多≠信息越多——很多特征是重复甚至有害的</h3>
+    <div class="two-col">
+      <div>
+        <div class="card">
+          <h4 style="color:var(--accent2)">🔗 特征冗余</h4>
+          <p>现实数据中很多特征是高度相关的，它们在"重复说同一件事"：</p>
+          <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.8rem">
+            <li>"身高（厘米）"和"身高（英寸）"——完全相关</li>
+            <li>"房屋面积（平方米）"和"房间数量"——高度相关</li>
+            <li>"像素(10,10)"和"像素(10,11)"——相邻像素高度相关</li>
+          </ul>
+          <p style="margin-top:0.8rem;color:var(--accent2)">冗余特征不仅浪费计算，还会干扰模型。</p>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <h4 style="color:var(--danger)">📢 噪声问题</h4>
+          <p>不是所有特征都包含有用信息，有些特征纯粹是噪声：</p>
+          <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.8rem">
+            <li>测量误差带来的随机波动</li>
+            <li>和预测目标完全无关的特征</li>
+            <li>收集数据时混入的无关信息</li>
+          </ul>
+          <p style="margin-top:0.8rem;color:var(--danger)">噪声特征会让模型学到错误规律，导致过拟合。</p>
+        </div>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>✨ PCA能做什么？</h4>
+      <p>PCA能自动把相关的特征"融合"成少数几个不相关的主成分，既去掉冗余，又能在一定程度上抑制噪声——因为噪声通常方差小，会被排在后面自动丢弃。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">9 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">问题四：计算量大、训练慢</h2>
+    <h3 class="sub">维度越高，模型的时间和空间复杂度都会飙升</h3>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-icon">⏱️</div>
+        <h4>训练时间长</h4>
+        <p>很多模型的训练时间随维度呈超线性甚至平方增长。维度从100涨到10000，训练时间可能涨上千倍。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">💾</div>
+        <h4>内存占用大</h4>
+        <p>高维特征矩阵占用大量内存/显存。存储100万条10000维数据需要几十GB空间。</p>
+      </div>
+      <div class="card" style="border-color:rgba(248,113,113,0.3)">
+        <div class="card-icon">🎯</div>
+        <h4 style="color:var(--danger)">容易过拟合</h4>
+        <p>维度越高，模型越容易"记住"训练数据的噪声和细节，而不是学到真正的规律，泛化能力变差。</p>
+      </div>
+    </div>
+    <div class="hbox blue">
+      <h4>⚡ 降维的工程价值</h4>
+      <p>在工业界，把特征从10000维降到100维，模型精度可能只降1%~2%，但训练速度能快100倍，推理速度也大幅提升，部署成本显著降低——这在工程上是非常划算的买卖。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">10 / 36</div>
+  <div class="slide-content">
+    <h1 class="st">降维的目标</h1>
+    <h3 class="sub">Dimensionality Reduction——用更少的特征表达最多的信息</h3>
+    <div class="flow" style="margin:2rem 0">
+      <div class="flow-node" style="min-width:150px">📊 高维数据<br><small style="color:var(--muted)">n维原始特征</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:180px">🎯 PCA降维<br><small style="color:var(--muted)">保留最多信息</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:150px">📉 低维数据<br><small style="color:var(--muted)">k维新特征 (k≪n)</small></div>
+    </div>
+    <div class="body">
+      <p>降维的核心目标可以概括为三句话：</p>
+    </div>
+    <div class="three-col" style="margin-top:1rem">
+      <div class="hbox success" style="margin:0">
+        <h4>✅ 保留核心信息</h4>
+        <p>丢掉的是冗余和噪声，关键信息要尽可能保留。</p>
+      </div>
+      <div class="hbox blue" style="margin:0">
+        <h4>✅ 新特征互不相关</h4>
+        <p>降维后的特征之间没有冗余，各说各的信息。</p>
+      </div>
+      <div class="hbox purple" style="margin:0">
+        <h4>✅ 维度大幅减少</h4>
+        <p>从成百上千维降到几十维甚至2/3维。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">11 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">降维不是随便丢特征！</h2>
+    <h3 class="sub">直接砍掉几个特征是最笨的方法——会丢失重要信息</h3>
+    <div class="vs">
+      <div class="vs-side vs-left">
+        <h3 style="color:var(--danger);margin-bottom:1rem">❌ 错误做法：特征选择</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul style="font-size:0.95rem">
+            <li>直接挑几个特征留下，其他删掉</li>
+            <li>比如：从100个特征里选10个</li>
+            <li>问题：每个被删掉的特征可能都包含一点独特信息</li>
+            <li>就像把照片从中间裁掉一半——剩下的一半不完整</li>
+            <li>信息丢失严重</li>
+          </ul>
+        </div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side vs-right">
+        <h3 style="color:var(--accent3);margin-bottom:1rem">✅ PCA做法：特征变换</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul style="font-size:0.95rem">
+            <li>不是删除，而是"融合重组"</li>
+            <li>把原来n个特征通过数学变换，组合成k个新特征</li>
+            <li>每个新特征都包含原来所有特征的部分信息</li>
+            <li>就像给高维数据"拍全景照"——整体保留，只是压缩</li>
+            <li>信息损失最小化</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 重要区分</h4>
+      <p>PCA是<strong>特征变换</strong>（Feature Transformation），不是<strong>特征选择</strong>（Feature Selection）。它创造了全新的特征，而不是从旧特征里挑几个。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">12 / 36</div>
+  <div class="slide-content">
+    <h1 class="st">PCA核心思想</h1>
+    <h3 class="sub">找到数据分布中最重要的方向——"主成分"</h3>
+    <div class="big-num" style="text-align:center">Principal Component Analysis</div>
+    <div class="hbox pink">
+      <h4>💡 一句话理解PCA</h4>
+      <p style="font-size:1.15rem">PCA要找的是：<strong>数据投影后方差最大的方向</strong>。数据在这个方向上最分散，包含的信息量最多。沿着这个方向"看"数据，能看到最清楚的"形状"。</p>
+    </div>
+    <div class="flow" style="margin-top:2rem">
+      <div class="flow-node">🗺️ 高维空间的数据点云</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl">🔍 找方差最大的方向</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">📐 投影到这些方向上</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">✨ 得到低维表示</div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">13 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">PCA直觉：投影到方差最大的方向</h2>
+    <h3 class="sub">用二维→一维的例子建立直观理解</h3>
+    <div class="visual-box">
+      <div style="text-align:center">
+        <svg width="500" height="280" viewBox="0 0 500 280">
+          <defs>
+            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#c084fc;stop-opacity:0.8" />
+              <stop offset="100%" style="stop-color:#818cf8;stop-opacity:0.8" />
+            </linearGradient>
+          </defs>
+          <line x1="50" y1="230" x2="450" y2="50" stroke="#c084fc" stroke-width="3" stroke-dasharray="8,4"/>
+          <text x="460" y="45" fill="#c084fc" font-size="14" font-weight="600">PC1方向（方差最大）</text>
+          <line x1="50" y1="50" x2="450" y2="230" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4"/>
+          <text x="460" y="240" fill="#64748b" font-size="13">差的方向（方差小）</text>
+          <g fill="url(#grad1)">
+            <circle cx="120" cy="200" r="5"/><circle cx="140" cy="190" r="5"/><circle cx="160" cy="180" r="5"/>
+            <circle cx="180" cy="170" r="5"/><circle cx="200" cy="160" r="5"/><circle cx="220" cy="150" r="5"/>
+            <circle cx="240" cy="140" r="5"/><circle cx="260" cy="130" r="5"/><circle cx="280" cy="120" r="5"/>
+            <circle cx="300" cy="110" r="5"/><circle cx="320" cy="100" r="5"/><circle cx="340" cy="90" r="5"/>
+            <circle cx="150" cy="175" r="5"/><circle cx="250" cy="145" r="5"/><circle cx="350" cy="95" r="5"/>
+            <circle cx="170" cy="185" r="5"/><circle cx="270" cy="135" r="5"/><circle cx="210" cy="155" r="5"/>
+          </g>
+          <line x1="60" y1="240" x2="440" y2="240" stroke="#94a3b8" stroke-width="1"/>
+          <line x1="60" y1="240" x2="60" y2="40" stroke="#94a3b8" stroke-width="1"/>
+          <text x="240" y="265" fill="#94a3b8" font-size="12">x₁</text>
+          <text x="30" y="140" fill="#94a3b8" font-size="12">x₂</text>
+        </svg>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🎯 看图理解</h4>
+      <p>图中椭圆形的数据点云：沿着紫色虚线方向，数据拉得很长、很分散（方差大）；沿着灰色虚线方向，数据很窄（方差小）。把数据投影到紫色方向上，点依然分得很开——保留了最多信息；投影到灰色方向，点都挤在一起——信息损失严重。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">14 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">什么是"方差最大的方向"？</h2>
+    <h3 class="sub">方差 = 数据分散程度 = 信息量大小</h3>
+    <div class="two-col">
+      <div class="card accent">
+        <h4 style="color:var(--accent3)">📊 方差大 = 信息多</h4>
+        <p>想象你用手机拍照：</p>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.8rem">
+          <li>正对着景物拍，能看到所有东西的细节和层次</li>
+          <li>这就是"方差大"的方向——数据区分度高，不同样本差异明显</li>
+          <li>人与人之间差别很大，模型容易学习</li>
+        </ul>
+        <div class="formula" style="margin:1rem 0 0;padding:1rem;text-align:left;font-size:0.9rem">
+      $$\displaystyle Var(X) = (1/n) \sum (x_i - x̄)²$$
+      <span class="desc">方差衡量数据偏离均值的程度，越大说明数据越分散。</span>
+    </div>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--danger)">📉 方差小 = 信息少</h4>
+        <p>如果你从侧面很窄的角度拍：</p>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.8rem">
+          <li>所有东西都挤成一条线，谁是谁都分不清楚</li>
+          <li>这就是"方差小"的方向——数据都堆在一起</li>
+          <li>所有样本看起来差不多，没什么有用信息</li>
+          <li>极端情况：方差=0，所有点都在同一个位置——完全没信息</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox pink">
+      <h4>🔑 PCA的核心逻辑</h4>
+      <p><strong>方差越大的方向，包含的信息量越多；方差越小的方向，越可能是噪声。</strong>所以PCA优先保留方差大的方向，扔掉方差小的方向——这样就能用最少的维度保留最多的信息。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">15 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">第一主成分 PC1</h2>
+    <h3 class="sub">数据投影后方差最大的方向——最重要的"视角"</h3>
+    <div class="body">
+      <p><strong style="color:var(--accent3)">第一主成分（PC1, First Principal Component）</strong>定义：</p>
+      <p>在所有可能的方向中，找到一个方向向量w₁，使得数据X投影到w₁上之后，投影值的方差<strong>最大</strong>。这个w₁就是第一主成分方向。</p>
+    </div>
+    <div class="formula">
+      $$\displaystyle PC1 = argmax_{w} Var(Xw) &nbsp;&nbsp; subject to &nbsp;&nbsp; ||w|| = 1$$
+      <span class="desc">
+        • Xw：数据投影到方向w上得到的一维坐标<br>
+        • Var(Xw)：投影值的方差，我们要最大化它<br>
+        • ||w||=1：约束w是单位向量（方向长度不重要）
+      </span>
+    </div>
+    <div class="hbox blue">
+      <h4>🗣️ 大白话解释</h4>
+      <p>PC1就是你站在哪个角度看这堆数据，能看到数据"最散开""最有层次"的样子。它是数据云最长的那个轴方向，就像椭球最长的那根轴。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">16 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">第二主成分 PC2</h2>
+    <h3 class="sub">与PC1正交、方差第二大的方向</h3>
+    <div class="body">
+      <p>找到PC1之后，第二主成分怎么找？两个约束：</p>
+      <ul>
+        <li><strong>正交约束：</strong>PC2必须与PC1垂直（正交），也就是它们的投影值不相关</li>
+        <li><strong>方差最大：</strong>在满足正交的前提下，找到方差第二大的方向</li>
+      </ul>
+    </div>
+    <div class="formula">
+      $$\displaystyle PC2 ⊥ PC1 &nbsp;&nbsp; (w_2ᵀw_1 = 0), &nbsp;&nbsp; Var(Xw_2) 次大$$
+    </div>
+    <div class="hbox purple">
+      <h4>🔬 正交的意义</h4>
+      <p>正交意味着PC2包含的信息和PC1<strong>完全不重复</strong>——PC2说的是PC1完全没有提到的"新信息"。如果两个方向不正交，它们就有信息冗余，这不符合我们"用最少维度承载最多信息"的目标。</p>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <h4>💡 二维例子</h4>
+      <p>在二维平面中，一旦PC1确定了（比如椭圆长轴），PC2就唯一确定了——必须是短轴方向，因为只有那个方向和PC1垂直。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">17 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">以此类推：所有主成分</h2>
+    <h3 class="sub">各主成分之间互不相关，方差依次递减</h3>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node hl" style="min-width:80px">PC1<br><small>方差最大</small></div>
+      <div class="flow-node" style="min-width:80px">PC2<br><small>方差第2</small></div>
+      <div class="flow-node" style="min-width:80px">PC3<br><small>方差第3</small></div>
+      <div class="flow-arrow">...</div>
+      <div class="flow-node" style="min-width:80px">PCk<br><small>方差第k</small></div>
+      <div class="flow-arrow">...</div>
+      <div class="flow-node" style="min-width:80px;opacity:0.5">PCn<br><small>方差最小</small></div>
+    </div>
+    <div class="body">
+      <p>n维数据最多可以找到n个主成分，它们满足：</p>
+    </div>
+    <div class="three-col">
+      <div class="hbox success" style="margin:0">
+        <h4>✅ 两两正交</h4>
+        <p>任意两个主成分方向互相垂直（点积为0），投影值不相关，没有信息冗余。</p>
+      </div>
+      <div class="hbox pink" style="margin:0">
+        <h4>✅ 方差递减</h4>
+        <p>Var(PC1) ≥ Var(PC2) ≥ Var(PC3) ≥ ... ≥ Var(PCn)，重要性依次降低。</p>
+      </div>
+      <div class="hbox blue" style="margin:0">
+        <h4>✅ 总方差不变</h4>
+        <p>所有主成分的方差之和 = 原始特征的方差之和——信息总量守恒，只是重新分配。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">18 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">PCA直观图示解释</h2>
+    <h3 class="sub">二维降到一维：为什么选长轴不选短轴？</h3>
+    <div class="two-col">
+      <div class="visual-box" style="flex-direction:column">
+        <svg width="320" height="220" viewBox="0 0 320 220">
+          <ellipse cx="160" cy="110" rx="120" ry="35" fill="rgba(192,132,252,0.15)" stroke="#c084fc" stroke-width="2" transform="rotate(-25 160 110)"/>
+          <line x1="40" y1="175" x2="280" y2="45" stroke="#c084fc" stroke-width="3"/>
+          <text x="285" y="40" fill="#c084fc" font-size="12" font-weight="600">PC1</text>
+          <g fill="#c084fc">
+            <circle cx="90" cy="150" r="4"/><circle cx="120" cy="135" r="4"/><circle cx="150" cy="120" r="4"/>
+            <circle cx="180" cy="105" r="4"/><circle cx="210" cy="90" r="4"/><circle cx="240" cy="75" r="4"/>
+            <circle cx="105" cy="142" r="4"/><circle cx="135" cy="127" r="4"/><circle cx="165" cy="112" r="4"/>
+            <circle cx="195" cy="97" r="4"/><circle cx="225" cy="82" r="4"/>
+          </g>
+        </svg>
+        <p style="margin-top:1rem;color:var(--success);font-weight:600">✅ 投影到PC1</p>
+        <p style="color:var(--muted);font-size:0.9rem">点依然分得很开，保留了大部分信息</p>
+      </div>
+      <div class="visual-box" style="flex-direction:column">
+        <svg width="320" height="220" viewBox="0 0 320 220">
+          <ellipse cx="160" cy="110" rx="120" ry="35" fill="rgba(248,113,113,0.1)" stroke="#f87171" stroke-width="2" stroke-dasharray="4,4" transform="rotate(-25 160 110)"/>
+          <line x1="100" y1="30" x2="220" y2="190" stroke="#f87171" stroke-width="3"/>
+          <text x="225" y="195" fill="#f87171" font-size="12" font-weight="600">错误方向</text>
+          <g fill="#f87171" opacity="0.6">
+            <circle cx="155" cy="100" r="4"/><circle cx="157" cy="105" r="4"/><circle cx="158" cy="108" r="4"/>
+            <circle cx="160" cy="110" r="4"/><circle cx="162" cy="112" r="4"/><circle cx="163" cy="115" r="4"/>
+            <circle cx="156" cy="103" r="4"/><circle cx="159" cy="107" r="4"/><circle cx="161" cy="111" r="4"/>
+            <circle cx="164" cy="116" r="4"/><circle cx="154" cy="98" r="4"/>
+          </g>
+        </svg>
+        <p style="margin-top:1rem;color:var(--danger);font-weight:600">❌ 投影到差的方向</p>
+        <p style="color:var(--muted);font-size:0.9rem">点都挤在一起，几乎无法区分</p>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>🎯 总结</h4>
+      <p>降维必然会有信息损失，PCA的目标就是让这个损失<strong>最小化</strong>——选择方差最大的方向，就等于让投影后的数据尽可能分散，尽可能保留原来的区分度。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">19 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">PCA数学本质</h2>
+    <h3 class="sub">协方差矩阵的特征值分解——不用担心，理解概念就好</h3>
+    <div class="formula">
+      $$\displaystyle C = (1/n)XᵀX &nbsp;&nbsp;⟹&nbsp;&nbsp; C = WΛWᵀ$$
+      <span class="desc">
+        • C：数据的协方差矩阵（记录特征间的相关性）<br>
+        • W：特征向量矩阵，每一列就是一个主成分方向wᵢ<br>
+        • Λ：特征值对角矩阵，对角线上λᵢ就是对应方向的方差<br>
+        • 这就是PCA的核心数学：特征分解 = 自动找出主成分！
+      </span>
+    </div>
+    <div class="hbox warn">
+      <h4>📚 数学深度提示</h4>
+      <p>如果你没学过线性代数，不用慌——你不需要会手算特征值分解。sklearn会帮你算好。你只需要知道结论：<strong>特征向量=主成分方向，特征值=该方向的方差大小</strong>，这就够了。</p>
+    </div>
+    <div class="card accent">
+      <h4>🔑 PCA求解步骤（简化版）</h4>
+      <div class="flow" style="margin:1rem 0;justify-content:flex-start">
+        <div class="flow-node">1️⃣ 数据标准化</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">2️⃣ 计算协方差矩阵</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">3️⃣ 特征值分解</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node hl">4️⃣ 取前k个特征向量</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">5️⃣ 投影得到降维数据</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">20 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">特征向量 (Eigenvector)</h2>
+    <h3 class="sub">特征向量 = 主成分方向 = "新坐标系的坐标轴"</h3>
+    <div class="two-col">
+      <div class="body">
+        <p><strong style="color:var(--accent3)">特征向量是什么？</strong></p>
+        <p>你可以把它理解为"数据自己长出来的坐标轴"：</p>
+        <ul>
+          <li>原来我们用(x₁, x₂)坐标系描述数据，这是人为选的</li>
+          <li>但数据可能在另一个方向上更"舒展"</li>
+          <li>特征向量就是数据"认为"最重要的方向</li>
+          <li>所有特征向量两两正交，构成一组新的正交基</li>
+          <li>把数据投影到这些新轴上，就得到了主成分</li>
+        </ul>
+      </div>
+      <div>
+        <div class="card">
+          <h4>🧭 类比理解</h4>
+          <p>想象你站在一个倾斜的房间里：</p>
+          <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.8rem">
+            <li>原来的x/y轴是"东-西""南-北"（人为定义）</li>
+            <li>但房间是斜的，"沿着墙走"和"垂直墙走"才是更自然的方向</li>
+            <li>特征向量就是沿着数据"自然走向"的那些方向</li>
+            <li>就像顺着椭球的长轴和短轴建立坐标系</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="hbox purple">
+      <h4>📌 结论</h4>
+      <p>W矩阵的每一列w₁, w₂, ..., wₖ就是我们要找的前k个主成分方向。它们是单位向量，两两正交，按重要性排序。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">21 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">特征值 (Eigenvalue)</h2>
+    <h3 class="sub">特征值 = 该方向的方差大小 = 重要程度</h3>
+    <div class="body">
+      <p><strong style="color:var(--accent3)">特征值λᵢ</strong>告诉我们：对应特征向量wᵢ这个方向，数据投影后方差有多大。</p>
+    </div>
+    <div class="formula">
+      $$\displaystyle \lambda _1 \geq \lambda _2 \geq \lambda _3 \geq ... \geq \lambda _n \geq 0$$
+      <span class="desc">特征值从大到小排列，对应主成分的重要性从高到低。</span>
+    </div>
+    <div class="three-col">
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent3)">📏</div>
+        <h4>λ大 = 方向重要</h4>
+        <p>λ₁最大，说明PC1方向数据最分散，信息最多，是最最重要的视角。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent2)">📐</div>
+        <h4>λ中等 = 有一定信息</h4>
+        <p>中间的特征值对应次要的方向，补充一些PC1没覆盖到的细节。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--danger)">🔇</div>
+        <h4>λ≈0 = 噪声方向</h4>
+        <p>特征值很小（接近0）说明这个方向数据几乎没变化，基本是噪声，可以丢弃。</p>
+      </div>
+    </div>
+    <div class="hbox blue">
+      <h4>🎯 对应关系</h4>
+      <p>特征值λᵢ = 第i主成分的方差 = 该方向承载的信息量大小。所以降维就是：按λ从大到小排序，取前k个对应的特征向量即可。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">22 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">方差解释率</h2>
+    <h3 class="sub">Explained Variance Ratio——每个主成分"解释"了多少比例的信息</h3>
+    <div class="formula">
+      $$\displaystyle 方差解释率 = \lambda _i / ( \lambda _1 + \lambda _2 + ... + \lambda _n)$$
+      <span class="desc">
+        单个主成分的方差占总方差的比例。<br>
+        意思是：这个主成分保留了原始数据百分之多少的信息。
+      </span>
+    </div>
+    <div class="card">
+      <h4>📊 举个例子</h4>
+      <p>假设4维数据的特征值是：λ₁=2.4, λ₂=1.2, λ₃=0.3, λ₄=0.1</p>
+      <div class="formula" style="margin:1rem 0 0;padding:1rem;text-align:left;font-size:0.95rem">
+      $$\displaystyle 总方差 = 2.4 + 1.2 + 0.3 + 0.1 = 4.0 \ \ PC1解释率 = 2.4/4.0 = 60% \ PC2解释率 = 1.2/4.0 = 30% \ PC3解释率 = 0.3/4.0 = 7.5% \ PC4解释率 = 0.1/4.0 = 2.5%$$
+    </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">23 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">方差解释率的直观理解</h2>
+    <h3 class="sub">就像考试得分——每个主成分对"保留信息"的贡献度</h3>
+    <div class="visual-box">
+      <div style="width:100%">
+        <p style="margin-bottom:1rem;color:var(--muted)">举个例子：用PCA降维MNIST（784维手写数字）</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem">
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:0.9rem;margin-bottom:0.3rem">
+              <span>PC1</span><span style="color:var(--accent3)">~10%</span>
+            </div>
+            <div style="height:24px;background:var(--bg3);border-radius:12px;overflow:hidden">
+              <div style="height:100%;width:10%;background:linear-gradient(90deg,var(--accent3),var(--accent2))"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:0.9rem;margin-bottom:0.3rem">
+              <span>PC1+PC2 累计</span><span style="color:var(--accent3)">~17%</span>
+            </div>
+            <div style="height:24px;background:var(--bg3);border-radius:12px;overflow:hidden">
+              <div style="height:100%;width:17%;background:linear-gradient(90deg,var(--accent3),var(--accent2))"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:0.9rem;margin-bottom:0.3rem">
+              <span>前50个PC 累计</span><span style="color:var(--success)">~83%</span>
+            </div>
+            <div style="height:24px;background:var(--bg3);border-radius:12px;overflow:hidden">
+              <div style="height:100%;width:83%;background:linear-gradient(90deg,var(--accent3),var(--accent2),var(--success))"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:0.9rem;margin-bottom:0.3rem">
+              <span>前150个PC 累计</span><span style="color:var(--success)">~95%</span>
+            </div>
+            <div style="height:24px;background:var(--bg3);border-radius:12px;overflow:hidden">
+              <div style="height:100%;width:95%;background:linear-gradient(90deg,var(--accent3),var(--accent2),var(--success))"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>😲 惊人的压缩率</h4>
+      <p>MNIST有784维，但只要<strong>前150个主成分就能保留95%的信息</strong>——维度压缩到原来的1/5，信息只丢5%！这就是PCA的威力。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">24 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">累计方差解释率</h2>
+    <h3 class="sub">保留k个主成分后，总共保留了原始数据百分之多少的信息</h3>
+    <div class="formula">
+      $$\displaystyle 累计解释率(k) = ( \lambda _1 + \lambda _2 + ... + \lambda ₖ) / ( \lambda _1 + \lambda _2 + ... + \lambda _n)$$
+    </div>
+    <div class="body">
+      <p>累计解释率是选择主成分个数k的核心依据：</p>
+    </div>
+    <div class="three-col">
+      <div class="card" style="border-color:rgba(52,211,153,0.3)">
+        <div class="card-icon" style="color:var(--success)">📊</div>
+        <h4>可视化用途</h4>
+        <p>降到2D或3D——不管解释率多少，为了能画图看，一般直接取k=2或3。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent3)">🎯</div>
+        <h4>特征压缩用途</h4>
+        <p>通常选择k使得累计解释率达到 <strong style="color:var(--accent3)">85%~95%</strong>。在这个区间，信息损失和维度压缩取得很好的平衡。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--warning)">🔧</div>
+        <h4>去噪用途</h4>
+        <p>可以保留更高比例（如99%），或者直接取较小的k，丢掉小特征值方向（通常是噪声）。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">25 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">如何选择主成分个数k？</h2>
+    <h3 class="sub">最常用的方法：肘部法则 + 累计解释率阈值</h3>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node">1️⃣ 先做PCA<br><small>不指定k</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">2️⃣ 画碎石图<br><small>特征值从大到小排</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">3️⃣ 找"肘部"<br><small>拐点位置</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl">4️⃣ 验证累计解释率<br><small>≥85%~95%</small></div>
+    </div>
+    <div class="two-col">
+      <div class="hbox success">
+        <h4>✅ 经验法则</h4>
+        <p>
+          • 日常使用：直接设累计解释率阈值为90%或95%，让sklearn自动选k<br>
+          • 可视化：固定k=2或k=3<br>
+          • 特征很多时先试k=原维度的1/10，看效果再调整
+        </p>
+      </div>
+      <div class="hbox warn">
+        <h4>⚠️ 注意</h4>
+        <p>
+          k不是越大越好，也不是越小越好——找一个平衡点。<br>
+          工业界更看重<strong>模型性能/训练速度</strong>的trade-off，可以用验证集做网格搜索选最优k。
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">26 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">PCA使用前必须标准化！</h2>
+    <h3 class="sub">这是最容易犯的错误——不标准化结果会完全错</h3>
+    <div class="hbox danger">
+      <h4>🚨 重要的事情说三遍</h4>
+      <p style="font-size:1.15rem">使用PCA之前，<strong>必须对数据做标准化（Standardization）</strong>！<br>使用PCA之前，<strong>必须对数据做标准化</strong>！<br>使用PCA之前，<strong>必须对数据做标准化</strong>！</p>
+    </div>
+    <div class="code"><span class="cm"># 正确的PCA流程</span>
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.decomposition <span class="kw">import</span> PCA
+
+scaler = <span class="fn">StandardScaler</span>()
+X_scaled = scaler.<span class="fn">fit_transform</span>(X)  <span class="cm"># ← 先标准化！</span>
+
+pca = <span class="fn">PCA</span>(n_components=<span class="num">0.95</span>)
+X_pca = pca.<span class="fn">fit_transform</span>(X_scaled)  <span class="cm"># 再做PCA</span></div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">27 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">为什么必须标准化？</h2>
+    <h3 class="sub">PCA对方差敏感——量纲会直接影响结果</h3>
+    <div class="body">
+      <p>PCA是基于<strong>方差大小</strong>来判断主成分重要性的，但方差大小受量纲（单位）影响很大：</p>
+    </div>
+    <div class="vs">
+      <div class="vs-side vs-left">
+        <h3 style="color:var(--danger);margin-bottom:1rem">❌ 不标准化的后果</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <p style="color:var(--ink2)">比如两个特征：</p>
+          <ul style="font-size:0.95rem">
+            <li>身高：单位厘米，范围150~200，方差≈200</li>
+            <li>体重：单位吨，范围0.05~0.1吨，方差≈0.0005</li>
+          </ul>
+          <p style="margin-top:1rem;color:var(--danger)">身高方差大，PCA会误以为身高"更重要"——但这完全是单位造成的假象！如果体重换成克做单位，体重方差就变成500000，反而"更重要"了。</p>
+        </div>
+      </div>
+      <div class="vs-divider">→</div>
+      <div class="vs-side vs-right">
+        <h3 style="color:var(--success);margin-bottom:1rem">✅ 标准化后</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <p style="color:var(--ink2)">StandardScaler把每个特征变成：</p>
+          <ul style="font-size:0.95rem">
+            <li>均值 = 0</li>
+            <li>标准差 = 1（方差=1）</li>
+          </ul>
+          <p style="margin-top:1rem;color:var(--success)">所有特征都被拉到同一尺度，方差大小不再受单位影响，PCA才能公平地找出真正重要的方向。</p>
+        </div>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 特例</h4>
+      <p>如果所有特征已经是同一量纲（比如都是像素值0~255），理论上可以不标准化。但为了保险起见，<strong>建议一律标准化</strong>，养成好习惯。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">28 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">PCA不是特征选择，是特征变换</h2>
+    <h3 class="sub">这一点一定要搞清楚——很多人一开始都会误解</h3>
+    <div class="vs">
+      <div class="vs-side vs-left">
+        <h3 style="color:var(--warning);margin-bottom:1rem">🔍 特征选择</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul style="font-size:0.95rem">
+            <li>从原始特征中<strong>挑出子集</strong></li>
+            <li>比如：从10个特征里选3个</li>
+            <li>选出来的还是原来的特征，有明确物理意义</li>
+            <li>例："身高"这个特征被留下了</li>
+            <li>方法：方差选择、互信息、L1正则等</li>
+          </ul>
+        </div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side vs-right">
+        <h3 style="color:var(--accent3);margin-bottom:1rem">✨ PCA特征变换</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul style="font-size:0.95rem">
+            <li>把原始特征<strong>线性组合</strong>成全新特征</li>
+            <li>比如：10个原始特征 → 3个主成分</li>
+            <li>每个主成分都是所有原始特征的加权和</li>
+            <li>例：PC1 = 0.3×身高 - 0.2×体重 + 0.5×年龄...</li>
+            <li>创造了空间中全新的方向</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">29 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">主成分的可解释性较弱</h2>
+    <h3 class="sub">这是PCA的一个缺点——新特征不再有直观的物理意义</h3>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--accent2)">📉 可解释性问题</h4>
+        <p style="margin-bottom:0.8rem">原始特征往往有明确含义：</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>"身高"——就是多高，很好理解</li>
+          <li>"年龄"——就是多少岁</li>
+          <li>"房间面积"——就是多少平米</li>
+        </ul>
+        <p style="margin-top:1rem">但主成分长这样：</p>
+        <div class="formula" style="margin:0.8rem 0;padding:0.8rem;font-size:0.85rem;text-align:left">
+      $$\displaystyle PC1 = 0.47 \times x_1 - 0.32 \times x_2 + 0.58 \times x_3 + ...$$
+    </div>
+        <p style="color:var(--muted)">这是什么意思？很难直接解释。你只能说"PC1是某种综合指标"，但说不出它具体对应什么物理量。</p>
+      </div>
+      <div>
+        <div class="hbox warn">
+          <h4>⚠️ 什么时候这是个问题？</h4>
+          <p>
+            • 做医疗、金融、风控等需要<strong>可解释性</strong>的场景——你需要告诉业务方"为什么模型拒绝了这个贷款"，PCA会让你难以解释<br>
+            • 如果只是做预测、可视化、压缩——可解释性不重要，效果好就行
+          </p>
+        </div>
+        <div class="hbox success">
+          <h4>✅ 但在很多场景下不是问题</h4>
+          <p>
+            • 图像数据：本来单个像素就没意义，PCA提取的主成分（如Eigenface）反而能揭示本质结构<br>
+            • 纯预测任务：只要模型精度高、速度快，谁在乎特征是什么意思？
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">30 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">PCA主要应用场景</h2>
+    <h3 class="sub">降维只是手段，它在实战中用途非常广泛</h3>
+    <div class="three-col">
+      <div class="card accent">
+        <div class="card-icon">👁️</div>
+        <h4>数据可视化</h4>
+        <p>把高维数据降到2D/3D，画散点图观察数据分布、发现簇和离群点，是EDA（探索性数据分析）神器。</p>
+        <div class="tags"><span class="tag">k=2或3</span></div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔇</div>
+        <h4>数据去噪</h4>
+        <p>噪声通常对应小特征值方向，丢弃小特征值的主成分，保留大部分方差，自然就能去掉一部分噪声。</p>
+        <div class="tags"><span class="tag g">提升性能</span></div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📦</div>
+        <h4>特征压缩</h4>
+        <p>把成百上千维特征压缩到几十维，大幅加速模型训练、减少过拟合、降低部署成本。</p>
+        <div class="tags"><span class="tag b">加速训练</span></div>
+      </div>
+    </div>
+    <div class="hbox pink">
+      <h4>🌟 其他用途</h4>
+      <p>
+        • 人脸识别中的Eigenface（特征脸）<br>
+        • 图像压缩<br>
+        • 异常检测（重构误差大的样本可能是异常点）<br>
+        • 作为其他模型的预处理步骤，解决多重共线性问题
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">31 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">经典应用：Eigenface 特征脸</h2>
+    <h3 class="sub">PCA在人脸识别领域的经典应用——90年代的黑科技</h3>
+    <div class="body">
+      <p>Eigenface是PCA最著名的应用之一，由MIT和Turk&Pentland在1991年提出，是早期人脸识别的基石。</p>
+    </div>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node" style="min-width:130px">📷 大量人脸图片<br><small>每张100×100=10000维</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:130px">🔮 PCA降维<br><small>提取前k个主成分</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:130px">🧑 特征脸(Eigenface)<br><small>k个"基础人脸组件"</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:130px">🎯 人脸识别<br><small>用系数重建+比对</small></div>
+    </div>
+    <div class="hbox purple">
+      <h4>🤯 神奇之处</h4>
+      <p>每张人脸都可以近似表示为：<strong>平均脸 + w₁×Eigenface₁ + w₂×Eigenface₂ + ... + wₖ×Eigenfaceₖ</strong>。也就是说，几百张特征脸通过不同加权组合，就能近似表示<strong>任意一张人脸</strong>！只需要存几十个系数，而不是存整张图——压缩率极高。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">32 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">sklearn使用PCA代码示例</h2>
+    <h3 class="sub">实战代码——5分钟上手用PCA</h3>
+    <div class="code"><span class="cm"># 导入库</span>
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.decomposition <span class="kw">import</span> PCA
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="cm"># 加载数据（鸢尾花4维特征）</span>
+iris = <span class="fn">load_iris</span>()
+X, y = iris.data, iris.target
+
+<span class="cm"># ✅ 第一步：标准化！必须！</span>
+scaler = <span class="fn">StandardScaler</span>()
+X_scaled = scaler.<span class="fn">fit_transform</span>(X)
+
+<span class="cm"># 方法1：指定降到2维（用于可视化）</span>
+pca = <span class="fn">PCA</span>(n_components=<span class="num">2</span>)
+X_pca = pca.<span class="fn">fit_transform</span>(X_scaled)
+
+<span class="cm"># 方法2：指定保留95%方差（自动选k）</span>
+<span class="cm"># pca = PCA(n_components=0.95)</span>
+<span class="cm"># X_pca = pca.fit_transform(X_scaled)</span>
+<span class="cm"># print(f"自动选择了{pca.n_components_}个主成分")</span>
+
+<span class="cm"># 查看方差解释率</span>
+<span class="fn">print</span>(<span class="str">"各主成分解释率:"</span>, pca.explained_variance_ratio_)
+<span class="fn">print</span>(<span class="str">"累计解释率:"</span>, pca.explained_variance_ratio_.<span class="fn">sum</span>())</div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">33 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">sklearn PCA 可视化代码</h2>
+    <h3 class="sub">把降维后的数据画出来——看不同类别是否自然分开</h3>
+    <div class="code"><span class="cm"># 可视化降维结果</span>
+plt.<span class="fn">figure</span>(figsize=(<span class="num">10</span>, <span class="num">8</span>))
+
+<span class="kw">for</span> target, color, label <span class="kw">in</span> <span class="fn">zip</span>([<span class="num">0</span>,<span class="num">1</span>,<span class="num">2</span>], [<span class="str">'#c084fc'</span>,<span class="str">'#818cf8'</span>,<span class="str">'#38bdf8'</span>], iris.target_names):
+    plt.<span class="fn">scatter</span>(X_pca[y==target, <span class="num">0</span>], X_pca[y==target, <span class="num">1</span>], 
+                c=color, label=label, s=<span class="num">80</span>, alpha=<span class="num">0.8</span>, edgecolors=<span class="str">'white'</span>)
+
+plt.<span class="fn">xlabel</span>(<span class="str">f'PC1 ({pca.explained_variance_ratio_[0]:.1%})'</span>, fontsize=<span class="num">12</span>)
+plt.<span class="fn">ylabel</span>(<span class="str">f'PC2 ({pca.explained_variance_ratio_[1]:.1%})'</span>, fontsize=<span class="num">12</span>)
+plt.<span class="fn">legend</span>(fontsize=<span class="num">11</span>)
+plt.<span class="fn">title</span>(<span class="str">'PCA of Iris Dataset'</span>, fontsize=<span class="num">14</span>)
+plt.<span class="fn">tight_layout</span>()
+plt.<span class="fn">show</span>()
+
+<span class="cm"># 💡 画累计解释率曲线（选k用）</span>
+<span class="cm"># pca_full = PCA().fit(X_scaled)</span>
+<span class="cm"># plt.plot(np.cumsum(pca_full.explained_variance_ratio_))</span>
+<span class="cm"># plt.xlabel('主成分个数'); plt.ylabel('累计解释率')</span>
+<span class="cm"># plt.grid(True); plt.show()</span></div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">34 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">PCA vs 其他降维方法</h2>
+    <h3 class="sub">PCA不是唯一的降维算法，还有其他流行方法</h3>
+    <table class="cmp">
+      <tr>
+        <th>算法</th>
+        <th>类型</th>
+        <th>核心思想</th>
+        <th>优点</th>
+        <th>缺点</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent3)">PCA</strong></td>
+        <td>线性</td>
+        <td>最大化方差，线性投影</td>
+        <td>快、简单、可解释、数学优美</td>
+        <td>只能处理线性关系</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">t-SNE</strong></td>
+        <td>非线性</td>
+        <td>保留局部邻域结构，概率分布匹配</td>
+        <td>可视化效果极好，能展开流形</td>
+        <td>慢、随机、不能用于新数据（无transform）</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--success)">LDA</strong></td>
+        <td>线性（有监督）</td>
+        <td>最大化类间距离/类内距离</td>
+        <td>利用标签信息，分类友好</td>
+        <td>有监督，只能降到c-1维</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">UMAP</strong></td>
+        <td>非线性</td>
+        <td>拓扑流形学习</td>
+        <td>比t-SNE快、保留全局结构</td>
+        <td>相对新，调参稍复杂</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--warning)">Kernel PCA</strong></td>
+        <td>非线性（核技巧）</td>
+        <td>核映射后做PCA</td>
+        <td>能处理非线性结构</td>
+        <td>核选择难，大数据慢</td>
+      </tr>
+    </table>
+    <div class="hbox blue">
+      <h4>💡 选择建议</h4>
+      <p>
+        • 日常使用/特征压缩/快速实验 → <strong style="color:var(--accent3)">PCA</strong>（首选）<br>
+        • 2D可视化且要好看、探索数据结构 → <strong style="color:var(--accent2)">t-SNE或UMAP</strong><br>
+        • 有标签、为分类任务降维 → <strong style="color:var(--success)">LDA</strong>
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · PCA主成分分析</div>
+  <div class="slide-number">35 / 36</div>
+  <div class="slide-content">
+    <h2 class="st">本集小结</h2>
+    <h3 class="sub">恭喜你完成了第14集！也是本系列传统机器学习的最后一个模型</h3>
+    <div class="body">
+      <div class="hbox pink">
+        <h4>📌 为什么要降维？</h4>
+        <p>高维数据有四大问题：维度灾难（距离失效、数据稀疏）、无法可视化、特征冗余噪声、计算量大易过拟合。</p>
+      </div>
+      <div class="hbox purple">
+        <h4>🎯 PCA核心思想</h4>
+        <p>找到数据投影后方差最大的方向（主成分），用少数几个互不相关的主成分表示原始数据，信息损失最小化。</p>
+      </div>
+      <div class="hbox blue">
+        <h4>📐 数学本质</h4>
+        <p>协方差矩阵的特征值分解：<strong>特征向量=主成分方向，特征值=该方向方差大小</strong>。按特征值从大到小取前k个。</p>
+      </div>
+      <div class="hbox success">
+        <h4>✅ 使用要点</h4>
+        <p><strong>必须标准化！</strong>累计解释率85%~95%选k。PCA是特征变换不是特征选择，主成分可解释性弱，但用途广泛（可视化、去噪、压缩、Eigenface）。</p>
+      </div>
+      <div class="hbox warn">
+        <h4>🎉 里程碑</h4>
+        <p>到这里，本系列的经典机器学习模型就全部讲完了！你已经掌握了线性回归、逻辑回归、决策树、随机森林、SVM、KNN、K-Means、PCA——这些是传统ML的核心武器库。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-content">
+    <h1>谢谢观看！</h1>
+    <p class="cover-sub">第14集 · PCA主成分分析 完<br><br>
+    <strong style="color:var(--accent3)">下一集：聚类算法评估与实践</strong><br><br>
+    B站：机器学习入门教程系列 · BV1YMoDBuEm2</p>
+    <div style="margin-top:2rem">
+      <a href="ppt-15.html" style="display:inline-block;padding:14px 40px;background:linear-gradient(135deg,var(--accent3),var(--accent2));color:white;text-decoration:none;border-radius:50px;font-weight:600;transition:transform .3s,box-shadow .3s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 30px rgba(192,132,252,0.3)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">下一集 →</a>
+    </div>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag">降维</span>
+      <span class="tag p">无监督学习</span>
+      <span class="tag b">特征工程</span>
+      <span class="tag g">数据可视化</span>
+      <span class="tag w">传统ML收官</span>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+});
+</script>
+</body></html>

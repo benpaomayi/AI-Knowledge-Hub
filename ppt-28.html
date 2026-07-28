@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>DL第12集 归一化/BatchNorm - ML学习站PPT</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#f43f5e;--accent2:#e11d48;--accent3:#fb7185;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--accent3);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent3);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(251,113,133,0.15) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(225,29,72,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(251,113,133,0.1);border:1px solid rgba(251,113,133,0.25);border-radius:50px;font-size:1rem;color:var(--accent3);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:700px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(251,113,133,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:1.8rem 2rem;margin:1.5rem 0;text-align:center;font-size:clamp(1rem,1.8vw,1.25rem);line-height:2.2;overflow-x:auto}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:1rem;display:block;text-align:left;line-height:1.7}
+.katex{color:var(--accent3)}.katex .mord.text{color:var(--ink2)}
+.hbox{background:rgba(244,63,94,0.08);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1rem 0}
+.hbox h4{color:var(--accent);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(251,191,36,0.08);border-left-color:var(--warning)}.hbox.warn h4{color:var(--warning)}
+.hbox.danger{background:rgba(248,113,113,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.pink{background:rgba(225,29,72,0.08);border-left-color:var(--accent2)}.hbox.pink h4{color:var(--accent2)}
+.hbox.rose{background:rgba(251,113,133,0.08);border-left-color:var(--accent3)}.hbox.rose h4{color:var(--accent3)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.95rem}
+table.cmp th{background:var(--bg3);color:var(--accent3);padding:12px 14px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.9rem}
+table.cmp td{padding:10px 14px;border-bottom:1px solid var(--rule);color:var(--ink2);line-height:1.6}
+table.cmp tr:hover td{background:rgba(251,113,133,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent3);background:rgba(251,113,133,0.1);color:var(--accent3);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent)}
+.tag.p{color:var(--accent2)}.tag.pi{color:var(--accent3)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}.tag.d{color:var(--danger)}
+.code{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:1.5rem 2rem;margin:1.5rem 0;font-family:var(--mono);font-size:0.95rem;color:var(--ink2);line-height:1.8;overflow-x:auto}
+.code .kw{color:var(--accent)}.code .str{color:var(--success)}.code .cmt{color:var(--muted)}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent3),var(--accent2),var(--accent),var(--success));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent3);color:var(--accent3)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent3)}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.end-slide .end-buttons{display:flex;gap:1.5rem;justify-content:center;margin-top:2.5rem;flex-wrap:wrap}
+.end-slide .end-btn{padding:14px 32px;border-radius:12px;font-size:1.05rem;font-weight:600;text-decoration:none;transition:all .3s}
+.end-slide .end-btn.primary{background:linear-gradient(135deg,var(--accent3),var(--accent2));color:white}
+.end-slide .end-btn.secondary{background:var(--bg2);border:1px solid var(--rule);color:var(--ink2)}
+.end-slide .end-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(251,113,133,0.2)}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col{grid-template-columns:1fr}.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="slides.html" style="font-weight:600;color:var(--accent3)">📊 PPT课件</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="chapter6.html">回到视频页</a>
+    <a href="ppt-27.html">← 上一集</a>
+    <a href="ppt-29.html">下一集 →</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">🧠 深度学习入门教程 · 第12集</div>
+    <h1 class="cover-title">归一化：Transformer都在用的训练技巧</h1>
+    <p class="cover-sub">从Internal Covariate Shift到BatchNorm/LayerNorm<br>BV1X2Ex6rEu9 · 时长 16分49秒</p>
+    <div class="tags">
+      <span class="tag pi">BatchNorm</span>
+      <span class="tag p">LayerNorm</span>
+      <span class="tag g">训练加速</span>
+      <span class="tag">Transformer</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">2 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">本集内容导览</h1>
+    <h3 class="sub">归一化是深度学习训练中最重要的技巧之一</h3>
+    <div class="body">
+      <ul>
+        <li><strong style="color:var(--accent3)">问题篇</strong>——为什么需要归一化？Internal Covariate Shift问题</li>
+        <li><strong style="color:var(--accent2)">基础篇</strong>——数据预处理中的标准化与归一化</li>
+        <li><strong style="color:var(--accent)">核心篇</strong>——Batch Normalization算法详解</li>
+        <li><strong style="color:var(--success)">实践篇</strong>——BN训练vs测试、位置选择、好处与原理</li>
+        <li><strong style="color:var(--warning)">扩展篇</strong>——LayerNorm/InstanceNorm/GroupNorm</li>
+        <li><strong style="color:var(--danger)">对比篇</strong>——BN vs LN，为什么Transformer用LN</li>
+      </ul>
+    </div>
+    <div class="hbox rose">
+      <h4>💡 为什么要学这个？</h4>
+      <p>BatchNorm是2015年提出的技术，几乎改变了深度学习的训练方式。而LayerNorm是Transformer的标配组件。理解归一化，是理解现代深度学习的基础。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">3 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">训练深度网络的困难</h1>
+    <h3 class="sub">在BatchNorm出现之前，训练深层神经网络是一件很头疼的事</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="card-icon" style="color:var(--danger)">🐌</div>
+        <h4>收敛慢</h4>
+        <p>需要很小的学习率，训练几十上百个epoch才能收敛，对学习率非常敏感</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--warning)">⚠️</div>
+        <h4>梯度消失/爆炸</h4>
+        <p>网络越深，信号在反向传播时越容易消失或爆炸，导致浅层学不到东西</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">🎯</div>
+        <h4>初始化敏感</h4>
+        <p>权重初始化稍微不好，网络就训不动，需要精心设计初始化方案</p>
+      </div>
+    </div>
+    <div class="hbox pink">
+      <h4>🔍 深层网络的核心问题</h4>
+      <p>网络每层的输入分布都在随着训练而变化，这导致每层都需要不断"适应"新的输入分布，训练变得困难。这就是Internal Covariate Shift问题。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">4 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">什么是Internal Covariate Shift (ICS)</h2>
+    <h3 class="sub">深度网络训练中的核心痛点</h3>
+    <div class="card" style="margin-bottom:1.5rem">
+      <h4 style="color:var(--accent2)">📖 ICS的定义</h4>
+      <p>在深层神经网络训练过程中，<strong>前面层参数的更新会导致后面层输入数据分布发生变化</strong>。每一层都需要不断适应新的输入分布，这就要求很小的学习率和精心的初始化，导致训练很慢。</p>
+    </div>
+    <div class="flow" style="margin:1rem 0">
+      <div class="flow-node" style="min-width:100px">输入层</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:100px">第1层<br><small style="color:var(--muted)">参数更新</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:100px">第2层<br><small style="color:var(--warning)">输入分布变了!</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:100px">第2层<br><small style="color:var(--muted)">参数更新</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:100px">第3层<br><small style="color:var(--danger)">输入分布又变了!</small></div>
+    </div>
+    <div class="hbox warn">
+      <h4>🎯 类比理解</h4>
+      <p>就像你在学习一门课，但教材的概念定义每天都在变。你刚适应了今天的定义，明天又变了，你永远在追赶，很难真正学好。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">5 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">数据预处理：为什么输入要归一化？</h2>
+    <h3 class="sub">我们早就知道：输入数据归一化能让梯度下降更快收敛</h3>
+    <div class="two-col">
+      <div>
+        <div class="hbox danger">
+          <h4>❌ 未归一化的问题</h4>
+          <p>如果特征x₁范围是0-1，x₂范围是0-1000，损失函数的等高线是一个很扁的椭圆，梯度下降会走"之"字形，震荡严重，收敛很慢。</p>
+        </div>
+        <div class="hbox success">
+          <h4>✅ 归一化后</h4>
+          <p>各特征尺度相近，等高线接近圆形，梯度方向更直接指向最小值，收敛速度快很多。</p>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--accent3)">💡 核心思想</h4>
+        <p>既然输入层归一化有这么多好处，那能不能<strong>对网络中间每一层的输入都做归一化</strong>，让它们的分布保持稳定呢？</p>
+        <p style="margin-top:1rem;color:var(--accent2);font-weight:600">这就是Batch Normalization的核心动机！</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">6 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">两种常见数据归一化方法</h2>
+    <h3 class="sub">标准化(Standardization) vs 归一化(Normalization)</h3>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="card">
+        <h4 style="color:var(--accent)">📐 标准化 (Standardization / Z-score)</h4>
+        <div class="formula" style="margin:1rem 0;padding:1.2rem">
+      $$\displaystyle x̂ = (x - \mu ) / \sigma$$
+    </div>
+        <p>让数据变成<strong>均值为0，方差为1</strong>的分布。</p>
+        <ul style="font-size:0.9rem;color:var(--muted);margin-top:0.5rem">
+          <li>μ是数据均值，σ是数据标准差</li>
+          <li>处理后数据分布大致在[-3, 3]之间</li>
+          <li>对异常值相对鲁棒</li>
+          <li>深度学习中最常用</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent2)">📏 归一化 (Min-Max Normalization)</h4>
+        <div class="formula" style="margin:1rem 0;padding:1.2rem">
+      $$\displaystyle x̂ = (x - x_min) / (x_max - x_min)$$
+    </div>
+        <p>把数据线性缩放到<strong>[0, 1]</strong>区间。</p>
+        <ul style="font-size:0.9rem;color:var(--muted);margin-top:0.5rem">
+          <li>x_min是最小值，x_max是最大值</li>
+          <li>严格限制在[0,1]范围内</li>
+          <li>对异常值敏感（一个outlier会压缩其他值）</li>
+          <li>适合需要固定范围的场景</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">7 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">Batch Normalization登场！</h1>
+    <h3 class="sub">Ioffe & Szegedy, 2015——《Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift》</h3>
+    <div class="hbox success">
+      <h4>🏆 BN的地位</h4>
+      <p>这篇论文是深度学习历史上最重要的论文之一。它提出后，训练深层网络变得容易很多，很快成为CNN的标配组件。论文引用量超过6万次！</p>
+    </div>
+    <div class="card" style="margin:1.5rem 0">
+      <h4 style="color:var(--accent3)">🎯 BN的核心思想</h4>
+      <p><strong>在网络的每一层输入时，在mini-batch维度上做标准化</strong>，把输入拉回到均值0、方差1的分布，让每层输入分布保持稳定。但又不是简单地固定死——通过可学习的参数，网络可以自己决定是否需要恢复原始分布。</p>
+    </div>
+    <div class="hbox rose">
+      <h4>✨ 优雅之处</h4>
+      <p>BN不是在输入层做一次归一化，而是<strong>插入到网络中间</strong>，作为网络的一层，和整个网络一起端到端训练！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">8 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">BatchNorm算法四步走</h2>
+    <h3 class="sub">BN不是简单的标准化，它有两个可学习参数来恢复表达能力</h3>
+    <div class="flow" style="flex-direction:column;gap:0.8rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent);padding-left:1.5rem">
+        <strong style="color:var(--accent)">Step 1: 计算mini-batch均值</strong>
+        <span style="font-family:var(--mono);display:block;margin-top:0.3rem;color:var(--muted)">μ_B = (1/m) * Σ x_i</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent);padding-left:1.5rem">
+        <strong style="color:var(--accent)">Step 2: 计算mini-batch方差</strong>
+        <span style="font-family:var(--mono);display:block;margin-top:0.3rem;color:var(--muted)">σ²_B = (1/m) * Σ (x_i - μ_B)²</span>
+      </div>
+      <div class="flow-node hl" style="text-align:left;min-width:auto;border-left:4px solid var(--accent2);padding-left:1.5rem">
+        <strong style="color:var(--accent2)">Step 3: 标准化（加ε防止除零）</strong>
+        <span style="font-family:var(--mono);display:block;margin-top:0.3rem;color:var(--muted)">x̂_i = (x_i - μ_B) / √(σ²_B + ε)</span>
+      </div>
+      <div class="flow-node hl" style="text-align:left;min-width:auto;border-left:4px solid var(--accent3);padding-left:1.5rem">
+        <strong style="color:var(--accent3)">Step 4: 缩放和偏移（可学习参数！）</strong>
+        <span style="font-family:var(--mono);display:block;margin-top:0.3rem;color:var(--muted)">y_i = γ * x̂_i + β</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">9 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">为什么需要γ和β？</h2>
+    <h3 class="sub">如果只做标准化，会降低网络的表达能力</h3>
+    <div class="two-col">
+      <div>
+        <div class="hbox warn">
+          <h4>⚠️ 只有标准化的问题</h4>
+          <p>强制把输入变成均值0方差1，可能会破坏网络已经学到的特征。比如Sigmoid激活函数，在0附近是近似线性的，如果输入都集中在0附近，就失去了非线性表达能力。</p>
+        </div>
+        <div class="hbox success">
+          <h4>✅ γ(scale)和β(shift)的作用</h4>
+          <p>这两个参数是<strong>可学习</strong>的！网络可以通过学习γ和β来：</p>
+          <ul style="margin-top:0.5rem">
+            <li>如果标准化确实好：γ≈1，β≈0，保持标准化</li>
+            <li>如果原始分布更好：γ=σ，β=μ，可以完全恢复原始分布！</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent3)">🧠 精妙设计</h4>
+        <p style="margin-bottom:1rem">BN相当于说："我把输入归一化了，但如果原始分布更好，你可以通过γ和β学回来。选择权交给网络自己！"</p>
+        <div class="formula" style="margin:0;padding:1rem">
+      $$\displaystyle 当 \gamma = \sqrt{( \sigma ²+ \epsilon ), \beta = \mu 时 \ y_i = \gamma x̂_i + \beta = x_i \ <span class="desc" style="text-align:center">恒等映射！完全恢复原始输入</span>$$
+    </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">10 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">训练 vs 测试：BN的一个关键细节</h2>
+    <h3 class="sub">训练时用batch统计量，测试时用训练集累计的统计量</h3>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent)">🏋️</div>
+        <h4>训练阶段 (Training)</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.8rem">
+          <li>对每个mini-batch，计算当前batch的μ_B和σ²_B</li>
+          <li>用当前batch的μ/σ做标准化</li>
+          <li><strong>同时</strong>用滑动平均累计running_mean和running_var</li>
+          <li>γ和β通过反向传播更新</li>
+        </ul>
+        <div class="hbox" style="margin-top:1rem;padding:0.8rem">
+          <p style="font-size:0.9rem">running_mean = momentum * running_mean + (1-momentum) * μ_B</p>
+        </div>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">🧪</div>
+        <h4>测试阶段 (Inference)</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.8rem">
+          <li>测试时可能只有一个样本，没法算batch统计量</li>
+          <li><strong>不用</strong>当前batch的μ/σ</li>
+          <li>用训练时累计好的running_mean和running_var</li>
+          <li>这两个是固定的，不再更新</li>
+          <li>γ和β固定为训练好的值</li>
+        </ul>
+        <div class="hbox danger" style="margin-top:1rem;padding:0.8rem">
+          <p style="font-size:0.9rem">⚠️ PyTorch中必须用model.eval()切换到测试模式！</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">11 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">BN层放在哪里？</h2>
+    <h3 class="sub">BN层在网络中的位置：激活前还是激活后？</h3>
+    <div class="card" style="margin-bottom:1.5rem">
+      <h4 style="color:var(--accent3)">📍 经典位置：Conv/FC → BN → ReLU</h4>
+      <p>原始论文推荐：BN层放在全连接层/卷积层之后，激活函数之前。</p>
+      <div class="code" style="margin-top:1rem">
+        <span class="kw">nn.Linear</span>(in_features, out_features)<br>
+        <span class="kw">nn.BatchNorm1d</span>(out_features)  <span class="cmt"># 放在线性层后</span><br>
+        <span class="kw">nn.ReLU</span>()                    <span class="cmt"># 激活函数前</span>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>🤔 也有争论</h4>
+      <p>也有一些研究和实践发现把BN放在激活函数之后效果也不错，甚至有研究把BN放在激活前还是后取决于具体任务。但<strong>经典做法是Conv/FC之后、激活之前</strong>，这是大多数情况下的默认选择。</p>
+    </div>
+    <div class="hbox">
+      <h4>📌 注意：有了BN，偏置b可以不要</h4>
+      <p>因为BN有β参数，它的作用就是偏置。所以Conv/FC层可以设bias=False，减少参数但不影响效果。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">12 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">BatchNorm的四大好处</h1>
+    <h3 class="sub">为什么BN这么好用？它解决了很多训练问题</h3>
+    <div class="four-col" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0">
+      <div class="card">
+        <div class="card-icon" style="color:var(--success)">🚀</div>
+        <h4>1. 可用更大学习率</h4>
+        <p>不用担心学习率大一点就震荡/不收敛，训练速度大幅提升，收敛快很多。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent3)">🛡️</div>
+        <h4>2. 自带正则化效果</h4>
+        <p>mini-batch的μ和σ是有噪声的估计（不是整个数据集的真实值），这种噪声类似Dropout，起到正则化作用。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent2)">🎯</div>
+        <h4>3. 降低对初始化的敏感度</h4>
+        <p>不用再精心设计权重初始化方案了！网络鲁棒性大大增强，初始化差点也能训起来。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--warning)">📉</div>
+        <h4>4. 缓解梯度消失</h4>
+        <p>让输入落在激活函数的非饱和区域，梯度不会太小，反向传播更顺畅，深层网络也能训。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">13 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">BN为什么真正有效？——不只是解决ICS</h2>
+    <h3 class="sub">后续研究发现：ICS可能不是BN有效的真正原因</h3>
+    <div class="hbox pink">
+      <h4>🔬 论文《How Does Batch Normalization Help Optimization?》(2018)</h4>
+      <p>这篇论文发现：BN确实有效，但原因可能和原始论文说的"解决ICS"关系不大。即使手动加入噪声制造ICS，BN仍然能加速训练。</p>
+    </div>
+    <div class="card" style="margin:1.5rem 0">
+      <h4 style="color:var(--accent3)">🎯 真正原因：让损失曲面更平滑</h4>
+      <p>BN的关键作用是<strong>让损失函数的景观（loss landscape）变得更平滑</strong>：</p>
+      <ul style="margin-top:0.8rem;color:var(--muted);font-size:1rem">
+        <li>梯度的大小更稳定，不会突然变得很大或很小</li>
+        <li>梯度的方向更准确，更少震荡</li>
+        <li>避免梯度爆炸和消失</li>
+        <li>大学习率下也能稳定收敛</li>
+      </ul>
+    </div>
+    <div class="hbox success">
+      <h4>💡 启示</h4>
+      <p>经典论文的解释不一定是对的！理解技术要持续跟进后续研究。但不管原因是什么，BN确实好用，这是实践验证的。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">14 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">BN的局限：Batch Size依赖问题</h1>
+    <h3 class="sub">BN不是银弹，它有一个致命弱点：依赖batch size</h3>
+    <div class="hbox danger">
+      <h4>❌ BN的问题</h4>
+      <p>BN是在mini-batch维度上计算均值方差的。如果batch size很小（比如1、2、4），那么用几个样本算出来的μ和σ噪声太大、不准，BN效果会大幅下降，甚至不如不用。</p>
+    </div>
+    <div class="card" style="margin:1.5rem 0">
+      <h4 style="color:var(--warning)">📉 什么时候batch size会很小？</h4>
+      <ul style="margin-top:0.8rem;color:var(--muted)">
+        <li><strong>GPU显存不够</strong>——大模型、大图像（如医学影像、高分辨率图像），只能用很小的batch size</li>
+        <li><strong>NLP/序列任务</strong>——batch中序列长度不同，需要padding，BN统计不准</li>
+        <li><strong>分布式训练</strong>——每个卡上的batch size变小</li>
+      </ul>
+    </div>
+    <div class="hbox rose">
+      <h4>✨ 于是，其他归一化方法应运而生</h4>
+      <p>为了解决BN的batch size依赖问题，研究者提出了LayerNorm、InstanceNorm、GroupNorm等方法，它们在不同维度做归一化，不依赖batch size。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">15 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">归一化方法大家族</h2>
+    <h3 class="sub">除了BN，还有哪些归一化方法？它们在哪个维度做归一化？</h3>
+    <table class="cmp">
+      <tr>
+        <th>方法</th>
+        <th>归一化维度</th>
+        <th>是否依赖batch size</th>
+        <th>典型应用场景</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">Batch Norm (BN)</strong></td>
+        <td>对每个通道，在N（batch）维度</td>
+        <td style="color:var(--danger)">是（batch要大）</td>
+        <td>CNN（大batch）</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">Layer Norm (LN)</strong></td>
+        <td>对每个样本，在C/H/W所有特征维度</td>
+        <td style="color:var(--success)">否</td>
+        <td>Transformer/NLP/RNN</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent3)">Instance Norm (IN)</strong></td>
+        <td>对每个样本每个通道，在H/W维度</td>
+        <td style="color:var(--success)">否</td>
+        <td>风格迁移、图像生成</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--success)">Group Norm (GN)</strong></td>
+        <td>对每个样本，通道分组后在组内归一化</td>
+        <td style="color:var(--success)">否</td>
+        <td>CNN（小batch）</td>
+      </tr>
+    </table>
+    <div class="hbox">
+      <h4>🎨 可视化理解</h4>
+      <p>想象一个4D张量(N, C, H, W)：BN沿着N方向算统计量，LN沿着C/H/W方向算，IN沿着H/W方向算，GN把C分成G组后沿着H/W和组内C算。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">16 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">Layer Normalization (LN)</h2>
+    <h3 class="sub">Transformer的标配，对每个样本独立归一化</h3>
+    <div class="two-col">
+      <div>
+        <div class="card">
+          <h4 style="color:var(--accent2)">📖 LayerNorm原理</h4>
+          <p style="margin-bottom:0.8rem">不依赖batch size！对<strong>单个样本</strong>的所有特征计算均值和方差，然后归一化。</p>
+          <div class="formula" style="margin:0.5rem 0;padding:1rem">
+      $$\displaystyle \mu = mean(x的所有特征) \ \sigma = std(x的所有特征) \ x̂ = (x - \mu ) / ( \sigma + \epsilon ) \ y = \gamma x̂ + \beta$$
+    </div>
+          <p style="font-size:0.9rem;color:var(--muted)">同样有可学习的γ和β参数。</p>
+        </div>
+      </div>
+      <div>
+        <div class="hbox success">
+          <h4>✅ LN的优点</h4>
+          <ul>
+            <li><strong>不依赖batch size</strong>——batch=1也能用</li>
+            <li>训练和测试行为完全一致（测试不用改）</li>
+            <li>对序列数据友好，不管padding多少</li>
+            <li>计算更简单直接</li>
+          </ul>
+        </div>
+        <div class="hbox rose" style="margin-top:1rem">
+          <h4>🌟 为什么Transformer用LN？</h4>
+          <p>后面会详细讲。简单说：NLP中序列长度可变，batch内padding导致BN统计不准，而LN对每个样本独立处理，完美适配Transformer！</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">17 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">Instance Norm & Group Norm</h2>
+    <h3 class="sub">两个特定场景下的归一化方法</h3>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">🎨</div>
+        <h4>Instance Normalization (IN)</h4>
+        <p style="margin-bottom:0.8rem">对每个样本、每个通道，单独在H/W维度做归一化。</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>相当于每个样本每个通道独立标准化</li>
+          <li>适合风格迁移任务</li>
+          <li>风格迁移中，对比度（均值/方差）代表风格，IN能去掉风格信息</li>
+          <li>图像生成任务常用（如GAN）</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--success)">👥</div>
+        <h4>Group Normalization (GN)</h4>
+        <p style="margin-bottom:0.8rem">把通道分成G组，对每个样本，在每组内做归一化。</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>是LN和IN之间的折中</li>
+          <li>G=1时就是LN</li>
+          <li>G=C(通道数)时就是IN</li>
+          <li>batch size很小时（如2/4），GN效果比BN好很多</li>
+          <li>何恺明团队2018年提出</li>
+          <li>目标检测/分割等任务常用（大图像显存受限）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">18 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">BatchNorm vs LayerNorm 详细对比</h2>
+    <h3 class="sub">两个最重要的归一化方法，全方位对比</h3>
+    <table class="cmp">
+      <tr>
+        <th>对比维度</th>
+        <th style="color:var(--accent)">BatchNorm (BN)</th>
+        <th style="color:var(--accent2)">LayerNorm (LN)</th>
+      </tr>
+      <tr>
+        <td>归一化维度</td>
+        <td>在batch维度（跨样本）</td>
+        <td>在特征维度（每个样本独立）</td>
+      </tr>
+      <tr>
+        <td>依赖batch size</td>
+        <td style="color:var(--danger)">是，batch要大（≥32效果好）</td>
+        <td style="color:var(--success)">否，batch=1也能用</td>
+      </tr>
+      <tr>
+        <td>训练/测试差异</td>
+        <td>测试用running stats，需model.eval()</td>
+        <td>训练测试完全一致，无需切换</td>
+      </tr>
+      <tr>
+        <td>γ和β参数</td>
+        <td>有，每个通道一组</td>
+        <td>有，每个特征一组（或每个通道）</td>
+      </tr>
+      <tr>
+        <td>CNN适用性</td>
+        <td style="color:var(--success)">⭐⭐⭐⭐⭐ CNN标配，效果好</td>
+        <td>⭐⭐ CNN中一般不如BN</td>
+      </tr>
+      <tr>
+        <td>NLP/Transformer适用性</td>
+        <td style="color:var(--danger)">⭐ 不合适，padding导致统计不准</td>
+        <td style="color:var(--success)">⭐⭐⭐⭐⭐ Transformer标配</td>
+      </tr>
+      <tr>
+        <td>典型应用</td>
+        <td>ResNet等CNN视觉模型</td>
+        <td>BERT/GPT等Transformer大模型</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">19 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">PyTorch中的归一化层</h2>
+    <h3 class="sub">实战：怎么在PyTorch里用这些归一化层？</h3>
+    <div class="code">
+<span class="cmt"># ========== BatchNorm ==========</span><br>
+<span class="cmt"># 用于全连接层 (batch, features)</span><br>
+bn1 = <span class="kw">nn.BatchNorm1d</span>(num_features=512)<br><br>
+<span class="cmt"># 用于CNN卷积层 (batch, C, H, W)</span><br>
+bn2 = <span class="kw">nn.BatchNorm2d</span>(num_channels=64)<br><br>
+<span class="cmt"># ========== LayerNorm ==========</span><br>
+<span class="cmt"># Transformer中最常用</span><br>
+ln = <span class="kw">nn.LayerNorm</span>(normalized_shape=768)<br><br>
+<span class="cmt"># ========== InstanceNorm ==========</span><br>
+in1 = <span class="kw">nn.InstanceNorm2d</span>(num_channels=64)<br><br>
+<span class="cmt"># ========== GroupNorm ==========</span><br>
+<span class="cmt"># num_groups: 分成几组；num_channels: 通道数</span><br>
+gn = <span class="kw">nn.GroupNorm</span>(num_groups=8, num_channels=64)
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 关键提醒</h4>
+      <p>用BN时，训练前记得调用<strong>model.train()</strong>，测试/推理前一定要调用<strong>model.eval()</strong>！否则用的是batch内的统计量，结果不稳定。LN不需要考虑这个。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">20 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">CNN示例：带BN的网络结构</h2>
+    <h3 class="sub">经典CNN中BN层的使用方式</h3>
+    <div class="code">
+<span class="kw">class</span> <span class="str">SimpleCNN</span>(nn.Module):<br>
+&nbsp;&nbsp;<span class="kw">def</span> <span class="str">__init__</span>(self):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">super</span>().__init__()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.features = nn.Sequential(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt"># Conv → BN → ReLU → Pool</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.Conv2d(<span class="str">3</span>, <span class="str">64</span>, kernel_size=<span class="str">3</span>, padding=<span class="str">1</span>, bias=<span class="kw">False</span>),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.BatchNorm2d(<span class="str">64</span>),  <span class="cmt"># BN在Conv后</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.ReLU(),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.MaxPool2d(<span class="str">2</span>),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.Conv2d(<span class="str">64</span>, <span class="str">128</span>, kernel_size=<span class="str">3</span>, padding=<span class="str">1</span>, bias=<span class="kw">False</span>),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.BatchNorm2d(<span class="str">128</span>),  <span class="cmt"># 有了BN，bias=False</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.ReLU(),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.MaxPool2d(<span class="str">2</span>),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;self.classifier = nn.Sequential(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.Linear(<span class="str">128*8*8</span>, <span class="str">512</span>, bias=<span class="kw">False</span>),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.BatchNorm1d(<span class="str">512</span>),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.ReLU(),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.Linear(<span class="str">512</span>, <span class="str">10</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;)
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">21 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">为什么Transformer用LayerNorm而非BatchNorm？</h1>
+    <h3 class="sub">这是面试常考题，也是理解LN的关键</h3>
+    <div class="hbox danger">
+      <h4>原因1：NLP中序列长度可变，padding问题</h4>
+      <p>一个batch里的句子长度不一样，短句子要padding（补0）。BN计算batch均值方差时，padding的0会被算进去，导致统计量不准。句子越长padding越少，统计量变化大，训练不稳定。</p>
+    </div>
+    <div class="hbox pink">
+      <h4>原因2：LayerNorm对每个样本独立</h4>
+      <p>LN对每个样本单独做归一化，不管batch里其他样本是什么样，也不管有没有padding。每个样本的归一化只和自己的特征有关，完美解决变长问题。</p>
+    </div>
+    <div class="hbox warn">
+      <h4>原因3：batch size往往很小</h4>
+      <p>Transformer模型大，显存有限，batch size经常很小（8/16/32），甚至微调时batch=1/2/4。这种情况下BN效果差，LN完全不受影响。</p>
+    </div>
+    <div class="hbox success">
+      <h4>原因4：训练测试一致</h4>
+      <p>Transformer训练时LN和推理时LN行为完全一致，不用维护running stats，也不用纠结model.eval()。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">22 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">Transformer中的LayerNorm位置</h2>
+    <h3 class="sub">Pre-Norm vs Post-Norm</h3>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--accent3)">📌 Pre-Norm（主流）</h4>
+        <p>先做LN，再做Attention/FFN，最后残差连接。GPT/BERT/PaLM等几乎所有现代大模型都用Pre-Norm。</p>
+        <div class="formula" style="margin:1rem 0;padding:1rem;font-size:1rem">
+      $$\displaystyle x = x + Attention(LN(x)) \ x = x + FFN(LN(x))$$
+    </div>
+        <p style="font-size:0.9rem;color:var(--success)">优点：训练更稳定，容易优化，不需要warmup也能训。</p>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent2)">📎 Post-Norm（原始Transformer）</h4>
+        <p>原始论文《Attention Is All You Need》用的：先做Attention/FFN加残差，再做LN。</p>
+        <div class="formula" style="margin:1rem 0;padding:1rem;font-size:1rem">
+      $$\displaystyle x = LN(x + Attention(x)) \ x = LN(x + FFN(x))$$
+    </div>
+        <p style="font-size:0.9rem;color:var(--warning)">缺点：训练不稳定，需要学习率warmup，深层难训。现在很少用了。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">23 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">归一化方法选择指南</h2>
+    <h3 class="sub">面对不同任务，我该用哪种归一化？</h3>
+    <div class="flow" style="flex-direction:column;gap:0.8rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent);padding-left:1.5rem">
+        <strong style="color:var(--accent)">🖼️ 做CV计算机视觉？</strong>
+        <span style="display:block;margin-top:0.3rem">
+          → batch size大(≥32)？用 <strong style="color:var(--accent)">BatchNorm2d</strong>（CNN标配）<br>
+          → batch size小(≤8)？用 <strong style="color:var(--success)">GroupNorm</strong>
+        </span>
+      </div>
+      <div class="flow-node hl" style="text-align:left;min-width:auto;border-left:4px solid var(--accent2);padding-left:1.5rem">
+        <strong style="color:var(--accent2)">📝 做NLP/Transformer？</strong>
+        <span style="display:block;margin-top:0.3rem">
+          → 不要犹豫，直接用 <strong style="color:var(--accent2)">LayerNorm</strong>！<br>
+          → Pre-Norm结构：x = x + Attention(LN(x))
+        </span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent3);padding-left:1.5rem">
+        <strong style="color:var(--accent3)">🎨 做风格迁移/图像生成？</strong>
+        <span style="display:block;margin-top:0.3rem">
+          → 用 <strong style="color:var(--accent3)">InstanceNorm2d</strong>（或AdaIN）<br>
+          → 适合需要去掉对比度/风格信息的场景
+        </span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--success);padding-left:1.5rem">
+        <strong style="color:var(--success)">🏋️ 大模型/小显存训练？</strong>
+        <span style="display:block;margin-top:0.3rem">
+          → 优先 <strong style="color:var(--success)">LayerNorm/GroupNorm</strong>，不依赖batch size<br>
+          → BN在batch太小时效果很差甚至有害
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">24 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">归一化技术发展历程</h2>
+    <h3 class="sub">从BN到现代大模型的归一化演进</h3>
+    <div class="flow" style="margin:2rem 0">
+      <div class="flow-node" style="min-width:130px">2015<br><strong style="color:var(--accent)">BatchNorm</strong><br><small>CNN标配</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:130px">2016<br><strong style="color:var(--accent3)">LayerNorm</strong><br><small>RNN/Transformer</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:130px">2016<br><strong style="color:var(--accent3)">InstanceNorm</strong><br><small>风格迁移</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:130px">2018<br><strong style="color:var(--success)">GroupNorm</strong><br><small>小batch CV</small></div>
+    </div>
+    <div class="flow" style="margin:1rem 0">
+      <div class="flow-node" style="min-width:130px">2019<br><strong>SwitchableNorm</strong><br><small>自适应选择</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:130px">2020+<br><strong style="color:var(--accent2)">Pre-LN Transformer</strong><br><small>GPT/BERT/LLaMA</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:130px">2022+<br><strong>RMSNorm</strong><br><small>LLaMA用，简化版LN</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:150px">未来<br><strong style="color:var(--warning)">?</strong><br><small>更好的归一化？</small></div>
+    </div>
+    <div class="hbox rose">
+      <h4>🔮 RMSNorm：LayerNorm的简化版</h4>
+      <p>LLaMA等大模型开始用RMSNorm：去掉了减均值操作，只除以均方根，计算更快，效果差不多。x̂ = x / RMS(x), y = γx̂，没有β。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">25 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">本集核心要点总结</h2>
+    <h3 class="sub">归一化/BatchNorm/LayerNorm核心知识点</h3>
+    <div class="hbox success">
+      <h4>🎯 ICS问题</h4>
+      <p>深层网络中前层参数更新导致后层输入分布变化，训练困难。BN最初是为解决ICS提出，但实际主要作用是平滑损失曲面。</p>
+    </div>
+    <div class="hbox">
+      <h4>📐 BatchNorm算法</h4>
+      <p>μ_B和σ²_B → 标准化(x-μ)/√(σ²+ε) → γx̂+β。γ和β是可学习参数，可恢复原始分布。训练用batch统计量，测试用running stats。</p>
+    </div>
+    <div class="hbox rose">
+      <h4>✅ BN的好处</h4>
+      <p>大学习率加速收敛、自带正则化、降低初始化敏感度、缓解梯度消失。位置：Conv/FC之后，ReLU之前。</p>
+    </div>
+    <div class="hbox pink">
+      <h4>🌟 其他归一化</h4>
+      <p>LayerNorm（Transformer必用，不依赖batch）、InstanceNorm（风格迁移）、GroupNorm（小batch CV）。Transformer用LN因为序列变长padding、batch小。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">26 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">常见坑和注意事项</h2>
+    <h3 class="sub">实践中容易踩的坑</h3>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--danger)">⚠️</div>
+        <h4>BN忘记eval()</h4>
+        <p>推理时忘记model.eval()，用的是测试batch的统计量而非running mean/var，结果随机且不稳定。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--warning)">📏</div>
+        <h4>batch size太小用BN</h4>
+        <p>batch size小于8还用BatchNorm，统计量噪声大，效果差。此时应该换GN或LN。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">🤔</div>
+        <h4>NLP里硬用BN</h4>
+        <p>在Transformer里用BN而不是LN，会因为padding问题效果很差，训练不稳定。</p>
+      </div>
+    </div>
+    <div class="hbox danger" style="margin-top:1.5rem">
+      <h4>🚫 不要在BN前加Dropout</h4>
+      <p>BN放在Dropout之前可能导致方差偏移问题。一般建议：Dropout放在网络最后，BN放在激活前。或者干脆用BN自带的正则化，Dropout少用。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-chapter">第12集 · 归一化/BatchNorm</div>
+  <div class="slide-number">27 / 28</div>
+  <div class="slide-content">
+    <h1>🎉 第12集学习完成！</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      归一化是深度学习训练的必备技巧<br><br>
+      <strong style="color:var(--accent3)">核心收获</strong><br>
+      理解BN/LN的原理、区别和适用场景<br>
+      知道CNN用BN、Transformer用LN的原因<br>
+      掌握PyTorch中归一化层的用法
+    </p>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag pi">✅ BatchNorm</span>
+      <span class="tag p">✅ LayerNorm</span>
+      <span class="tag g">🚀 训练加速</span>
+      <span class="tag">🧠 深度学习基础</span>
+    </div>
+    <div class="end-buttons">
+      <a href="ppt-27.html" class="end-btn secondary">← 上一集</a>
+      <a href="chapter6.html" class="end-btn secondary">📺 回到视频页</a>
+      <a href="ppt-29.html" class="end-btn primary">下一集：正则化 →</a>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-number">28 / 28</div>
+  <div class="slide-content">
+    <h1>下集预告：正则化/Dropout</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      过拟合是深度学习的大敌！下一集我们学习：<br><br>
+      <strong style="color:var(--accent3)">L1/L2正则化、权重衰减</strong><br>
+      <strong style="color:var(--accent2)">Dropout随机失活</strong><br>
+      <strong style="color:var(--success)">数据增强、早停</strong><br><br>
+      掌握对抗过拟合的全套武器！
+    </p>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag d">🛡️ 正则化</span>
+      <span class="tag pi">🎲 Dropout</span>
+      <span class="tag g">📊 过拟合</span>
+      <span class="tag w">⏱️ 早停</span>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+});
+</script>
+</body></html>

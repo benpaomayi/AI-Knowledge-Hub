@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>DL第5集 反向传播 - ML学习站PPT</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#f97316;--accent2:#fb923c;--accent3:#f59e0b;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--accent3);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent3);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(245,158,11,0.15) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(249,115,22,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.25);border-radius:50px;font-size:1rem;color:var(--accent);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:700px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(249,115,22,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:1.8rem 2rem;margin:1.5rem 0;text-align:center;font-size:clamp(1rem,1.8vw,1.25rem);line-height:2.2;overflow-x:auto}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:1rem;display:block;text-align:left;line-height:1.7}
+.katex{color:var(--accent3)}.katex .mord.text{color:var(--ink2)}
+.hbox{background:rgba(249,115,22,0.08);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1rem 0}
+.hbox h4{color:var(--accent);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(251,191,36,0.08);border-left-color:var(--warning)}.hbox.warn h4{color:var(--warning)}
+.hbox.danger{background:rgba(248,113,113,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.orange{background:rgba(251,146,60,0.08);border-left-color:var(--accent2)}.hbox.orange h4{color:var(--accent2)}
+.hbox.amber{background:rgba(245,158,11,0.08);border-left-color:var(--accent3)}.hbox.amber h4{color:var(--accent3)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.95rem}
+table.cmp th{background:var(--bg3);color:var(--accent3);padding:12px 14px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.9rem}
+table.cmp td{padding:10px 14px;border-bottom:1px solid var(--rule);color:var(--ink2);line-height:1.6}
+table.cmp tr:hover td{background:rgba(249,115,22,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent3);background:rgba(245,158,11,0.1);color:var(--accent3);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent)}
+.tag.o{color:var(--accent2)}.tag.a{color:var(--accent3)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}.tag.d{color:var(--danger)}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent3),var(--accent2),var(--accent),var(--success));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent3);color:var(--accent3)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent3)}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.end-slide .end-buttons{display:flex;gap:1.5rem;justify-content:center;margin-top:2.5rem;flex-wrap:wrap}
+.end-slide .end-btn{padding:14px 32px;border-radius:12px;font-size:1.05rem;font-weight:600;text-decoration:none;transition:all .3s}
+.end-slide .end-btn.primary{background:linear-gradient(135deg,var(--accent3),var(--accent2));color:white}
+.end-slide .end-btn.secondary{background:var(--bg2);border:1px solid var(--rule);color:var(--ink2)}
+.end-slide .end-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(249,115,22,0.2)}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:1.5rem;align-items:stretch;margin:1.5rem 0}
+.vs-side{padding:1.5rem;border-radius:14px}
+.vs-divider{display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;color:var(--muted)}
+.code-block{background:var(--bg3);border-radius:12px;padding:1.5rem;margin:1rem 0;font-family:var(--mono);font-size:0.9rem;line-height:1.7;color:var(--ink2);overflow-x:auto}
+.code-block .kw{color:var(--accent3)}.code-block .fn{color:var(--accent2)}.code-block .str{color:var(--success)}.code-block .cmt{color:var(--muted)}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col{grid-template-columns:1fr}.hint{display:none}.vs{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="slides.html" style="font-weight:600;color:var(--accent3)">📊 PPT课件</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="chapter5.html">回到视频页</a>
+    <a href="ppt-19.html">← 上一集</a>
+    <a href="ppt-21.html">下一集 →</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">🧠 深度学习入门 · 第5集</div>
+    <h1 class="cover-title">反向传播：海量参数如何训练</h1>
+    <p class="cover-sub">神经网络动辄百万/亿级参数，如何高效计算梯度？<br>BV1Lg5T6SEmP · 时长 35分47秒</p>
+    <div class="tags">
+      <span class="tag a">反向传播</span>
+      <span class="tag o">链式法则</span>
+      <span class="tag">计算图</span>
+      <span class="tag g">梯度下降</span>
+      <span class="tag w">PyTorch</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">2 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">本集内容导览</h1>
+    <h3 class="sub">理解反向传播——深度学习的"引擎"</h3>
+    <div class="body">
+      <ul>
+        <li><strong style="color:var(--accent3)">问题引入</strong>——百万参数如何高效训练？</li>
+        <li><strong style="color:var(--accent2)">前向传播回顾</strong>——数据如何流过网络</li>
+        <li><strong style="color:var(--accent)">链式法则</strong>——微积分基础，反向传播的核心</li>
+        <li><strong style="color:var(--success)">计算图与四步法</strong>——反向传播的标准流程</li>
+        <li><strong style="color:var(--warning)">数值示例</strong>——手算一个2层网络</li>
+        <li><strong style="color:var(--danger)">梯度消失/爆炸</strong>——深度网络训练难题</li>
+        <li><strong style="color:var(--accent)">PyTorch实战</strong>——自动微分autograd</li>
+      </ul>
+    </div>
+    <div class="hbox amber">
+      <h4>🎯 学习目标</h4>
+      <p>学完这一集，你不仅要知道反向传播"是什么"，更要理解"为什么"——为什么从后往前算更高效？为什么需要可导的激活函数？</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">3 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">问题引入：百万参数如何训练？</h1>
+    <h3 class="sub">神经网络的参数量级远超传统ML算法</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="big-num" style="font-size:3rem">10¹</div>
+        <h4>线性回归</h4>
+        <p>几个到几十个参数，直接求解析解或简单梯度下降即可</p>
+      </div>
+      <div class="card accent">
+        <div class="big-num" style="font-size:3rem">10⁶</div>
+        <h4>小型神经网络</h4>
+        <p>百万级参数，暴力求导完全不可行</p>
+      </div>
+      <div class="card">
+        <div class="big-num" style="font-size:3rem">10¹¹+</div>
+        <h4>大语言模型</h4>
+        <p>GPT-4级别模型千亿到万亿参数，必须高效计算</p>
+      </div>
+    </div>
+    <div class="hbox danger">
+      <h4>❓ 核心问题</h4>
+      <p>梯度下降需要知道损失L对<strong>每个参数w</strong>的偏导数∂L/∂w。如果每个偏导数都单独计算，计算量会爆炸！我们需要一个聪明的方法——<strong style="color:var(--accent3)">反向传播</strong>。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">4 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">前向传播回顾</h2>
+    <h3 class="sub">数据从输入层流向输出层，得到预测值</h3>
+    <div class="formula">
+      输入X → z¹ = W¹a⁰ + b¹ → a¹ = g(z¹) → z² = W²a¹ + b² → a² = g(z²) → ... → ŷ = aᴸ
+      <span class="desc">前向传播是"推理"过程：逐层做线性变换(z=Wa+b)，再通过激活函数g做非线性变换，最终得到预测ŷ。</span>
+    </div>
+    <div class="flow">
+      <div class="flow-node">输入层<br>a⁰ = X</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">隐藏层1<br>z¹, a¹</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl">隐藏层2<br>z², a²</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">输出层<br>ŷ = aᴸ</div>
+    </div>
+    <div class="hbox orange">
+      <h4>📝 关键概念</h4>
+      <p><strong>zˡ</strong>：第l层的线性输出（预激活）；<strong>aˡ</strong>：第l层的激活输出；<strong>Wˡ, bˡ</strong>：第l层的权重和偏置；<strong>g(·)</strong>：激活函数。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">5 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">损失函数：衡量预测有多差</h2>
+    <h3 class="sub">L(ŷ, y)告诉我们当前预测和真实值的差距</h3>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--danger)">📉 回归问题：MSE</h4>
+        <div class="formula" style="margin:1rem 0;padding:1rem">
+          L = (1/2)||ŷ - y||²
+        </div>
+        <p>均方误差，预测值和真实值差的平方和（系数1/2为求导方便）</p>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent)">📊 分类问题：交叉熵</h4>
+        <div class="formula" style="margin:1rem 0;padding:1rem">
+          L = -Σ yᵢ log(ŷᵢ)
+        </div>
+        <p>交叉熵损失，衡量两个概率分布的差异</p>
+      </div>
+    </div>
+    <div class="hbox amber">
+      <h4>🎯 训练目标</h4>
+      <p>我们的目标是找到一组参数W,b，让损失L尽可能小。梯度下降告诉我们：<strong>沿着梯度反方向更新参数，损失就会减小</strong>。问题是——怎么高效计算所有参数的梯度？</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">6 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">为什么需要反向传播？</h1>
+    <h3 class="sub">直接逐层求导太复杂，链式法则从输出往回算更高效</h3>
+    <div class="vs">
+      <div class="vs-side" style="background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2)">
+        <h3 style="color:var(--danger);margin-bottom:1rem">❌ 蛮力求导</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul>
+            <li>对每个参数w，直接用定义求偏导</li>
+            <li>需要重复计算大量中间结果</li>
+            <li>时间复杂度：O(N²)甚至更高</li>
+            <li>百万参数时完全不可行</li>
+          </ul>
+        </div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side" style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2)">
+        <h3 style="color:var(--success);margin-bottom:1rem">✅ 反向传播</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul>
+            <li>利用链式法则，从输出层往回算</li>
+            <li>中间结果只算一次，重复利用</li>
+            <li>时间复杂度：O(N)，和前向传播同阶</li>
+            <li>一次前向+一次反向，算出所有梯度</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>💡 核心洞察</h4>
+      <p>反向传播不是什么神秘的魔法——它就是<strong style="color:var(--accent3)">链式法则 + 动态规划</strong>！把大问题拆成小问题，复用中间结果，避免重复计算。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">7 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">微积分基础：链式法则</h2>
+    <h3 class="sub">反向传播的数学核心——复合函数求导</h3>
+    <div class="formula">
+      如果 y = f(g(x))，那么 dy/dx = (dy/dg) · (dg/dx)
+      <span class="desc">这就是链式法则(Chain Rule)：复合函数的导数，可以拆成每个简单函数导数的乘积。</span>
+    </div>
+    <div class="card" style="margin:1.5rem 0">
+      <h4>🌰 举个栗子</h4>
+      <p style="margin-top:1rem">如果 L = (1/2)(ŷ - y)²，而 ŷ = σ(z)，z = wx + b</p>
+      <div class="formula" style="margin:1rem 0;padding:1.2rem">
+        ∂L/∂w = (∂L/∂ŷ) · (∂ŷ/∂z) · (∂z/∂w) = (ŷ-y) · σ'(z) · x
+      </div>
+      <p>一层一层"剥开"求导，最后乘起来——这就是链式法则的力量！</p>
+    </div>
+    <div class="hbox orange">
+      <h4>🔑 关键理解</h4>
+      <p>链式法则告诉我们：<strong>一个参数对最终损失的"贡献"，等于它对每一层影响的乘积</strong>。误差从输出端一层层"传"回来，这就是"反向传播"名字的由来。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">8 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">计算图(Computation Graph)</h2>
+    <h3 class="sub">把神经网络视为有向无环图(DAG)，节点是运算，边是数据</h3>
+    <div class="flow" style="margin:1.5rem 0;flex-direction:column">
+      <div style="display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap">
+        <div class="flow-node" style="min-width:80px">x</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" style="min-width:100px">× w</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" style="min-width:100px">+ b</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" style="min-width:100px">σ(·)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" style="min-width:80px">ŷ</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node hl" style="min-width:100px">L(ŷ,y)</div>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="hbox success">
+        <h4>➡️ 前向传播</h4>
+        <p>从左到右，顺着箭头方向计算，记录每个节点的输出值（激活值）。</p>
+      </div>
+      <div class="hbox amber">
+        <h4>⬅️ 反向传播</h4>
+        <p>从右到左，逆着箭头方向计算，利用链式法则求每个节点对L的偏导数（梯度）。</p>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>💾 为什么要"记录"？</h4>
+      <p>反向传播计算梯度时，需要用到前向传播时的中间结果（比如aˡ、zˡ）。所以前向传播时必须把这些值存下来，这也是训练神经网络比推理更占显存的原因之一。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">9 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">反向传播四步法</h1>
+    <h3 class="sub">标准流程，记住这四步就够了</h3>
+    <div class="flow" style="flex-direction:column;gap:1rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--success);padding-left:1.5rem">
+        <strong style="color:var(--success)">步骤1：前向传播</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">输入X，逐层计算所有zˡ和aˡ，直到得到预测ŷ和损失L。把所有中间值都存下来！</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent);padding-left:1.5rem">
+        <strong style="color:var(--accent)">步骤2：输出层误差δᴸ</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">计算输出层的"误差项"δᴸ = ∂L/∂zᴸ = (aᴸ - y) ⊙ g'(zᴸ)（MSE损失+σ激活时）</span>
+      </div>
+      <div class="flow-node hl" style="text-align:left;min-width:auto;border-left:4px solid var(--accent2);padding-left:1.5rem">
+        <strong style="color:var(--accent2)">步骤3：反向传播误差</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">从后往前逐层计算δˡ = ((Wˡ⁺¹)ᵀ δˡ⁺¹) ⊙ g'(zˡ)，l = L-1, L-2, ..., 1</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent3);padding-left:1.5rem">
+        <strong style="color:var(--accent3)">步骤4：计算梯度</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">∂L/∂Wˡ = δˡ (aˡ⁻¹)ᵀ，∂L/∂bˡ = δˡ。有了梯度就可以梯度下降更新参数了！</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">10 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">误差项δˡ的含义</h2>
+    <h3 class="sub">理解δˡ是什么，比记住公式更重要</h3>
+    <div class="formula">
+      δˡ = ∂L / ∂zˡ
+      <span class="desc">δˡ（delta）是损失L对第l层线性输出zˡ的偏导数。它衡量的是：<strong>第l层的zˡ变化一点点，损失L会变化多少</strong>——也就是这一层"贡献"了多少误差。</span>
+    </div>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <h4 style="color:var(--danger)">🔴 输出层 δᴸ</h4>
+        <p>直接衡量预测值和真实值的差距。误差"发源"的地方。</p>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent2)">🟠 隐藏层 δˡ</h4>
+        <p>通过Wˡ⁺¹把后一层的误差"传"回来，再乘以本层激活函数的导数。</p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--accent3)">🟡 参数梯度</h4>
+        <p>∂L/∂Wˡ = δˡ(aˡ⁻¹)ᵀ——本层误差乘以前一层激活，就是权重的梯度。</p>
+      </div>
+    </div>
+    <div class="hbox amber">
+      <h4>🤔 直觉理解</h4>
+      <p>想象团队做项目出了bug：先找到直接责任人（输出层），然后根据每个人的"贡献度"（权重W），把责任一层层追溯回去——每个人为自己造成的那部分错误负责，然后调整自己（更新参数）。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">11 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">数值示例：手算一个2层网络</h2>
+    <h3 class="sub">用具体数字走一遍反向传播，加深理解</h3>
+    <div class="card" style="margin-bottom:1rem">
+      <h4>📋 网络设置</h4>
+      <p style="margin-top:0.5rem">
+        • 输入x=0.5，真实标签y=1.0（简单回归）<br>
+        • 1个隐藏层，1个隐藏神经元，w₁=0.2, b₁=0.1, w₂=0.4, b₂=0.2<br>
+        • 激活函数用sigmoid: σ(z)=1/(1+e⁻ᶻ)<br>
+        • 损失函数L=(1/2)(ŷ-y)²
+      </p>
+    </div>
+    <div class="hbox success">
+      <h4>✅ 步骤1：前向传播</h4>
+      <p>
+        z₁ = w₁x + b₁ = 0.2×0.5 + 0.1 = 0.2<br>
+        a₁ = σ(z₁) = 1/(1+e⁻⁰·²) ≈ 0.5498<br>
+        z₂ = w₂a₁ + b₂ = 0.4×0.5498 + 0.2 ≈ 0.4199<br>
+        ŷ = a₂ = σ(z₂) ≈ 0.6034<br>
+        L = 0.5×(0.6034-1.0)² ≈ 0.0786
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">12 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">数值示例：反向计算梯度</h2>
+    <h3 class="sub">接上页，计算δ₂、δ₁和各参数梯度</h3>
+    <div class="hbox orange">
+      <h4>✅ 步骤2：输出层误差δ₂</h4>
+      <p>
+        sigmoid导数：σ'(z) = σ(z)(1-σ(z))<br>
+        δ₂ = ∂L/∂z₂ = (a₂ - y)·σ'(z₂) = (0.6034-1.0)×0.6034×(1-0.6034) ≈ -0.3966×0.2393 ≈ <strong>-0.0949</strong>
+      </p>
+    </div>
+    <div class="hbox amber">
+      <h4>✅ 步骤3：隐藏层误差δ₁</h4>
+      <p>
+        δ₁ = (w₂ᵀ·δ₂)·σ'(z₁) = (0.4×(-0.0949))×0.5498×(1-0.5498) ≈ -0.0380×0.2475 ≈ <strong>-0.0094</strong>
+      </p>
+    </div>
+    <div class="hbox success">
+      <h4>✅ 步骤4：计算梯度</h4>
+      <p>
+        ∂L/∂w₂ = δ₂·a₁ = -0.0949×0.5498 ≈ <strong>-0.0522</strong><br>
+        ∂L/∂b₂ = δ₂ ≈ <strong>-0.0949</strong><br>
+        ∂L/∂w₁ = δ₁·x = -0.0094×0.5 ≈ <strong>-0.0047</strong><br>
+        ∂L/∂b₁ = δ₁ ≈ <strong>-0.0094</strong>
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">13 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">数值示例：梯度下降更新</h2>
+    <h3 class="sub">用算出的梯度更新参数，看损失是否下降</h3>
+    <div class="card" style="margin-bottom:1rem">
+      <h4>📊 参数更新（学习率η=0.5）</h4>
+      <p style="margin-top:1rem">
+        w₂ = w₂ - η·∂L/∂w₂ = 0.4 - 0.5×(-0.0522) = 0.4 + 0.0261 = <strong>0.4261</strong><br>
+        b₂ = 0.2 - 0.5×(-0.0949) = <strong>0.2475</strong><br>
+        w₁ = 0.2 - 0.5×(-0.0047) = <strong>0.2024</strong><br>
+        b₁ = 0.1 - 0.5×(-0.0094) = <strong>0.1047</strong>
+      </p>
+    </div>
+    <div class="hbox success">
+      <h4>🎉 验证损失下降了！</h4>
+      <p>用新参数重新前向传播：<br>
+      z₁=0.2024×0.5+0.1047≈0.2059, a₁≈0.5513<br>
+      z₂=0.4261×0.5513+0.2475≈0.4824, ŷ≈0.6183<br>
+      L=0.5×(0.6183-1.0)²≈<strong>0.0729</strong> ← 比之前的0.0786小了！
+      </p>
+    </div>
+    <div class="hbox warn">
+      <h4>💡 注意</h4>
+      <p>这只是一次更新！实际训练要重复成千上万次：前向→反向→更新→前向→...直到损失收敛。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">14 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">为什么激活函数必须可导？</h1>
+    <h3 class="sub">不可导的激活函数，反向传播就失效了</h3>
+    <div class="vs">
+      <div class="vs-side" style="background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2)">
+        <h3 style="color:var(--danger);margin-bottom:1rem">❌ 阶跃函数（不可导）</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul>
+            <li>f(x) = 1 if x>0 else 0</li>
+            <li>除了x=0处，导数都是0！</li>
+            <li>δˡ = ... ⊙ g'(zˡ) = ... ⊙ 0 = 0</li>
+            <li>梯度全是0，参数无法更新</li>
+            <li>这就是为什么感知机只能有一层</li>
+          </ul>
+        </div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side" style="background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2)">
+        <h3 style="color:var(--success);margin-bottom:1rem">✅ Sigmoid/ReLU（可导）</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul>
+            <li>几乎处处可导（ReLU在x=0处不可导，但不影响）</li>
+            <li>g'(z)大部分时候不为0</li>
+            <li>误差信号可以顺利传回去</li>
+            <li>多层网络才能训练</li>
+            <li>这是深度学习能"深"的关键！</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="hbox danger">
+      <h4>⚠️ 历史教训</h4>
+      <p>为什么深度学习在2006年才开始爆发？除了算力和数据，一个重要原因是人们早年用sigmoid/tanh，网络一深就梯度消失，根本训不动。直到ReLU出现，深层网络才真正能训练起来。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">15 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">梯度消失问题(Vanishing Gradient)</h2>
+    <h3 class="sub">深层网络训练的头号敌人</h3>
+    <div class="formula">
+      δˡ = (Wˡ⁺¹)ᵀ(Wˡ⁺²)ᵀ...(Wᴸ)ᵀδᴸ ⊙ g'(zˡ)⊙g'(zˡ⁺¹)...⊙g'(zᴸ⁻¹)
+      <span class="desc">反向传播中，梯度是很多项相乘的结果。如果每一层的导数g'(z)都小于1（比如sigmoid最大0.25），乘的层数多了，梯度就会指数级衰减到接近0。</span>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-icon" style="color:var(--danger)">📉</div>
+        <h4>Sigmoid梯度消失</h4>
+        <p>σ'(x)最大值只有0.25（在x=0处），两端饱和时导数趋近于0。<br><br>
+        <strong style="color:var(--danger)">10层后：0.25¹⁰ ≈ 10⁻⁶</strong>——梯度几乎为0！<br>
+        前面的层（靠近输入的层）根本学不到东西。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--success)">⚡</div>
+        <h4>ReLU缓解问题</h4>
+        <p>ReLU(x)=max(0,x)，正区间导数g'(x)=1！<br><br>
+        只要神经元不"死亡"，正区间梯度能无损传回去，不会衰减。<br><br>
+        这就是为什么ReLU是现代深度学习的默认激活函数。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">16 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">梯度爆炸问题(Exploding Gradient)</h2>
+    <h3 class="sub">和梯度消失相反，但同样危险</h3>
+    <div class="hbox danger">
+      <h4>💥 怎么发生的？</h4>
+      <p>如果权重W初始化得太大，或者W的取值大于1，反向传播时梯度连乘会导致梯度<strong>指数级增长</strong>，变得非常大。</p>
+    </div>
+    <div class="card" style="margin:1rem 0">
+      <h4>📊 梯度爆炸的症状</h4>
+      <div class="tags" style="margin-top:0.5rem">
+        <span class="tag d">损失变成NaN</span>
+        <span class="tag d">参数更新剧烈震荡</span>
+        <span class="tag d">模型完全不收敛</span>
+        <span class="tag w">损失一开始就很大</span>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🛠️ 解决方案</h4>
+      <p>
+        <strong>1. 合理的权重初始化</strong>——Xavier/He初始化，让W不要太大也不要太小<br>
+        <strong>2. 梯度裁剪(Gradient Clipping)</strong>——设置阈值，梯度超过就截断<br>
+        <strong>3. Batch Normalization</strong>——让每层输入分布稳定，间接缓解梯度问题<br>
+        <strong>4. 残差连接(ResNet)</strong>——提供梯度"高速公路"，直接传回去
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">17 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">动态图 vs 静态图</h1>
+    <h3 class="sub">两大深度学习框架的核心区别</h3>
+    <table class="cmp">
+      <tr>
+        <th>特性</th>
+        <th style="color:var(--accent2)">PyTorch：动态图 (Define-by-Run)</th>
+        <th style="color:var(--accent)">TensorFlow 1.x：静态图 (Define-and-Run)</th>
+      </tr>
+      <tr>
+        <td>计算图构建</td>
+        <td>前向传播时<strong>实时构建</strong></td>
+        <td>先<strong>定义好图</strong>，再运行</td>
+      </tr>
+      <tr>
+        <td>调试难度</td>
+        <td style="color:var(--success)">简单！用普通Python调试器即可</td>
+        <td style="color:var(--danger)">困难，图是"黑盒"</td>
+      </tr>
+      <tr>
+        <td>灵活性</td>
+        <td style="color:var(--success)">极高，支持动态控制流（if/for/while）</td>
+        <td>需要用特殊语法（tf.cond等）</td>
+      </tr>
+      <tr>
+        <td>Pythonic程度</td>
+        <td style="color:var(--success)">非常Pythonic，和写普通NumPy一样</td>
+        <td>有自己的一套语法，学习曲线陡</td>
+      </tr>
+      <tr>
+        <td>部署优化</td>
+        <td>早期稍弱，现在TorchScript/ONNX已追上</td>
+        <td style="color:var(--success)">静态图天生容易优化部署</td>
+      </tr>
+      <tr>
+        <td>研究界偏好</td>
+        <td style="color:var(--success)">绝对主流！90%+论文用PyTorch</td>
+        <td>工业界历史项目多，研究界已较少</td>
+      </tr>
+    </table>
+    <div class="hbox amber">
+      <h4>📌 趋势</h4>
+      <p>TensorFlow 2.x也默认启用Eager Execution（动态图）了——<strong>动态图已成为事实标准</strong>。我们这个课程也以PyTorch为主。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">18 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">PyTorch自动微分：autograd</h2>
+    <h3 class="sub">你不需要手写反向传播！PyTorch自动帮你算</h3>
+    <div class="card">
+      <h4>🔑 核心概念</h4>
+      <div class="body" style="font-size:0.95rem">
+        <ul>
+          <li><strong style="color:var(--accent3)">requires_grad=True</strong>：告诉PyTorch这个tensor需要追踪梯度</li>
+          <li><strong style="color:var(--accent2)">.backward()</strong>：在损失tensor上调用，自动计算所有梯度</li>
+          <li><strong style="color:var(--accent)">.grad</strong>：反向传播后，梯度存在这个属性里</li>
+          <li><strong style="color:var(--success)">with torch.no_grad()</strong>：推理时不需要追踪梯度，节省显存和计算</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-block">
+<span class="kw">import</span> torch
+
+<span class="cmt"># 定义需要梯度的参数</span>
+w = torch.tensor([0.2], requires_grad=<span class="str">True</span>)
+b = torch.tensor([0.1], requires_grad=<span class="str">True</span>)
+x = torch.tensor([0.5])
+y = torch.tensor([1.0])
+
+<span class="cmt"># 前向传播：自动构建计算图</span>
+y_pred = torch.sigmoid(w * x + b)
+loss = 0.5 * (y_pred - y)**2
+
+<span class="cmt"># 反向传播：自动计算所有梯度！</span>
+loss.<span class="fn">backward</span>()
+
+<span class="cmt"># 查看梯度</span>
+<span class="fn">print</span>(w.grad)  <span class="cmt"># ∂L/∂w，和我们手算的一致</span>
+<span class="fn">print</span>(b.grad)  <span class="cmt"># ∂L/∂b</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">19 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">代码示例：手写2层网络前向反向</h2>
+    <h3 class="sub">用NumPy手动实现，理解底层原理</h3>
+    <div class="code-block">
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">sigmoid</span>(z):
+    <span class="kw">return</span> 1 / (1 + np.exp(-z))
+
+<span class="kw">def</span> <span class="fn">sigmoid_grad</span>(a):
+    <span class="kw">return</span> a * (1 - a)
+
+<span class="cmt"># 初始化参数</span>
+W1 = np.random.randn(2, 3)  <span class="cmt"># 输入2→隐藏3</span>
+b1 = np.zeros((3, 1))
+W2 = np.random.randn(1, 3)  <span class="cmt"># 隐藏3→输出1</span>
+b2 = np.zeros((1, 1))
+
+<span class="kw">def</span> <span class="fn">forward_backward</span>(X, y, W1, b1, W2, b2):
+    <span class="cmt"># 前向</span>
+    z1 = W1 @ X + b1
+    a1 = <span class="fn">sigmoid</span>(z1)
+    z2 = W2 @ a1 + b2
+    a2 = <span class="fn">sigmoid</span>(z2)
+    
+    <span class="cmt"># 反向</span>
+    dz2 = a2 - y
+    dW2 = dz2 @ a1.T
+    db2 = np.<span class="fn">sum</span>(dz2, axis=1, keepdims=<span class="str">True</span>)
+    dz1 = (W2.T @ dz2) * <span class="fn">sigmoid_grad</span>(a1)
+    dW1 = dz1 @ X.T
+    db1 = np.<span class="fn">sum</span>(dz1, axis=1, keepdims=<span class="str">True</span>)
+    
+    <span class="kw">return</span> a2, dW1, db1, dW2, db2
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">20 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">代码示例：PyTorch autograd自动求导</h2>
+    <h3 class="sub">用PyTorch实现同样的网络，不用手写反向传播</h3>
+    <div class="code-block">
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn <span class="kw">as</span> nn
+
+<span class="cmt"># 定义网络（PyTorch风格）</span>
+<span class="kw">class</span> <span class="fn">SimpleNet</span>(nn.Module):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        self.fc1 = nn.<span class="fn">Linear</span>(2, 3)  <span class="cmt"># 2→3</span>
+        self.fc2 = nn.<span class="fn">Linear</span>(3, 1)  <span class="cmt"># 3→1</span>
+        self.sigmoid = nn.<span class="fn">Sigmoid</span>()
+    
+    <span class="kw">def</span> <span class="fn">forward</span>(self, x):
+        x = self.<span class="fn">sigmoid</span>(self.fc1(x))
+        x = self.<span class="fn">sigmoid</span>(self.fc2(x))
+        <span class="kw">return</span> x
+
+model = <span class="fn">SimpleNet</span>()
+criterion = nn.<span class="fn">MSELoss</span>()
+optimizer = torch.optim.<span class="fn">SGD</span>(model.parameters(), lr=0.1)
+
+<span class="cmt"># 训练一步</span>
+X = torch.randn(1, 2)
+y = torch.tensor([[1.0]])
+
+optimizer.<span class="fn">zero_grad</span>()       <span class="cmt"># 梯度清零</span>
+y_pred = <span class="fn">model</span>(X)           <span class="cmt"># 前向（自动构图）</span>
+loss = <span class="fn">criterion</span>(y_pred, y) <span class="cmt"># 算损失</span>
+loss.<span class="fn">backward</span>()             <span class="cmt"># 反向（自动算梯度！）</span>
+optimizer.<span class="fn">step</span>()            <span class="cmt"># 更新参数</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">21 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">训练循环：完整流程</h2>
+    <h3 class="sub">把前向、反向、更新串起来，就是完整的训练</h3>
+    <div class="flow" style="flex-direction:column;gap:1rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--warning);padding-left:1.5rem">
+        <strong style="color:var(--warning)">0. 初始化</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">随机初始化W,b；选择优化器、学习率；准备数据</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--success);padding-left:1.5rem">
+        <strong style="color:var(--success)">循环N个epoch：</strong>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent);padding-left:2.5rem">
+        <strong style="color:var(--accent)">1. 梯度清零</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">optimizer.zero_grad()——PyTorch梯度会累加，不清零会出错</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent2);padding-left:2.5rem">
+        <strong style="color:var(--accent2)">2. 前向传播</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">y_pred = model(X)——得到预测值</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--danger);padding-left:2.5rem">
+        <strong style="color:var(--danger)">3. 计算损失</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">loss = criterion(y_pred, y)——衡量预测好坏</span>
+      </div>
+      <div class="flow-node hl" style="text-align:left;min-width:auto;border-left:4px solid var(--accent3);padding-left:2.5rem">
+        <strong style="color:var(--accent3)">4. 反向传播</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">loss.backward()——autograd自动计算所有梯度</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--success);padding-left:2.5rem">
+        <strong style="color:var(--success)">5. 参数更新</strong>
+        <span style="color:var(--muted);margin-left:1rem;display:block;margin-top:0.3rem;font-size:0.95rem">optimizer.step()——沿梯度反方向更新W,b</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">22 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">反向传播直觉：责任分摊</h2>
+    <h3 class="sub">用一个生活类比来理解反向传播</h3>
+    <div class="card" style="margin-bottom:1.5rem">
+      <h4>🏢 公司项目类比</h4>
+      <p style="margin-top:0.8rem;line-height:1.9">
+        想象一个公司：CEO（输出层）→ 总监（隐藏层2）→ 经理（隐藏层1）→ 员工（输入层附近）。<br><br>
+        项目搞砸了，损失了100万（损失L）：<br>
+        <strong>1. 首先问责CEO</strong>：CEO负直接责任（输出层误差δᴸ）<br>
+        <strong>2. CEO追溯责任</strong>：根据各个总监的"贡献度"（权重W），把责任分配下去<br>
+        <strong>3. 总监再分配</strong>：每个总监再根据自己下属经理的贡献度，继续往下分配责任<br>
+        <strong>4. 每个人负责任</strong>：每个人根据自己分到的责任大小（梯度），调整自己的工作方式（更新参数）
+      </p>
+    </div>
+    <div class="hbox amber">
+      <h4>🎯 关键</h4>
+      <p>没有人是"无辜"的，也没有人承担全部责任——每个人根据自己在整个流程中的"贡献"，承担相应的责任。这就是反向传播的本质：<strong style="color:var(--accent3)">信用分配(Credit Assignment)</strong>问题。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">23 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">常见误区澄清</h2>
+    <h3 class="sub">这些问题很多初学者都会搞错</h3>
+    <div class="hbox danger">
+      <h4>❌ 误区1：反向传播是一种优化算法？</h4>
+      <p><strong>不是！</strong>反向传播只是用来<strong>计算梯度</strong>的方法。梯度下降（或Adam等优化器）才是用梯度来更新参数的优化算法。反向传播+梯度下降，才是完整的训练流程。</p>
+    </div>
+    <div class="hbox warn">
+      <h4>❌ 误区2：反向传播很神秘/很复杂？</h4>
+      <p><strong>一点都不！</strong>反向传播本质就是<strong>链式法则 + 缓存中间结果</strong>，没有任何新的数学。如果你懂微积分的链式求导，你就懂反向传播的原理了。</p>
+    </div>
+    <div class="hbox orange">
+      <h4>❌ 误区3：我必须能手推反向传播才能用深度学习？</h4>
+      <p><strong>不需要！</strong>就像你不需要会写编译器也能写代码一样，你不需要手推反向传播（PyTorch帮你做了）。但<strong>理解原理很重要</strong>——这样你遇到梯度消失/爆炸、训练不收敛等问题时，才知道怎么排查。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">24 / 28</div>
+  <div class="slide-content">
+    <h2 class="st">检查梯度：数值梯度校验</h2>
+    <h3 class="sub">写反向传播时，如何验证自己算对了？</h3>
+    <div class="formula">
+      数值梯度：∂L/∂w ≈ [L(w+ε) - L(w-ε)] / (2ε)
+      <span class="desc">用导数的定义（双边差分）来近似计算梯度。ε取很小的值（如1e-5），然后和你解析算出来的梯度比较，如果相对误差小于1e-7，基本就是对的。</span>
+    </div>
+    <div class="code-block">
+<span class="kw">def</span> <span class="fn">grad_check</span>(f, w, eps=1e-5):
+    <span class="cmt"># f是计算损失的函数，w是参数</span>
+    num_grad = np.<span class="fn">zeros_like</span>(w)
+    it = np.nditer(w, flags=[<span class="str">'multi_index'</span>], op_flags=[<span class="str">'readwrite'</span>])
+    <span class="kw">while</span> <span class="kw">not</span> it.finished:
+        idx = it.multi_index
+        old_val = w[idx]
+        w[idx] = old_val + eps
+        loss_plus = <span class="fn">f</span>(w)
+        w[idx] = old_val - eps
+        loss_minus = <span class="fn">f</span>(w)
+        w[idx] = old_val
+        num_grad[idx] = (loss_plus - loss_minus) / (2*eps)
+        it.<span class="fn">iternext</span>()
+    <span class="kw">return</span> num_grad
+    </div>
+    <div class="hbox success">
+      <h4>✅ 实用建议</h4>
+      <p>自己写反向传播时，一定要用梯度校验！这是最可靠的debug方法。当然，用PyTorch autograd就不需要担心这个了。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">25 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">本集核心知识点总结</h1>
+    <h3 class="sub">反向传播——深度学习训练的核心引擎</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">🔗</div>
+        <h4>核心原理</h4>
+        <p>链式法则+计算图+动态规划复用中间结果</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">📝</div>
+        <h4>四步流程</h4>
+        <p>前向→输出层误差→反向传误差→算梯度</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--success)">⚠️</div>
+        <h4>常见问题</h4>
+        <p>梯度消失/爆炸，合理初始化+BN+残差解决</p>
+      </div>
+    </div>
+    <div class="hbox amber">
+      <h4>🎯 记住</h4>
+      <p>• 反向传播就是<strong>从后往前用链式法则算梯度</strong><br>
+      • δˡ = ∂L/∂zˡ 是第l层的误差项<br>
+      • 激活函数必须<strong>可导</strong>，否则梯度传不回去<br>
+      • 实际用PyTorch时，<strong>loss.backward()</strong>一行搞定<br>
+      • 理解原理比背公式重要，遇到问题才知道怎么查</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">26 / 28</div>
+  <div class="slide-content">
+    <h1 class="st">下集预告：激活函数</h1>
+    <h3 class="sub">为什么没有激活函数，再深的网络也只是单层？</h3>
+    <div class="hbox orange" style="margin:2rem 0">
+      <h4>🔮 下集内容</h4>
+      <p>
+        • 为什么非线性是深度学习的力量源泉？<br>
+        • Sigmoid/Tanh/ReLU/LeakyReLU/GELU/Swish...这么多激活函数怎么选？<br>
+        • ReLU的"神经元死亡"问题是什么？怎么解决？<br>
+        • Softmax为什么用于多分类输出层？<br>
+        • 一张表总结所有常用激活函数的优缺点
+      </p>
+    </div>
+    <div class="flow">
+      <div class="flow-node hl" style="min-width:140px">🧠 反向传播<br><small style="color:var(--success)">✅ 本集完成</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:140px">⚡ 激活函数<br><small style="color:var(--accent3)">下集更精彩</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:140px">📉 梯度下降<br><small style="color:var(--muted)">NN优化器</small></div>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-chapter">DL第5集 · 反向传播</div>
+  <div class="slide-number">27 / 28</div>
+  <div class="slide-content">
+    <h1>🎉 本集结束！</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      恭喜你学完了反向传播！<br><br>
+      <strong style="color:var(--accent3)">你现在理解了神经网络是如何"学习"的</strong><br><br>
+      B站：BV1Lg5T6SEmP · 35分47秒
+    </p>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag a">✅ 反向传播</span>
+      <span class="tag o">🔗 链式法则</span>
+      <span class="tag">📊 计算图</span>
+      <span class="tag g">🔥 PyTorch autograd</span>
+    </div>
+    <div class="end-buttons">
+      <a href="chapter5.html" class="end-btn secondary">📺 回到视频页</a>
+      <a href="ppt-19.html" class="end-btn secondary">← 上一集</a>
+      <a href="ppt-21.html" class="end-btn primary">下一集：激活函数 →</a>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-number">28 / 28</div>
+  <div class="slide-content">
+    <h1>🧠 继续加油！</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      反向传播是深度学习最重要的基础算法之一<br><br>
+      <strong style="color:var(--success)">理解原理 + 动手实践 = 真正掌握</strong><br><br>
+      下一集：激活函数——为神经网络注入灵魂
+    </p>
+    <div class="tags" style="justify-content:center;margin-top:3rem">
+      <span class="tag g">💪 Keep Learning</span>
+      <span class="tag a">🔥 Deep Learning</span>
+      <span class="tag o">🚀 Next: 激活函数</span>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+});
+</script>
+</body></html>

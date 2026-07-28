@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第7章 CNN计算机视觉与NLP大模型 - ML学习站</title>
+  <style>
+    :root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--bg4:#334155;--ink:#f8fafc;--ink-muted:#cbd5e1;--muted:#94a3b8;--rule:rgba(251,191,36,0.15);--accent:#fbbf24;--accent2:#f59e0b;--accent3:#d97706;--accent-glow:rgba(251,191,36,0.25);--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace;--max:1100px;--radius:12px;--radius-lg:20px}
+    *{box-sizing:border-box;margin:0;padding:0}html{font-size:16px;scroll-behavior:smooth}
+    body{font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.7;overflow-x:hidden}a{text-decoration:none;color:inherit}
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,14,26,0.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--rule);padding:0 2rem}
+    .navbar-inner{max-width:var(--max);margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+    .logo{display:flex;align-items:center;gap:10px;font-size:1.2rem;font-weight:700;color:var(--accent)}
+    .logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent3),var(--accent));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .nav-links{display:flex;gap:1.2rem;list-style:none;align-items:center}
+    .nav-links a{color:var(--muted);font-weight:500;font-size:0.85rem;transition:color .3s}
+    .nav-links a:hover,.nav-links a.active{color:var(--accent3)}
+    .back-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:var(--bg3);border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;color:var(--ink-muted);transition:all .3s}
+    .back-btn:hover{border-color:var(--accent3);color:var(--accent3)}
+    .chapter-hero{padding-top:100px;padding-bottom:3rem;background:linear-gradient(180deg,rgba(251,191,36,0.06) 0%,transparent 100%)}
+    .chapter-hero-inner{max-width:var(--max);margin:0 auto;padding:0 2rem}
+    .breadcrumb{font-size:0.85rem;color:var(--muted);margin-bottom:1.5rem;display:flex;gap:8px;align-items:center}
+    .breadcrumb a{color:var(--accent3)}
+    .chapter-badge{display:inline-flex;padding:6px 14px;background:rgba(251,191,36,0.12);color:var(--accent);border-radius:20px;font-size:0.8rem;font-weight:600;margin-bottom:1rem;border:1px solid rgba(251,191,36,0.2)}
+    .chapter-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.2;margin-bottom:1rem}
+    .chapter-subtitle{font-size:1.1rem;color:var(--muted);max-width:700px;line-height:1.8}
+    .chapter-meta{display:flex;gap:2rem;margin-top:1.5rem;flex-wrap:wrap}
+    .meta-item{display:flex;align-items:center;gap:6px;font-size:0.9rem;color:var(--ink-muted)}
+    .video-nav{display:flex;gap:0.5rem;margin-top:2rem;flex-wrap:wrap}
+    .vnav-item{padding:8px 14px;background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius);font-size:0.82rem;color:var(--muted);cursor:pointer;transition:all .3s;font-family:var(--font);text-align:left}
+    .vnav-item:hover,.vnav-item.active{border-color:var(--accent);color:var(--accent);background:rgba(251,191,36,0.08)}
+    .vnav-item strong{display:block;color:var(--ink);font-size:0.8rem;margin-bottom:1px}
+    .vnav-item span{font-size:0.72rem}
+    .main{max-width:var(--max);margin:0 auto;padding:0 2rem}
+    .lesson{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+    .lesson:last-child{border-bottom:none}
+    .lesson-header{display:flex;align-items:flex-start;gap:1rem;margin-bottom:2rem}
+    .lesson-num{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;flex-shrink:0;color:var(--bg);background:linear-gradient(135deg,var(--accent),var(--accent2))}
+    .lesson-info h2{font-size:1.4rem;font-weight:700;margin-bottom:4px;line-height:1.3}
+    .lesson-info .lesson-dur{font-size:0.85rem;color:var(--muted)}
+    .video-wrapper{position:relative;width:100%;padding-bottom:56.25%;margin-bottom:2.5rem;background:var(--bg2);border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--rule)}
+    .video-wrapper iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+    .content-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem}
+    .content-card{background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius-lg);padding:1.75rem;transition:border-color .3s}
+    .content-card:hover{border-color:var(--accent3)}
+    .content-card.full{grid-column:1/-1}
+    .card-tag{display:inline-block;padding:3px 10px;background:rgba(251,191,36,0.1);color:var(--accent);border-radius:6px;font-size:0.75rem;font-weight:600;margin-bottom:1rem}
+    .content-card h3{font-size:1.1rem;margin-bottom:1rem}
+    .content-card p{font-size:0.92rem;color:var(--ink-muted);line-height:1.8;margin-bottom:0.8rem}
+    .content-card ul{list-style:none;padding:0}
+    .content-card li{padding:0.4rem 0;font-size:0.9rem;color:var(--ink-muted);display:flex;gap:10px;align-items:flex-start;line-height:1.7}
+    .content-card li::before{content:'▸';color:var(--accent);flex-shrink:0;margin-top:1px}
+    .key-point{background:rgba(251,191,36,0.06);border-left:3px solid var(--accent);border-radius:0 var(--radius) var(--radius) 0;padding:1.25rem 1.5rem;margin:1.5rem 0}
+    .key-point h4{color:var(--accent);font-size:0.95rem;margin-bottom:0.5rem}
+    .key-point p{font-size:0.9rem;color:var(--ink-muted);line-height:1.8}
+    .formula-box{background:var(--bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1.25rem 1.5rem;margin:1rem 0;font-family:var(--mono);font-size:0.9rem;color:var(--accent);text-align:center;letter-spacing:0.02em;overflow-x:auto;line-height:2}
+    .formula-box .comment{color:var(--muted);font-family:var(--font);font-size:0.82rem;display:block;margin-top:0.3rem}
+    .code-block{background:var(--bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1.25rem 1.5rem;margin:1rem 0;overflow-x:auto;font-family:var(--mono);font-size:0.86rem;line-height:1.7;color:var(--ink-muted)}
+    .code-block .kw{color:var(--accent2)}.code-block .fn{color:var(--accent3)}.code-block .str{color:var(--success)}.code-block .cm{color:var(--muted);font-style:italic}.code-block .num{color:var(--warning)}
+    .summary-map{background:var(--bg);border-radius:var(--radius-lg);border:1px solid var(--rule);padding:2rem;margin:1.5rem 0}
+    .map-section{margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--rule)}
+    .map-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+    .map-section h4{font-size:1rem;color:var(--accent);margin-bottom:0.75rem;display:flex;align-items:center;gap:8px}
+    .map-tags{display:flex;gap:0.5rem;flex-wrap:wrap}
+    .map-tag{padding:5px 14px;background:var(--bg2);border:1px solid var(--rule);border-radius:20px;font-size:0.8rem;color:var(--ink-muted);transition:all .3s}
+    .map-tag:hover{border-color:var(--accent);color:var(--accent)}
+    .arch-timeline{background:var(--bg);border-radius:var(--radius-lg);border:1px solid var(--rule);padding:2rem;margin:1.5rem 0}
+    .timeline-item{display:flex;gap:1rem;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--rule)}
+    .timeline-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+    .timeline-year{width:80px;flex-shrink:0;color:var(--accent);font-weight:700;font-size:0.95rem}
+    .timeline-content h5{font-size:0.95rem;margin-bottom:0.3rem}
+    .timeline-content p{font-size:0.82rem;color:var(--muted);line-height:1.5}
+    .nlp-history{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0}
+    .nlp-card{background:var(--bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1.5rem;text-align:center;transition:all .3s}
+    .nlp-card:hover{border-color:var(--accent);transform:translateY(-4px)}
+    .nlp-card .nlp-icon{font-size:2.5rem;margin-bottom:0.75rem}
+    .nlp-card h4{font-size:0.95rem;margin-bottom:0.4rem}
+    .nlp-card p{font-size:0.78rem;color:var(--muted);line-height:1.5}
+    .chapter-nav{display:flex;justify-content:space-between;align-items:center;padding:2rem 0;margin-top:2rem;border-top:1px solid var(--rule)}
+    .chapter-nav .prev,.chapter-nav .next{display:flex;align-items:center;gap:8px;padding:12px 20px;background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius);color:var(--ink-muted);font-size:0.9rem;transition:all .3s}
+    .chapter-nav .next{margin-left:auto;text-align:right}
+    .chapter-nav .prev:hover{border-color:var(--accent2);color:var(--accent2)}
+    .chapter-nav .next:hover{border-color:var(--success);color:var(--success)}
+    .nav-label{font-size:0.75rem;color:var(--muted);display:block}.nav-title{font-weight:600;color:var(--ink)}
+    footer{background:var(--bg2);border-top:1px solid var(--rule);padding:3rem 2rem 2rem;margin-top:3rem}
+    .footer-inner{max-width:var(--max);margin:0 auto;text-align:center;color:var(--muted);font-size:0.82rem}
+    @media(max-width:768px){.content-grid,.nlp-history{grid-template-columns:1fr!important}.nav-links{display:none}}
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="ml-learning-site.html" class="logo"><div class="logo-icon">🧠</div><span>ML学习站</span></a>
+      <ul class="nav-links">
+        <li><a href="ml-learning-site.html">首页</a></li>
+        <li><a href="slides.html">📊 PPT版</a></li>
+        <li><a href="chapter1.html">第1章</a></li>
+        <li><a href="chapter2.html">第2章</a></li>
+        <li><a href="chapter3.html">第3章</a></li>
+        <li><a href="#lessonD15" class="active">DL15</a></li>
+        <li><a href="#lessonD16">DL16</a></li>
+        <li><a href="#lessonD17">DL17</a></li>
+        <li><a href="#lessonD18">DL18</a></li>
+        <li><a href="#lessonD19">DL19</a></li>
+      </ul>
+      <a href="ml-learning-site.html" class="back-btn">← 返回首页</a>
+    </div>
+  </nav>
+
+  <div class="chapter-hero">
+    <div class="chapter-hero-inner">
+      <div class="breadcrumb"><a href="ml-learning-site.html">首页</a> / <span>第7章 CNN计算机视觉与NLP大模型</span></div>
+      <span class="chapter-badge">✨ 深度学习终章 · 第15-19集</span>
+      <h1 class="chapter-title">CNN计算机视觉与NLP大模型</h1>
+      <p class="chapter-subtitle">学习卷积神经网络CNN——计算机视觉的核心技术，从卷积层、池化层到残差连接，理解图像识别的原理；最后走进NLP与大语言模型世界，从规则方法到Transformer，见证AI革命的诞生。</p>
+      <div class="chapter-meta">
+        <span class="meta-item">📺 5集视频</span><span class="meta-item">⏱ 约114分钟</span><span class="meta-item">👁️ 计算机视觉</span><span class="meta-item">💬 NLP大模型</span>
+      </div>
+      <div class="video-nav">
+        <a href="#lessonD15" class="vnav-item active"><strong>DL15</strong><span>CNN为什么需要 (21:45)</span></a>
+        <a href="#lessonD16" class="vnav-item"><strong>DL16</strong><span>卷积层 (18:32)</span></a>
+        <a href="#lessonD17" class="vnav-item"><strong>DL17</strong><span>池化层与代码 (15:07)</span></a>
+        <a href="#lessonD18" class="vnav-item"><strong>DL18</strong><span>残差连接 (33:26)</span></a>
+        <a href="#lessonD19" class="vnav-item"><strong>DL19</strong><span>NLP与大模型 (25:58)</span></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="lesson" id="lessonD15">
+      <div class="lesson-header">
+        <div class="lesson-num">15</div>
+        <div class="lesson-info">
+          <h2>CNN第一课：CV任务为什么需要CNN</h2>
+          <div class="lesson-dur">⏱ 21分45秒 · BV1TtjJ6CEbe</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1TtjJ6CEbe&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 全连接网络处理图像的致命问题</h4>
+        <p>如果用普通全连接网络处理图像，参数会爆炸！一张224×224×3的RGB图片，输入层就有224×224×3 = <strong style="color:var(--ink)">150,528</strong>个神经元。如果第一个隐藏层有1024个神经元，仅这一层就有150K×1024 ≈ <strong style="color:var(--ink)">1.5亿个参数</strong>！这不仅计算慢、容易过拟合，更重要的是——全连接网络完全忽略了图像的<strong style="color:var(--ink)">空间结构</strong>。</p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">核心问题</span>
+          <h3>❌ 全连接网络的缺陷</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">参数爆炸</strong>：图像像素展开为一维向量，参数数量巨大</li>
+            <li><strong style="color:var(--ink)">丢失空间信息</strong>：像素的位置关系完全被忽略</li>
+            <li><strong style="color:var(--ink)">没有平移不变性</strong>：同一个物体在图片不同位置就认不出来了</li>
+            <li><strong style="color:var(--ink)">泛化能力差</strong>：需要大量数据才能训练</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">图像的本质</span>
+          <h3>🖼️ 空间局部相关性</h3>
+          <p>图像像素之间有很强的局部相关性：</p>
+          <ul>
+            <li><strong style="color:var(--ink)">局部像素</strong>通常组成边缘、纹理等基础特征</li>
+            <li><strong style="color:var(--ink)">相邻区域</strong>构成物体的部件（眼睛、轮子等）</li>
+            <li><strong style="color:var(--ink)">高层组合</strong>形成完整物体（人脸、汽车等）</li>
+            <li>这是一种<strong style="color:var(--ink)">层次化</strong>的特征结构</li>
+          </ul>
+        </div>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">生物启发</span>
+        <h3>🧠 Hubel-Wiesel实验：视觉皮层的启发</h3>
+        <p>1962年，Hubel和Wiesel通过对猫视觉皮层的研究发现：</p>
+        <div class="content-grid" style="margin-bottom:0">
+          <div>
+            <ul>
+              <li><strong style="color:var(--ink)">简单细胞（Simple Cells）</strong>：只对特定位置、特定方向的边缘有反应</li>
+              <li><strong style="color:var(--ink)">复杂细胞（Complex Cells）</strong>：对边缘有反应，但具有一定的<strong style="color:var(--ink)">平移不变性</strong>（边缘在小范围内移动仍能激活）</li>
+            </ul>
+          </div>
+          <div>
+            <ul>
+              <li>视觉皮层是<strong style="color:var(--ink)">层次化</strong>处理信息的：V1（边缘）→ V2（形状）→ V4（颜色/形状）→ IT（物体识别）</li>
+              <li>CNN正是模拟了这一机制：<strong style="color:var(--ink)">局部感受野+层次化特征提取</strong></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="key-point" style="margin-top:2rem">
+        <h4>✨ CNN的三大核心优势</h4>
+        <p><strong style="color:var(--ink)">1. 参数大幅减少</strong>：局部连接+权重共享，同样的任务参数量只有全连接的几十分之一甚至几百分之一；<strong style="color:var(--ink)">2. 平移不变性</strong>：同一个特征在图像任何位置都能被检测到；<strong style="color:var(--ink)">3. 层次化特征提取</strong>：从边缘→纹理→部件→物体，自动学习多层级特征。</p>
+      </div>
+    </div>
+
+    <div class="lesson" id="lessonD16">
+      <div class="lesson-header">
+        <div class="lesson-num">16</div>
+        <div class="lesson-info">
+          <h2>卷积层：如何提取图像特征</h2>
+          <div class="lesson-dur">⏱ 18分32秒 · BV1NR7L6YEiF</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1NR7L6YEiF&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 卷积运算的核心思想</h4>
+        <p>卷积层是CNN的核心。一个<strong style="color:var(--ink)">卷积核（滤波器/Kernel）</strong>是一个小的权重矩阵（比如3×3），它在输入图像上从左到右、从上到下滑动，每到一个位置就和对应区域做<strong style="color:var(--ink)">逐元素相乘再求和</strong>，得到输出特征图上的一个值。这个过程就像用一个"模板"在图像上找匹配的模式。</p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">卷积核作用</span>
+          <h3>🔍 卷积核能检测什么？</h3>
+          <p>不同的卷积核权重可以检测不同的特征：</p>
+          <ul>
+            <li><strong style="color:var(--ink)">边缘检测</strong>：水平边缘、垂直边缘、对角线边缘</li>
+            <li><strong style="color:var(--ink)">模糊/平滑</strong>：取邻域平均，消除噪声</li>
+            <li><strong style="color:var(--ink)">锐化</strong>：强调边缘和细节</li>
+            <li>CNN通过训练<strong style="color:var(--ink)">自动学习</strong>卷积核的权重，不需要人工设计</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">输出尺寸公式</span>
+          <h3>📐 卷积输出尺寸计算</h3>
+          <div class="formula-box">
+            Out = (In - K + 2P) / S + 1
+          </div>
+          <ul>
+            <li><strong style="color:var(--ink)">In</strong>：输入尺寸（如224）</li>
+            <li><strong style="color:var(--ink)">K</strong>：卷积核大小（如3）</li>
+            <li><strong style="color:var(--ink)">P</strong>：Padding填充大小</li>
+            <li><strong style="color:var(--ink)">S</strong>：Stride步幅</li>
+          </ul>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">关键参数</span>
+          <h3>⚙️ Padding 填充</h3>
+          <p>在输入图像周围填充0（通常），有两个作用：</p>
+          <ul>
+            <li><strong style="color:var(--ink)">保持尺寸</strong>：3×3卷积用P=1，可以让输出和输入尺寸相同</li>
+            <li><strong style="color:var(--ink)">保留边缘信息</strong>：不填充的话，图像边缘像素只被计算一次，信息利用不充分</li>
+            <li>P=K/2（向下取整）时称为Same Padding</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">关键参数</span>
+          <h3>⚙️ Stride 步幅</h3>
+          <p>卷积核每次滑动的距离：</p>
+          <ul>
+            <li><strong style="color:var(--ink)">S=1</strong>：每次滑动1个像素，最常用</li>
+            <li><strong style="color:var(--ink)">S=2</strong>：每次滑动2个像素，输出尺寸减半，起到<strong style="color:var(--ink)">下采样</strong>作用</li>
+            <li>步幅越大，输出尺寸越小，计算越快</li>
+          </ul>
+        </div>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">多通道与1×1卷积</span>
+        <h3>🌈 多通道卷积与1×1卷积的妙用</h3>
+        <div class="content-grid" style="margin-bottom:0">
+          <div>
+            <h4 style="font-size:0.95rem;color:var(--accent);margin-bottom:0.75rem">RGB多通道卷积</h4>
+            <ul>
+              <li>输入是3通道RGB图像，卷积核也必须是<strong style="color:var(--ink)">3通道</strong>的（K×K×3）</li>
+              <li>每个通道独立卷积后<strong style="color:var(--ink)">相加</strong>，得到1个输出通道</li>
+              <li>有N个卷积核，就输出N个通道（每个卷积核产生1个通道）</li>
+              <li>卷积核数量 = 输出通道数 = 特征图数量</li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="font-size:0.95rem;color:var(--accent);margin-bottom:0.75rem">1×1卷积的作用</h4>
+            <ul>
+              <li><strong style="color:var(--ink)">降维/升维</strong>：用较少的1×1卷积核减少通道数，大幅降低计算量（GoogLeNet/ResNet核心技巧）</li>
+              <li><strong style="color:var(--ink)">跨通道信息融合</strong>：在不改变空间尺寸的情况下整合各通道信息</li>
+              <li>增加非线性（后面接ReLU）</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson" id="lessonD17">
+      <div class="lesson-header">
+        <div class="lesson-num">17</div>
+        <div class="lesson-info">
+          <h2>CNN：池化层、分类与代码示例</h2>
+          <div class="lesson-dur">⏱ 15分07秒 · BV1fW7L6XEiv</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1fW7L6XEiv&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 池化层是做什么的？</h4>
+        <p>池化层（Pooling）通常紧跟在卷积层之后，作用是<strong style="color:var(--ink)">降低特征图尺寸</strong>，减少计算量和参数，同时让网络对小的位移有更强的鲁棒性。池化层<strong style="color:var(--ink)">没有可学习的参数</strong>，只是固定的运算。</p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">池化类型</span>
+          <h3>🏊 Max Pooling vs Average Pooling</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">Max Pooling（最大池化）</strong>：取窗口内的最大值，保留最显著的特征，最常用</li>
+            <li><strong style="color:var(--ink)">Average Pooling（平均池化）</strong>：取窗口内的平均值，更平滑，但可能丢失重要特征</li>
+            <li>典型参数：2×2窗口，步幅S=2，这样高宽都减半</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">池化作用</span>
+          <h3>🎯 池化层的三大作用</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">降维</strong>：特征图尺寸减半，后续计算量减为1/4</li>
+            <li><strong style="color:var(--ink)">增大感受野</strong>：后面层的每个神经元能看到更大的原图区域</li>
+            <li><strong style="color:var(--ink)">平移不变性</strong>：特征在小范围内移动，池化后仍能激活</li>
+          </ul>
+        </div>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">经典架构</span>
+        <h3>🏆 CNN架构演进之路</h3>
+        <div class="arch-timeline">
+          <div class="timeline-item">
+            <div class="timeline-year">1998</div>
+            <div class="timeline-content">
+              <h5>LeNet-5</h5>
+              <p>Yann LeCun提出，手写数字识别，卷积+池化+全连接的经典模式，现代CNN的雏形</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2012</div>
+            <div class="timeline-content">
+              <h5>AlexNet</h5>
+              <p>Alex Krizhevsky，ImageNet竞赛冠军，8层网络，ReLU激活函数、Dropout、GPU训练，深度学习革命的开始</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2014</div>
+            <div class="timeline-content">
+              <h5>VGGNet</h5>
+              <p>牛津大学，统一使用3×3小卷积核堆叠，16-19层，结构简洁规整，证明了深度的重要性</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2014</div>
+            <div class="timeline-content">
+              <h5>GoogLeNet (Inception)</h5>
+              <p>Google，Inception模块（多尺度卷积并行），1×1卷积降维，22层但参数比AlexNet还少</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2015</div>
+            <div class="timeline-content">
+              <h5>ResNet</h5>
+              <p>何恺明等人，残差连接，152层（甚至1000+层），解决深度网络退化问题，影响最深远</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="key-point" style="margin-top:2rem">
+        <h4>📋 典型CNN结构模式</h4>
+        <p><strong style="color:var(--ink)">[Conv → ReLU → Pool] × N → Flatten → [FC → ReLU] × M → 输出层</strong>。图像经过多轮卷积+池化提取特征后，Flatten展平为向量，通过全连接层完成分类。现代网络（ResNet等）通常只用卷积层，最后用全局平均池化替代Flatten。</p>
+      </div>
+      <div class="code-block">
+        <span class="cm"># PyTorch实现简单CNN</span><br>
+        <span class="kw">import</span> torch<br>
+        <span class="kw">import</span> torch.nn <span class="kw">as</span> nn<br><br>
+        <span class="kw">class</span> <span class="fn">SimpleCNN</span>(nn.Module):<br>
+        &nbsp;&nbsp;<span class="kw">def</span> <span class="fn">__init__</span>(self):<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">super</span>().<span class="fn">__init__</span>()<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;self.features = nn.Sequential(<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.Conv2d(<span class="num">3</span>, <span class="num">32</span>, <span class="num">3</span>, padding=<span class="num">1</span>),  <span class="cm"># 3通道输入→32通道</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.ReLU(),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.MaxPool2d(<span class="num">2</span>, <span class="num">2</span>),  <span class="cm"># 尺寸减半</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.Conv2d(<span class="num">32</span>, <span class="num">64</span>, <span class="num">3</span>, padding=<span class="num">1</span>),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.ReLU(),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.MaxPool2d(<span class="num">2</span>, <span class="num">2</span>),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;self.classifier = nn.Sequential(<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.Flatten(),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.Linear(<span class="num">64</span> * <span class="num">56</span> * <span class="num">56</span>, <span class="num">256</span>),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.ReLU(),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.Linear(<span class="num">256</span>, <span class="num">10</span>)  <span class="cm"># 10分类</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;)<br><br>
+        &nbsp;&nbsp;<span class="kw">def</span> <span class="fn">forward</span>(self, x):<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;x = self.features(x)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;x = self.classifier(x)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> x
+      </div>
+    </div>
+
+    <div class="lesson" id="lessonD18">
+      <div class="lesson-header">
+        <div class="lesson-num">18</div>
+        <div class="lesson-info">
+          <h2>残差连接：CNN和Transformer的共同捷径</h2>
+          <div class="lesson-dur">⏱ 33分26秒 · BV1LGMw6HEEB</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1LGMw6HEEB&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 深度网络的退化问题</h4>
+        <p>理论上网络越深，表达能力越强。但实际训练发现：网络加深到一定程度后，<strong style="color:var(--ink)">训练误差反而上升</strong>！这不是过拟合（过拟合是训练误差低但测试误差高），而是<strong style="color:var(--ink)">深层网络更难训练</strong>——梯度在反向传播时不断相乘，越来越小（梯度消失）或越来越大（梯度爆炸），导致前面层几乎学不到东西。</p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">梯度问题</span>
+          <h3>⚠️ 梯度消失与爆炸</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">梯度消失</strong>：反向传播时梯度经过多层连乘，趋近于0，前面层参数不更新</li>
+            <li><strong style="color:var(--ink)">梯度爆炸</strong>：梯度连乘后变得很大，参数更新不稳定</li>
+            <li><strong style="color:var(--ink)">BN（BatchNorm）</strong>部分缓解了这个问题，但没有根本解决</li>
+            <li>根本问题：深层网络很难学习<strong style="color:var(--ink)">恒等映射</strong>（即输出=输入）</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">核心思想</span>
+          <h3>🪜 残差连接：y = F(x) + x</h3>
+          <div class="formula-box">
+            y = F(x) + x
+          </div>
+          <p>ResNet的核心思想极其简单：</p>
+          <ul>
+            <li>不让网络直接学习y=H(x)，而是学习<strong style="color:var(--ink)">残差F(x)=H(x)-x</strong></li>
+            <li>即：输出 = 输入 + 残差（F(x)是需要学习的"增量"）</li>
+            <li>有一条<strong style="color:var(--ink)">捷径（shortcut/skip connection）</strong>直接把x传到输出</li>
+          </ul>
+        </div>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">为什么有效</span>
+        <h3>🔑 残差连接为什么能训练152层？</h3>
+        <div class="content-grid" style="margin-bottom:0">
+          <div>
+            <ul>
+              <li><strong style="color:var(--ink)">恒等映射很容易</strong>：如果F(x)=0，那y=x就是恒等映射，网络至少不会变差</li>
+              <li><strong style="color:var(--ink)">梯度直接回传</strong>：反向传播时，梯度可以通过shortcut直接流回前面层，不会消失</li>
+            </ul>
+          </div>
+          <div>
+            <ul>
+              <li>梯度公式：∂L/∂x = ∂L/∂y · (1 + ∂F/∂x)，那个"+1"保证了即使∂F/∂x很小，梯度也不会消失</li>
+              <li>ResNet用152层在ImageNet上取得3.57%错误率，远超人类水平</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="key-point" style="margin-top:2rem">
+        <h4>🌉 残差连接在Transformer中的应用</h4>
+        <p>残差连接不只属于CNN！Transformer中<strong style="color:var(--ink)">每个子层</strong>（多头注意力、FFN）都用了残差连接+LayerNorm：<strong style="color:var(--ink)">x = x + Sublayer(LN(x))</strong>。可以说，没有残差连接就没有Transformer，也就没有今天的大语言模型。后续的DenseNet（密集连接）等都是残差思想的扩展。</p>
+      </div>
+    </div>
+
+    <div class="lesson" id="lessonD19">
+      <div class="lesson-header">
+        <div class="lesson-num">19</div>
+        <div class="lesson-info">
+          <h2>NLP概述：从规则到Transformer与大模型</h2>
+          <div class="lesson-dur">⏱ 25分58秒 · BV1RMMu6TEpu</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1RMMu6TEpu&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">发展历史</span>
+        <h3>📜 NLP七十年：从规则到大模型</h3>
+        <div class="arch-timeline">
+          <div class="timeline-item">
+            <div class="timeline-year">1950s-80s</div>
+            <div class="timeline-content">
+              <h5>规则方法</h5>
+              <p>人工编写语法规则和词典，如机器翻译的规则系统。优点：可解释；缺点：规则写不完，无法处理歧义，维护成本极高</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">1990s-2010</div>
+            <div class="timeline-content">
+              <h5>统计NLP</h5>
+              <p>基于统计的方法：BoW（词袋模型）、TF-IDF、N-gram语言模型、隐马尔可夫模型（HMM）、条件随机场（CRF）。从数据中自动学习概率</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2013</div>
+            <div class="timeline-content">
+              <h5>词向量时代</h5>
+              <p>Word2Vec、GloVe将词映射为稠密向量，捕捉词语间的语义关系（king-man+woman≈queen），是NLP的里程碑</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2014-2016</div>
+            <div class="timeline-content">
+              <h5>RNN/LSTM + Seq2Seq</h5>
+              <p>RNN/LSTM处理序列数据，Seq2Seq+Attention用于机器翻译。但RNN无法并行计算，长距离依赖问题严重</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2017</div>
+            <div class="timeline-content">
+              <h5>Transformer诞生</h5>
+              <p>Google发表《Attention Is All You Need》，完全抛弃RNN，只用Self-Attention，可并行计算，能捕捉长距离依赖，AI革命的起点</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-year">2018-至今</div>
+            <div class="timeline-content">
+              <h5>预训练大模型时代</h5>
+              <p>BERT（2018）、GPT系列（GPT-1/2/3/4）——预训练+微调范式，大语言模型(LLM)展现出涌现能力，ChatGPT改变世界</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="key-point" style="margin-top:2rem">
+        <h4>💡 注意力机制的核心思想</h4>
+        <p>当你读一句话时，你不会对每个词都花同样的注意力——你会<strong style="color:var(--ink)">聚焦在最重要的部分</strong>。注意力机制就是让模型学会"对重要的信息分配更多权重"。比如翻译"The animal didn't cross the street because it was tired"，"it"指的是"animal"而不是"street"，注意力机制能让模型在处理"it"时重点关注"animal"。</p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">核心机制</span>
+          <h3>🎯 Self-Attention 自注意力</h3>
+          <p>Self-Attention是Transformer的核心：</p>
+          <ul>
+            <li>一句话中的<strong style="color:var(--ink)">每个词都和句子中所有词</strong>计算注意力权重</li>
+            <li>每个词的输出是所有词的<strong style="color:var(--ink)">加权和</strong>，权重代表它们之间的关联度</li>
+            <li>可以<strong style="color:var(--ink)">并行计算</strong>（不像RNN必须一个词一个词处理）</li>
+            <li>能捕捉任意距离的依赖关系</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">架构简述</span>
+          <h3>🏗️ Transformer架构</h3>
+          <p>Transformer采用编码器-解码器结构：</p>
+          <ul>
+            <li><strong style="color:var(--ink)">编码器（Encoder）</strong>：多层堆叠，每层=多头注意力+FFN+残差+LayerNorm</li>
+            <li><strong style="color:var(--ink)">解码器（Decoder）</strong>：类似编码器，但加了掩码注意力防止看到未来的词</li>
+            <li>BERT只用编码器，GPT只用解码器</li>
+          </ul>
+        </div>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">大模型范式</span>
+        <h3>🚀 预训练+微调：大模型成功的关键</h3>
+        <p>现代LLM的核心范式：</p>
+        <div class="nlp-history" style="grid-template-columns:repeat(3,1fr)">
+          <div class="nlp-card">
+            <div class="nlp-icon">📚</div>
+            <h4>预训练 Pre-training</h4>
+            <p>在海量文本（互联网、书籍等）上做无监督学习，学习通用语言能力。通常是"下一个词预测"任务</p>
+          </div>
+          <div class="nlp-card">
+            <div class="nlp-icon">🎯</div>
+            <h4>微调 Fine-tuning</h4>
+            <p>在特定任务数据上继续训练，适配具体任务（分类、问答、翻译等）。现在也常用Prompting替代微调</p>
+          </div>
+          <div class="nlp-card">
+            <div class="nlp-icon">✨</div>
+            <h4>涌现能力</h4>
+            <p>参数规模大到一定程度（百亿级以上），模型突然展现出小模型没有的能力：推理、思维链、Few-shot学习</p>
+          </div>
+        </div>
+      </div>
+      <div class="key-point" style="margin-top:2rem">
+        <h4>🌟 AI的未来展望</h4>
+        <p>从机器学习到深度学习，从CNN到Transformer到大语言模型，AI正在以前所未有的速度发展。多模态（理解图像、音频、视频）、具身智能（机器人）、AI for Science（用AI做科学研究）、AGI（通用人工智能）……这是一个最好的时代，也是AI学习者的黄金时代。恭喜你完成了全部34集的学习，这只是你AI旅程的开始！</p>
+      </div>
+    </div>
+
+    <div style="margin-top:3rem;padding:2.5rem;background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(99,102,241,0.04));border:1px solid rgba(139,92,246,0.25);border-radius:var(--radius);position:relative;overflow:hidden">
+      <div style="position:absolute;top:-30px;right:-30px;width:150px;height:150px;background:radial-gradient(circle,rgba(139,92,246,0.15),transparent 70%);pointer-events:none"></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem">
+        <div style="width:44px;height:44px;background:linear-gradient(135deg,#8b5cf6,#6366f1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">👑</div>
+        <div>
+          <h3 style="font-size:1.3rem;background:linear-gradient(135deg,#a78bfa,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Transformer架构深度解析 · 专题精讲</h3>
+          <p style="color:var(--muted);font-size:0.9rem;margin-top:2px">41页幻灯片 · 彻底掌握大模型的核心基石</p>
+        </div>
+      </div>
+      <p style="color:var(--ink2);line-height:1.8;margin-bottom:1.5rem">Transformer是现代AI大模型（BERT、GPT、LLaMA、ChatGPT等）的核心架构。本专题PPT从RNN/LSTM的瓶颈出发，逐层剖析Self-Attention自注意力机制、Scaled Dot-Product、Multi-Head Attention多头注意力、位置编码、Encoder/Decoder架构、Masked Attention、Cross-Attention、FFN、Add&Norm、训练过程，以及BERT/GPT/ViT家族的区别，帮助你彻底理解这个改变AI历史的架构。</p>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap">
+        <a href="ppt-transformer.html" style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:linear-gradient(135deg,#8b5cf6,#6366f1);color:white;border-radius:10px;text-decoration:none;font-weight:600;font-size:0.95rem;transition:all .3s">
+          📊 进入Transformer专题PPT <span>→</span>
+        </a>
+        <a href="slides.html" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--bg2);border:1px solid rgba(139,92,246,0.3);color:#a78bfa;border-radius:10px;text-decoration:none;font-weight:500;font-size:0.9rem;transition:all .3s">
+          📚 查看全部PPT
+        </a>
+      </div>
+    </div>
+
+    <div style="margin-top:3rem;padding:2.5rem;background:linear-gradient(135deg,rgba(6,182,212,0.08),rgba(14,165,233,0.04));border:1px solid rgba(6,182,212,0.25);border-radius:var(--radius);position:relative;overflow:hidden">
+      <div style="position:absolute;top:-30px;right:-30px;width:150px;height:150px;background:radial-gradient(circle,rgba(6,182,212,0.15),transparent 70%);pointer-events:none"></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem">
+        <div style="width:44px;height:44px;background:linear-gradient(135deg,#06b6d4,#0ea5e9);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">🐋</div>
+        <div>
+          <h3 style="font-size:1.3rem;background:linear-gradient(135deg,#22d3ee,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">DeepSeek-V3 论文精读 · 前沿专题</h3>
+          <p style="color:var(--muted);font-size:0.9rem;margin-top:2px">49页幻灯片 · 论文arXiv:2412.19437完整解析：MLA推导、MoE架构、MTP、FP8训练、Aux-Loss-Free</p>
+        </div>
+      </div>
+      <p style="color:var(--ink2);line-height:1.8;margin-bottom:1.5rem">基于DeepSeek-V3论文(arXiv:2412.19437)的完整技术解析。本专题PPT深入讲解：MLA多头潜在注意力的低秩联合压缩推导与解耦式RoPE、DeepSeekMoE的细粒度专家分割与共享专家隔离、Multi-Token Prediction(MTP)多Token预测、Auxiliary-Loss-Free无辅助损失负载均衡、FP8混合精度训练的块级量化策略、DualPipe流水线算法、以及$5.58M训练671B模型的成本分析。</p>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap">
+        <a href="ppt-deepseek.html" style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:linear-gradient(135deg,#06b6d4,#0ea5e9);color:white;border-radius:10px;text-decoration:none;font-weight:600;font-size:0.95rem;transition:all .3s">
+          📊 进入DeepSeek专题PPT <span>→</span>
+        </a>
+        <a href="https://github.com/deepseek-ai/DeepSeek-V3.2-Exp" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--bg2);border:1px solid rgba(6,182,212,0.3);color:#22d3ee;border-radius:10px;text-decoration:none;font-weight:500;font-size:0.9rem;transition:all .3s">
+          🔗 GitHub仓库
+        </a>
+      </div>
+    </div>
+
+    <div class="chapter-nav">
+      <a href="chapter6.html" class="prev">
+        <span>←</span><span><span class="nav-label">上一章</span><span class="nav-title">第6章 深度学习神经网络</span></span>
+      </a>
+      <a href="ml-learning-site.html" class="next" style="border-color:rgba(52,211,153,0.3);color:var(--success)">
+        <span><span class="nav-label">完成学习</span><span class="nav-title">返回首页 🏠</span></span>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <p>🎉 恭喜完成全部34集学习！从经典机器学习到深度学习CNN与大模型，你已经完成了完整的AI入门之旅！ | © 2026 ML学习站</p>
+      <p style="margin-top:0.5rem"><a href="https://space.bilibili.com/291215958/lists/7984530?type=season" target="_blank" style="color:var(--accent)">前往B站观看原视频 →</a></p>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('a[href^="#"]').forEach(function(a){a.addEventListener('click',function(e){var h=this.getAttribute('href');if(h==='#')return;e.preventDefault();var t=document.querySelector(h);if(t)t.scrollIntoView({behavior:'smooth',block:'start'})})});
+    var vnavs=document.querySelectorAll('.vnav-item');var lessons=document.querySelectorAll('.lesson');window.addEventListener('scroll',function(){var cur=0;lessons.forEach(function(l,i){if(window.scrollY>=l.offsetTop-120)cur=i});vnavs.forEach(function(n,i){n.classList.toggle('active',i===cur)})});
+  </script>
+</body>
+</html>

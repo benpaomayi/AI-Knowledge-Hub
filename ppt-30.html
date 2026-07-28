@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>DL第14集 如何训练DL模型 - ML学习站PPT</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#f43f5e;--accent2:#e11d48;--accent3:#fb7185;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--accent3);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent3);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(251,113,133,0.15) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(225,29,72,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(251,113,133,0.1);border:1px solid rgba(251,113,133,0.25);border-radius:50px;font-size:1rem;color:var(--accent3);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--accent),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:700px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(251,113,133,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:1.8rem 2rem;margin:1.5rem 0;text-align:center;font-size:clamp(1rem,1.8vw,1.25rem);line-height:2.2;overflow-x:auto}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:1rem;display:block;text-align:left;line-height:1.7}
+.katex{color:var(--accent3)}.katex .mord.text{color:var(--ink2)}
+.hbox{background:rgba(244,63,94,0.08);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1rem 0}
+.hbox h4{color:var(--accent);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(251,191,36,0.08);border-left-color:var(--warning)}.hbox.warn h4{color:var(--warning)}
+.hbox.danger{background:rgba(248,113,113,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.pink{background:rgba(225,29,72,0.08);border-left-color:var(--accent2)}.hbox.pink h4{color:var(--accent2)}
+.hbox.rose{background:rgba(251,113,133,0.08);border-left-color:var(--accent3)}.hbox.rose h4{color:var(--accent3)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.95rem}
+table.cmp th{background:var(--bg3);color:var(--accent3);padding:12px 14px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.9rem}
+table.cmp td{padding:10px 14px;border-bottom:1px solid var(--rule);color:var(--ink2);line-height:1.6}
+table.cmp tr:hover td{background:rgba(251,113,133,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent3);background:rgba(251,113,133,0.1);color:var(--accent3);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent)}
+.tag.p{color:var(--accent2)}.tag.pi{color:var(--accent3)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}.tag.d{color:var(--danger)}
+.code{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:1.5rem 2rem;margin:1.5rem 0;font-family:var(--mono);font-size:0.9rem;color:var(--ink2);line-height:1.7;overflow-x:auto}
+.code .kw{color:var(--accent)}.code .str{color:var(--success)}.code .cmt{color:var(--muted)}.code .func{color:var(--accent3)}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent3),var(--accent2),var(--accent),var(--success));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent3);color:var(--accent3)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent3)}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:800;background:linear-gradient(135deg,var(--accent3),var(--accent2),var(--success));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.end-slide .end-buttons{display:flex;gap:1.5rem;justify-content:center;margin-top:2.5rem;flex-wrap:wrap}
+.end-slide .end-btn{padding:14px 32px;border-radius:12px;font-size:1.05rem;font-weight:600;text-decoration:none;transition:all .3s}
+.end-slide .end-btn.primary{background:linear-gradient(135deg,var(--accent3),var(--accent2));color:white}
+.end-slide .end-btn.secondary{background:var(--bg2);border:1px solid var(--rule);color:var(--ink2)}
+.end-slide .end-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(251,113,133,0.2)}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col{grid-template-columns:1fr}.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="slides.html" style="font-weight:600;color:var(--accent3)">📊 PPT课件</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="chapter6.html">回到视频页</a>
+    <a href="ppt-29.html">← 上一集</a>
+    <a href="ppt-31.html">下一集 →</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">🧠 深度学习入门教程 · 第14集</div>
+    <h1 class="cover-title">如何训练一个深度学习模型</h1>
+    <p class="cover-sub">完整流程、曲线诊断、调参技巧、避坑指南<br>BV1FmJJ6rEqS · 时长 26分28秒</p>
+    <div class="tags">
+      <span class="tag pi">训练流程</span>
+      <span class="tag p">调参技巧</span>
+      <span class="tag g">曲线诊断</span>
+      <span class="tag w">经验总结</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">2 / 30</div>
+  <div class="slide-content">
+    <h1 class="st">本集内容导览</h1>
+    <h3 class="sub">从0到1训练一个深度学习模型的完整方法论</h3>
+    <div class="body">
+      <ul>
+        <li><strong style="color:var(--accent3)">流程篇</strong>——训练DL模型的8个标准步骤</li>
+        <li><strong style="color:var(--accent2)">诊断篇</strong>——如何看懂训练曲线？各种症状对应什么问题？</li>
+        <li><strong style="color:var(--accent)">调参篇</strong>——超参数调优优先级，先调什么后调什么？</li>
+        <li><strong style="color:var(--success)">技巧篇</strong>——Sanity Check、梯度裁剪、可视化工具</li>
+        <li><strong style="color:var(--warning)">避坑篇</strong>——新手最容易犯的错误和常见bug</li>
+        <li><strong style="color:var(--danger)">总结篇</strong>——训练好模型的标准、核心代码模板</li>
+      </ul>
+    </div>
+    <div class="hbox rose">
+      <h4>💡 这集很重要！</h4>
+      <p>学了各种层、损失函数、优化器、正则化，真正开始训练时还是会手忙脚乱。这集给你一套完整的训练方法论，让你知道出问题该怎么诊断、怎么解决。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">3 / 30</div>
+  <div class="slide-content">
+    <h1 class="st">训练DL模型：完整8步流程</h1>
+    <h3 class="sub">一个标准的深度学习项目应该怎么走完这8步</h3>
+    <div class="flow" style="flex-direction:column;gap:0.6rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node hl" style="text-align:left;min-width:auto;border-left:4px solid var(--accent);padding-left:1.5rem">
+        <strong style="color:var(--accent)">Step 1: 数据准备</strong>
+        <span style="color:var(--muted);margin-left:1rem">收集→清洗→划分→预处理→增强</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent2);padding-left:1.5rem">
+        <strong style="color:var(--accent2)">Step 2: 选择模型架构</strong>
+        <span style="color:var(--muted);margin-left:1rem">从简单模型开始，MLP→CNN→Transformer</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent3);padding-left:1.5rem">
+        <strong style="color:var(--accent3)">Step 3: 选择损失函数</strong>
+        <span style="color:var(--muted);margin-left:1rem">回归MSE/Huber，分类CrossEntropy</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--success);padding-left:1.5rem">
+        <strong style="color:var(--success)">Step 4: 选择优化器</strong>
+        <span style="color:var(--muted);margin-left:1rem">默认Adam，极致性能SGD+Momentum</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--warning);padding-left:1.5rem">
+        <strong style="color:var(--warning)">Step 5: 设置超参数</strong>
+        <span style="color:var(--muted);margin-left:1rem">学习率最重要！batch size/epoch/网络大小</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--danger);padding-left:1.5rem">
+        <strong style="color:var(--danger)">Step 6-8: 训练→验证→调参循环</strong>
+        <span style="color:var(--muted);margin-left:1rem">前向→loss→反向→更新→监控→调优</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">4 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">Step 1: 数据准备</h2>
+    <h3 class="sub">数据决定了上限，模型只是在逼近这个上限</h3>
+    <div class="three-col" style="margin:1rem 0">
+      <div class="card">
+        <h4 style="color:var(--accent3)">📥 数据收集与清洗</h4>
+        <ul style="font-size:0.9rem;color:var(--muted);margin-top:0.5rem">
+          <li>收集足够的标注数据</li>
+          <li>处理缺失值、异常值</li>
+          <li>检查标签是否正确（错误标签很致命！）</li>
+          <li>去重、统一格式</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent2)">✂️ 数据集划分</h4>
+        <ul style="font-size:0.9rem;color:var(--muted);margin-top:0.5rem">
+          <li><strong>Train</strong>: 训练模型（70-80%）</li>
+          <li><strong>Val</strong>: 调参选模型（10-15%）</li>
+          <li><strong>Test</strong>: 最终评估（10-15%）</li>
+          <li>划分前先shuffle！</li>
+          <li>注意类别不平衡问题</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--accent)">🔧 预处理与增强</h4>
+        <ul style="font-size:0.9rem;color:var(--muted);margin-top:0.5rem">
+          <li>标准化/归一化</li>
+          <li>数据增强（CV翻转/裁剪等）</li>
+          <li>转Tensor、构建DataLoader</li>
+          <li>注意：train/val预处理一致</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 数据泄露是大忌！</h4>
+      <p>验证集/测试集的信息绝对不能泄露到训练过程中。比如用全量数据做标准化（应该只用train的mean/std）、特征选择用到了标签、数据增强错误应用到val/test——这些都会让你得到虚高的分数，上线就崩。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">5 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">Step 2: 选择模型架构</h2>
+    <h3 class="sub">从简单开始，不要一上来就用最复杂的模型</h3>
+    <div class="hbox success">
+      <h4>🎯 原则：从简单基线开始</h4>
+      <p>永远从最简单的模型开始跑通整个pipeline，建立baseline。不要一上来就堆Transformer、ResNet。先用小模型（比如1-2层MLP）快速验证思路，再逐步加深加大。</p>
+    </div>
+    <table class="cmp">
+      <tr>
+        <th>任务类型</th>
+        <th>首选基线模型</th>
+        <th>进阶模型</th>
+      </tr>
+      <tr>
+        <td>表格数据分类/回归</td>
+        <td>MLP（2-3层全连接）</td>
+        <td>XGBoost/LightGBM（其实树模型更强）</td>
+      </tr>
+      <tr>
+        <td>图像分类</td>
+        <td>简单CNN（LeNet风格）</td>
+        <td>ResNet、EfficientNet、ViT（预训练微调）</td>
+      </tr>
+      <tr>
+        <td>文本分类</td>
+        <td>Embedding + LSTM/TextCNN</td>
+        <td>BERT/RoBERTa等预训练模型微调</td>
+      </tr>
+      <tr>
+        <td>目标检测</td>
+        <td>YOLOv8（直接用）</td>
+        <td>根据场景选择，用开源SOTA</td>
+      </tr>
+    </table>
+    <div class="hbox rose">
+      <h4>💡 优先用预训练模型</h4>
+      <p>现在不是2012年了！CV用torchvision的预训练ResNet，NLP用HuggingFace的BERT，在自己数据上微调，比从头训效果好10倍，还快得多。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">6 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">Step 3 & 4: 损失函数 & 优化器</h2>
+    <h3 class="sub">根据任务选损失，优化器默认Adam</h3>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--accent)}">📉 损失函数选择</h4>
+        <div style="margin-top:1rem">
+          <p style="margin-bottom:0.8rem"><strong style="color:var(--success)">回归任务：</strong></p>
+          <ul style="font-size:0.95rem;color:var(--muted)">
+            <li><strong>MSELoss</strong>——均方误差，默认首选</li>
+            <li><strong>HuberLoss(SmoothL1)</strong>——对异常值鲁棒</li>
+            <li><strong>MAELoss</strong>——平均绝对误差</li>
+          </ul>
+          <p style="margin:1rem 0 0.8rem"><strong style="color:var(--warning)">分类任务：</strong></p>
+          <ul style="font-size:0.95rem;color:var(--muted)">
+            <li><strong>CrossEntropyLoss</strong>——多分类默认（内含Softmax）</li>
+            <li><strong>BCEWithLogitsLoss</strong>——多标签/二分类</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent2)">⚡ 优化器选择</h4>
+        <div style="margin-top:1rem">
+          <div class="hbox success" style="margin:0 0 1rem;padding:1rem">
+            <h4 style="margin-bottom:0.3rem">✅ 默认推荐：Adam / AdamW</h4>
+            <p style="font-size:0.95rem">自适应学习率，收敛快，调参少，对初始化不敏感。90%的场景用Adam就够了。</p>
+          </div>
+          <div class="hbox warn" style="margin:0;padding:1rem">
+            <h4 style="margin-bottom:0.3rem">⚡ 追求极致：SGD + Momentum</h4>
+            <p style="font-size:0.95rem">需要仔细调学习率，收敛慢但最终可能到更好的最优点。论文刷点常用。</p>
+          </div>
+          <p style="margin-top:1rem;font-size:0.9rem;color:var(--muted)">其他：RMSprop、Adagrad等历史产物，现在很少用了。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">7 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">Step 5: 超参数设置——学习率最重要</h2>
+    <h3 class="sub">学习率是最重要的超参数，没有之一</h3>
+    <div class="card" style="margin-bottom:1rem;border-left:4px solid var(--accent3)">
+      <h4 style="color:var(--accent3)">🔴 学习率 (Learning Rate)——最重要！</h4>
+      <p>常用尝试范围：<strong style="color:var(--accent2)">1e-2, 1e-3, 1e-4, 5e-4, 1e-5</strong></p>
+      <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.5rem">
+        <li>Adam默认1e-3是不错的起点</li>
+        <li>微调预训练模型用更小的lr（1e-4或1e-5）</li>
+        <li>太大：loss震荡/NaN；太小：收敛极慢</li>
+        <li>推荐用学习率调度器（Cosine/StepLR）</li>
+      </ul>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--accent)">📦 Batch Size</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.5rem">
+          <li>显存允许的话越大越好（32, 64, 128...）</li>
+          <li>batch size大，学习率也可以调大（线性缩放规则）</li>
+          <li>batch太小（≤8）效果差，BN不准</li>
+          <li>显存不够：梯度累积</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent2)">🔢 Epoch数</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.5rem">
+          <li>一开始先设10-20epoch看趋势</li>
+          <li>用Early Stopping自动决定何时停</li>
+          <li>不够就加，太多浪费时间还可能过拟合</li>
+          <li>微调预训练模型epoch少（3-10）</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">8 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">Step 6: 训练循环核心代码</h2>
+    <h3 class="sub">训练循环的标准pipeline</h3>
+    <div class="code">
+<span class="kw">def</span> <span class="func">train_one_epoch</span>(model, loader, criterion, optimizer, device):<br>
+&nbsp;&nbsp;model.train()<br>
+&nbsp;&nbsp;total_loss = <span class="str">0</span><br>
+&nbsp;&nbsp;correct = <span class="str">0</span><br>
+&nbsp;&nbsp;<span class="kw">for</span> x, y <span class="kw">in</span> loader:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;x, y = x.to(device), y.to(device)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;optimizer.zero_grad()         <span class="cmt"># ① 梯度清零！</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;logits = model(x)             <span class="cmt"># ② 前向传播</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;loss = criterion(logits, y)   <span class="cmt"># ③ 计算loss</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;loss.backward()               <span class="cmt"># ④ 反向传播</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;optimizer.step()              <span class="cmt"># ⑤ 更新参数</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;total_loss += loss.item() * x.size(<span class="str">0</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;correct += (logits.argmax(<span class="str">1</span>) == y).sum().item()<br>
+&nbsp;&nbsp;<span class="kw">return</span> total_loss / len(loader.dataset), correct / len(loader.dataset)
+    </div>
+    <div class="hbox danger">
+      <h4>🚨 最常见bug：忘记zero_grad()</h4>
+      <p>每轮迭代开始前必须调用optimizer.zero_grad()清空梯度，否则梯度会累积，结果完全错误。这是新手犯错率最高的地方之一！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">9 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">验证循环与完整训练模板</h2>
+    <h3 class="sub">每个epoch后必须在验证集上评估</h3>
+    <div class="code">
+<span class="kw">def</span> <span class="func">evaluate</span>(model, loader, criterion, device):<br>
+&nbsp;&nbsp;model.eval()                    <span class="cmt"># 🔴 切换到评估模式！</span><br>
+&nbsp;&nbsp;total_loss = <span class="str">0</span><br>
+&nbsp;&nbsp;correct = <span class="str">0</span><br>
+&nbsp;&nbsp;<span class="kw">with</span> torch.no_grad():           <span class="cmt"># 不计算梯度，省显存加速</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span> x, y <span class="kw">in</span> loader:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x, y = x.to(device), y.to(device)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;logits = model(x)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;loss = criterion(logits, y)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;total_loss += loss.item() * x.size(<span class="str">0</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;correct += (logits.argmax(<span class="str">1</span>) == y).sum().item()<br>
+&nbsp;&nbsp;<span class="kw">return</span> total_loss / len(loader.dataset), correct / len(loader.dataset)<br>
+<br>
+<span class="cmt"># 训练主循环</span><br>
+<span class="kw">for</span> epoch <span class="kw">in</span> range(num_epochs):<br>
+&nbsp;&nbsp;train_loss, train_acc = train_one_epoch(...)<br>
+&nbsp;&nbsp;val_loss, val_acc = evaluate(...)<br>
+&nbsp;&nbsp;print(f<span class="str">"Epoch {epoch}: train_loss={train_loss:.4f}, val_acc={val_acc:.4f}"</span>)<br>
+&nbsp;&nbsp;scheduler.step()  <span class="cmt"># 学习率调度器更新</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">10 / 30</div>
+  <div class="slide-content">
+    <h1 class="st">训练曲线诊断</h1>
+    <h3 class="sub">训练出问题了？看曲线就知道是什么问题</h3>
+    <div class="hbox success">
+      <h4>✅ 理想曲线（训练正常）</h4>
+      <p>train loss稳步下降，val loss也稳步下降然后趋于平稳，两者差距小。train acc和val acc都上升然后趋于平稳，接近。这说明模型正常训练，泛化良好。</p>
+    </div>
+    <div class="hbox warn">
+      <h4>📊 诊断口诀</h4>
+      <p>看loss比看acc重要！loss是优化的直接目标，acc只是离散指标。训练时优先看loss曲线。</p>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <h4 style="color:var(--accent3)">🔍 我们接下来看4种典型症状：</h4>
+      <ul style="color:var(--muted);margin-top:0.5rem">
+        <li>1. train和val loss都不下降——学习率/模型容量/数据问题</li>
+        <li>2. train loss下降但val loss上升——过拟合</li>
+        <li>3. train loss下降很慢——学习率太小/初始化/梯度消失</li>
+        <li>4. loss=NaN——梯度爆炸</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">11 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">症状1：loss不下降（loss stays high）</h2>
+    <h3 class="sub">训练loss和验证loss都不降，模型什么都没学到</h3>
+    <div class="hbox danger">
+      <h4>🔴 可能原因及解决方案：</h4>
+    </div>
+    <div class="flow" style="flex-direction:column;gap:0.8rem;align-items:stretch;margin:1rem 0">
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--danger);padding-left:1.5rem">
+        <strong>原因1：学习率太大或太小</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">→ 学习率太大：loss震荡甚至上升，尝试降低lr（除以10）<br>→ 学习率太小：loss几乎不动，尝试提高lr（乘以10）<br>💡 建议：先试lr=1e-3，不行再试1e-4和1e-2</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--warning);padding-left:1.5rem">
+        <strong>原因2：模型容量不够</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">→ 模型太简单，学不到数据中的模式<br>→ 解决方案：增加层数/增加隐藏维度/换更复杂的架构</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent3);padding-left:1.5rem">
+        <strong>原因3：数据/代码bug</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">→ 检查数据是否正确加载？标签对不对？<br>→ 有没有忘记zero_grad()？loss计算对不对？<br>→ 数据预处理是否正确？归一化做了吗？<br>→ Sanity Check：用极小数据集（10-100个样本）测试能不能过拟合</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">12 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">症状2：过拟合（train好val差）</h2>
+    <h3 class="sub">train loss一直降，val loss先降后升——这是最常见的情况</h3>
+    <div class="hbox pink">
+      <h4>🔴 典型表现</h4>
+      <p>train loss接近0，train acc接近100%；val loss上升，val acc停滞甚至下降；两者gap越来越大。模型在死记硬背训练集。</p>
+    </div>
+    <div class="card" style="margin:1rem 0">
+      <h4 style="color:var(--success)">✅ 解决方案（按优先级）：</h4>
+      <ol style="color:var(--muted);padding-left:1.5rem;line-height:2">
+        <li><strong>加数据/数据增强</strong>——最有效！CV加翻转/裁剪，收集更多真实数据</li>
+        <li><strong>加Weight Decay</strong>——优化器设置weight_decay=1e-4</li>
+        <li><strong>加Dropout</strong>——MLP加p=0.5的Dropout层</li>
+        <li><strong>Early Stopping</strong>——val loss不提升就停，选best checkpoint</li>
+        <li><strong>简化模型</strong>——减少层数/神经元，不要用太复杂的模型</li>
+        <li><strong>标签平滑</strong>——分类任务加label_smoothing=0.1</li>
+        <li><strong>加BatchNorm</strong>——BN也有正则化效果</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">13 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">症状3：收敛太慢/训练不动</h2>
+    <h3 class="sub">loss在下降，但下降非常非常慢，训练几十epoch还没收敛</h3>
+    <div class="hbox warn">
+      <h4>🟡 可能原因：</h4>
+    </div>
+    <div class="three-col" style="margin:1rem 0">
+      <div class="card">
+        <h4 style="color:var(--warning)">📉 学习率太小</h4>
+        <p style="font-size:0.95rem;color:var(--muted)">lr过小导致每步更新太小，loss像蜗牛爬。<br><br><strong style="color:var(--success)">解决</strong>：把lr调大5-10倍试试。</p>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent2)">⚠️ 初始化不好</h4>
+        <p style="font-size:0.95rem;color:var(--muted)">权重初始化不合理导致梯度消失/饱和。<br><br><strong style="color:var(--success)">解决</strong>：用PyTorch默认的Kaiming/Xavier初始化，或用预训练模型。</p>
+      </div>
+      <div class="card">
+        <h4 style="color:var(--accent3)">📉 梯度消失</h4>
+        <p style="font-size:0.95rem;color:var(--muted)">深层网络sigmoid/tanh导致梯度消失。<br><br><strong style="color:var(--success)">解决</strong>：用ReLU激活、加BatchNorm、用残差连接。</p>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>💡 其他可能</h4>
+      <p>优化器选择（SGD比Adam收敛慢但可能更好）、没有做数据归一化、学习率没设对、网络太深但没有残差连接。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">14 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">症状4：loss=NaN（最吓人的bug）</h2>
+    <h3 class="sub">训练中loss突然变成nan，训练直接崩了</h3>
+    <div class="hbox danger">
+      <h4>💥 NaN = 梯度爆炸或数值不稳定</h4>
+      <p>loss=NaN 99%是梯度爆炸导致的——梯度变得太大，更新步长太大，参数越更新越离谱，越算越大，最终溢出变成NaN（Not a Number）。</p>
+    </div>
+    <div class="card" style="margin:1rem 0">
+      <h4 style="color:var(--danger)">🛠️ 解决方案（按优先级）：</h4>
+      <ol style="color:var(--muted);padding-left:1.5rem;line-height:2">
+        <li><strong>降低学习率！</strong>——lr太大是NaN的第一大原因，除以10试试</li>
+        <li><strong>梯度裁剪</strong>——torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)</li>
+        <li><strong>检查数据</strong>——数据里有没有NaN/inf？有没有除以0？标签对不对？</li>
+        <li><strong>检查loss计算</strong>——CrossEntropy的target要是long类型；有没有log(0)？</li>
+        <li><strong>降低权重初始化范围</strong>——初始化值太大</li>
+        <li><strong>混合精度训练要注意</strong>——用GradScaler避免fp16溢出</li>
+      </ol>
+    </div>
+    <div class="code" style="margin-top:1rem">
+<span class="cmt"># 加这行在loss.backward()之后、optimizer.step()之前</span><br>
+torch.nn.utils.<span class="func">clip_grad_norm_</span>(model.parameters(), max_norm=<span class="str">1.0</span>)
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">15 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">训练问题诊断速查表</h2>
+    <h3 class="sub">一张表总结所有常见问题</h3>
+    <table class="cmp">
+      <tr>
+        <th>症状</th>
+        <th>最可能原因</th>
+        <th>首选解决方案</th>
+      </tr>
+      <tr>
+        <td>loss一开始就是NaN</td>
+        <td>数据有NaN/inf、学习率太大</td>
+        <td>检查数据 → 降低lr → 梯度裁剪</td>
+      </tr>
+      <tr>
+        <td>训练几轮后loss变NaN</td>
+        <td>梯度爆炸、lr过大</td>
+        <td>降低lr → 加梯度裁剪</td>
+      </tr>
+      <tr>
+        <td>loss完全不动（flat）</td>
+        <td>学习率太小、代码bug、模型太简单</td>
+        <td>Sanity Check小数据集 → 调lr → 检查代码</td>
+      </tr>
+      <tr>
+        <td>train loss降但val loss升</td>
+        <td style="color:var(--danger)">过拟合</td>
+        <td>数据增强 → Weight Decay → Dropout → Early Stop</td>
+      </tr>
+      <tr>
+        <td>train/val loss都降但很慢</td>
+        <td>学习率太小、梯度消失</td>
+        <td>调大lr → 检查初始化 → 用ReLU/BN/残差</td>
+      </tr>
+      <tr>
+        <td>loss剧烈震荡</td>
+        <td>学习率太大、batch太小</td>
+        <td>降低lr → 增大batch size → 加学习率衰减</td>
+      </tr>
+      <tr>
+        <td>验证准确率在某个值卡住（如50%二分类）</td>
+        <td>数据问题/标签错误/模型没学到东西</td>
+        <td>Sanity Check → 检查数据标签 → 换优化器/lr</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">16 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">超参数调优优先级</h2>
+    <h3 class="sub">超参数这么多，先调哪个后调哪个？</h3>
+    <div class="flow" style="flex-direction:column;gap:0.8rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node hl" style="text-align:left;min-width:auto;border-left:4px solid var(--danger);padding-left:1.5rem">
+        <strong style="color:var(--danger)">🥇 优先级1：学习率 (lr)</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">影响最大！合适的lr和差的lr能差10倍以上效果。先试1e-3, 1e-4, 1e-2三个量级，找到loss下降最快的那个区间再细调。</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--warning);padding-left:1.5rem">
+        <strong style="color:var(--warning)">🥈 优先级2：Batch Size</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">显存允许尽量大（32-256）。batch size大，训练更稳定，梯度更准，也可以用更大学习率。</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent);padding-left:1.5rem">
+        <strong style="color:var(--accent)">🥉 优先级3：网络深度/宽度</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">从简单小网络开始，容量不够再加深加宽。先2层，不够再加到3-4层。</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent2);padding-left:1.5rem">
+        <strong style="color:var(--accent2)">4. 优化器选择</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">默认AdamW/Adam就很好，不要在这上面浪费太多时间。</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent3);padding-left:1.5rem">
+        <strong style="color:var(--accent3)">5. 正则化强度</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">Weight Decay(1e-4)、Dropout(0.3-0.5)、数据增强策略——在确定能过拟合之后再调。</span>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>💡 调参建议</h4>
+      <p>一次只调一个参数！不要同时改lr、batch size、网络结构，否则你不知道是哪个改动起了作用。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">17 / 30</div>
+  <div class="slide-content">
+    <h1 class="st">第一步：Sanity Check！</h1>
+    <h3 class="sub">在正式训练前，先做一个最重要的测试</h3>
+    <div class="hbox rose">
+      <h4>🧪 Sanity Check（合理性检查）</h4>
+      <p>取一个很小的数据集（比如10-100个样本，甚至1个batch），让模型在这个小数据集上训练，看能不能<strong>把loss降到接近0，准确率达到100%</strong>。</p>
+    </div>
+    <div class="card" style="margin:1.5rem 0">
+      <h4 style="color:var(--success)">✅ 如果Sanity Check通过：</h4>
+      <p>说明模型、loss计算、反向传播、优化器都是正常工作的。模型有能力记住数据，代码没有致命bug。然后再在全量数据上训练。</p>
+    </div>
+    <div class="card accent" style="margin-bottom:1rem">
+      <h4 style="color:var(--danger)">❌ 如果Sanity Check不通过：</h4>
+      <p>连10个样本都记不住？100%是代码bug！别浪费时间在全量数据上训练了，先修bug。常见问题：</p>
+      <ul style="color:var(--muted);margin-top:0.5rem;font-size:0.95rem">
+        <li>忘记zero_grad()？</li>
+        <li>loss函数用错了？（分类用MSE？）</li>
+        <li>数据/标签加载错了？</li>
+        <li>模型输出维度不对？</li>
+        <li>学习率设得太离谱？</li>
+      </ul>
+    </div>
+    <div class="hbox warn">
+      <h4>⭐ 这是最高效的debug方法！</h4>
+      <p>很多新手一上来就用全量数据训练，跑几个小时发现不对，浪费时间。先花2分钟做Sanity Check，能避免90%的无效训练。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">18 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">学习率调度器 (Scheduler)</h2>
+    <h3 class="sub">让学习率在训练中动态变化，收敛更好</h3>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--accent)}">📈 为什么需要scheduler？</h4>
+        <p style="font-size:0.95rem;color:var(--muted);margin-top:0.5rem">训练初期用大lr快速收敛，后期用小lr精细调整到最优点。固定lr不是最优的。</p>
+        <div style="margin-top:1rem">
+          <p style="margin-bottom:0.5rem"><strong>常用scheduler：</strong></p>
+          <ul style="font-size:0.95rem;color:var(--muted)">
+            <li><strong style="color:var(--success)">CosineAnnealingLR</strong>——余弦退火，现在最流行，效果好</li>
+            <li><strong>StepLR</strong>——每N个epoch乘gamma</li>
+            <li><strong>ReduceLROnPlateau</strong>——val loss不下降就自动降lr</li>
+            <li><strong>OneCycleLR</strong>——Super Convergence，先升后降</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent2)">🔧 PyTorch代码示例</h4>
+        <div class="code" style="margin-top:1rem;padding:1rem">
+<span class="kw">from</span> torch.optim.lr_scheduler <span class="kw">import</span> CosineAnnealingLR<br>
+<br>
+optimizer = torch.optim.AdamW(<br>
+&nbsp;&nbsp;model.parameters(),<br>
+&nbsp;&nbsp;lr=<span class="str">1e-3</span>,<br>
+&nbsp;&nbsp;weight_decay=<span class="str">1e-4</span><br>
+)<br>
+scheduler = CosineAnnealingLR(<br>
+&nbsp;&nbsp;optimizer,<br>
+&nbsp;&nbsp;T_max=num_epochs<br>
+)<br>
+<br>
+<span class="cmt"># 训练循环中每个epoch后：</span><br>
+scheduler.step()
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">19 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">梯度裁剪 (Gradient Clipping)</h2>
+    <h3 class="sub">防止梯度爆炸的简单有效技巧</h3>
+    <div class="hbox">
+      <h4>📐 原理</h4>
+      <p>在反向传播后、更新参数前，如果梯度的范数（大小）超过了阈值max_norm，就按比例把梯度缩放到max_norm，限制步长不要太大。这是RNN/LSTM训练的标配，现在大模型训练也常用。</p>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="code" style="margin:0">
+<span class="cmt"># 训练循环中：</span><br>
+optimizer.zero_grad()<br>
+loss = criterion(model(x), y)<br>
+loss.backward()<br>
+<br>
+<span class="cmt"># 🔽 加这一行！</span><br>
+torch.nn.utils.<span class="func">clip_grad_norm_</span>(<br>
+&nbsp;&nbsp;model.parameters(),<br>
+&nbsp;&nbsp;max_norm=<span class="str">1.0</span>  <span class="cmt"># 阈值，常用1.0</span><br>
+)<br>
+<br>
+optimizer.step()
+      </div>
+      <div>
+        <div class="hbox success" style="margin-top:0">
+          <h4>✅ 什么时候用？</h4>
+          <ul style="font-size:0.95rem">
+            <li>训练RNN/LSTM时（标配）</li>
+            <li>训练Transformer/大模型时</li>
+            <li>出现NaN时（防梯度爆炸）</li>
+            <li>梯度不稳定时</li>
+          </ul>
+        </div>
+        <div class="hbox warn" style="margin-top:1rem">
+          <h4>⚠️ 注意</h4>
+          <p>梯度裁剪只是"保险"，如果总出现梯度爆炸，说明学习率太大或者模型结构有问题，应该先调lr，而不是依赖梯度裁剪。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">20 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">可视化工具：TensorBoard & WandB</h2>
+    <h3 class="sub">不要用print看loss！用可视化工具追踪训练过程</h3>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--accent)">📊 TensorBoard</h4>
+        <p style="font-size:0.95rem;color:var(--muted);margin-top:0.5rem">PyTorch官方自带，简单好用，本地运行。</p>
+        <div class="code" style="margin-top:1rem;padding:1rem;font-size:0.85rem">
+<span class="kw">from</span> torch.utils.tensorboard <span class="kw">import</span> SummaryWriter<br>
+writer = SummaryWriter(<span class="str">'runs/exp1'</span>)<br>
+<br>
+<span class="cmt"># 训练中记录：</span><br>
+writer.add_scalar(<span class="str">'Loss/train'</span>, train_loss, epoch)<br>
+writer.add_scalar(<span class="str">'Acc/val'</span>, val_acc, epoch)<br>
+writer.add_histogram(<span class="str">'weights'</span>, model.fc.weight, epoch)<br>
+<br>
+<span class="cmt"># 命令行启动：</span><br>
+<span class="cmt"># tensorboard --logdir=runs</span>
+        </div>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent2)">🪄 WandB (Weights & Biases)</h4>
+        <p style="font-size:0.95rem;color:var(--muted);margin-top:0.5rem">更强大的实验追踪工具，云端同步，团队协作，自动记录超参数、系统资源。</p>
+        <ul style="font-size:0.95rem;color:var(--muted);margin-top:1rem">
+          <li>自动记录GPU/CPU使用率</li>
+          <li>对比多个实验的曲线</li>
+          <li>记录超参数和配置</li>
+          <li>自动上传模型checkpoint</li>
+          <li>生成美观的报告</li>
+        </ul>
+        <div class="hbox rose" style="margin-top:1rem;padding:0.8rem">
+          <p style="font-size:0.9rem">个人用免费，做实验多了强烈推荐！</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">21 / 30</div>
+  <div class="slide-content">
+    <h1 class="st">常见坑Top榜</h1>
+    <h3 class="sub">新手训练模型最容易犯的错误</h3>
+    <div class="three-col" style="margin:1rem 0">
+      <div class="card" style="border-top:3px solid var(--danger)">
+        <h4 style="color:var(--danger)">1️⃣ 忘记zero_grad()</h4>
+        <p style="font-size:0.9rem;color:var(--muted)">梯度累积，模型更新错误。每次迭代开头必须清零！</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--danger)">
+        <h4 style="color:var(--danger)">2️⃣ 忘记model.eval()/train()</h4>
+        <p style="font-size:0.9rem;color:var(--muted)">验证时Dropout/BN还在训练模式，结果随机不准。</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--warning)">
+        <h4 style="color:var(--warning)">3️⃣ 训练/测试预处理不一致</h4>
+        <p style="font-size:0.9rem;color:var(--muted)">训练用了Normalize测试忘了用，或者验证集做了数据增强。</p>
+      </div>
+    </div>
+    <div class="three-col" style="margin-top:1rem">
+      <div class="card" style="border-top:3px solid var(--warning)">
+        <h4 style="color:var(--warning)">4️⃣ 数据泄露</h4>
+        <p style="font-size:0.9rem;color:var(--muted)">验证集信息泄露到训练中，虚高分数上线就崩。</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--accent)">
+        <h4 style="color:var(--accent)">5️⃣ label类型错误</h4>
+        <p style="font-size:0.9rem;color:var(--muted)">CrossEntropy需要label是long类型，不是one-hot，不是float。</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--accent2)">
+        <h4 style="color:var(--accent2)">6️⃣ 没把数据/模型转到GPU</h4>
+        <p style="font-size:0.9rem;color:var(--muted)">model.to(device)和x.to(device)都要做，device要统一。</p>
+      </div>
+    </div>
+    <div class="hbox danger" style="margin-top:1.5rem">
+      <h4>💀 终极bug：形状不匹配但没报错</h4>
+      <p>比如预测和标签形状对不上但广播了，loss能算但结果完全错。建议：经常打印logits.shape和y.shape检查！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">22 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">更多常见bug和解决方案</h2>
+    <h3 class="sub">那些让你debug到怀疑人生的小问题</h3>
+    <div class="hbox danger">
+      <h4>🐛 CUDA error: device-side assert triggered</h4>
+      <p>90%是标签越界了！比如分类有10类，label里出现了10（应该是0-9）。检查label的最大值是否超过num_classes-1。</p>
+    </div>
+    <div class="hbox warn">
+      <h4>🐛 显存不足 CUDA out of memory</h4>
+      <p>减小batch size、减小模型大小、用gradient_checkpointing、用混合精度训练(amp)、推理用torch.no_grad()、不要把不需要的tensor存在GPU上。</p>
+    </div>
+    <div class="hbox pink">
+      <h4>🐛 训练完验证/测试结果差</h4>
+      <p>检查有没有model.eval()、有没有加载best checkpoint而不是last epoch、测试预处理和训练一致吗？有没有在训练集上测试（作弊）？</p>
+    </div>
+    <div class="hbox success">
+      <h4>🐛 训练速度很慢</h4>
+      <p>DataLoader的num_workers设为CPU核心数、pin_memory=True、用GPU训练、不要在训练循环中做.item()太多次、用混合精度。</p>
+    </div>
+    <div class="code" style="margin-top:1rem">
+train_loader = DataLoader(train_dataset, batch_size=<span class="str">64</span>, shuffle=<span class="kw">True</span>,<br>
+&nbsp;&nbsp;num_workers=<span class="str">4</span>, pin_memory=<span class="kw">True</span>)  <span class="cmt"># 加速数据加载</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">23 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">混合精度训练 (AMP)</h2>
+    <h3 class="sub">用FP16加速训练，节省显存，几乎不损失精度</h3>
+    <div class="two-col">
+      <div>
+        <div class="hbox success">
+          <h4>✅ AMP的好处</h4>
+          <ul style="font-size:0.95rem">
+            <li>训练速度提升30%-50%</li>
+            <li>显存占用减少约40%</li>
+            <li>可以用更大的batch size</li>
+            <li>现在GPU（Turing/Ampere架构）原生支持</li>
+            <li>PyTorch用torch.cuda.amp几行代码就搞定</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent2)">🔧 代码模板</h4>
+        <div class="code" style="margin:1rem 0 0;padding:1rem;font-size:0.8rem">
+scaler = torch.cuda.amp.GradScaler()<br>
+<br>
+<span class="kw">for</span> x, y <span class="kw">in</span> loader:<br>
+&nbsp;&nbsp;optimizer.zero_grad()<br>
+&nbsp;&nbsp;<span class="kw">with</span> torch.cuda.amp.autocast():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;loss = criterion(model(x), y)<br>
+&nbsp;&nbsp;scaler.scale(loss).backward()<br>
+&nbsp;&nbsp;scaler.step(optimizer)<br>
+&nbsp;&nbsp;scaler.update()
+        </div>
+      </div>
+    </div>
+    <div class="hbox rose">
+      <h4>💡 注意</h4>
+      <p>AMP在某些情况下可能导致NaN（精度问题），如果出现NaN，先关掉AMP看是不是AMP引起的。GradScaler会自动处理梯度缩放来避免fp16溢出。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">24 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">迁移学习：站在巨人的肩膀上</h2>
+    <h3 class="sub">不要从头训练！用预训练模型微调成了现代DL的标配</h3>
+    <div class="hbox pink">
+      <h4>🌟 迁移学习范式</h4>
+      <p>别人在大数据集（如ImageNet）上训练好的模型，已经学到了通用的特征（边缘、纹理、形状等）。你只需要在自己的小数据集上"微调"一下，就能达到非常好的效果，比从头训快得多，准确率还高。</p>
+    </div>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node" style="min-width:120px">下载预训练模型<br><small style="color:var(--success)">已在大数据集训练好</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:120px">替换最后一层<br><small style="color:var(--accent3)">适配自己的任务类别数</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:120px">微调<br><small style="color:var(--accent2)">用小学习率训练</small></div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h4 style="color:var(--success)">✅ 优点</h4>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>不需要大量数据</li>
+          <li>训练快（1/10时间）</li>
+          <li>准确率更高</li>
+          <li>不容易过拟合</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--warning)">⚠️ 微调注意</h4>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>学习率要小（1e-4或1e-5），不要破坏预训练权重</li>
+          <li>可以先只训最后一层，再全部微调</li>
+          <li>数据预处理要和预训练时一致！</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">25 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">训练好模型的标准</h2>
+    <h3 class="sub">怎么知道模型训好了？</h3>
+    <div class="flow" style="flex-direction:column;gap:1rem;align-items:stretch;margin:1.5rem 0">
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--success);padding-left:1.5rem">
+        <strong style="color:var(--success)">✅ 标准1：能过拟合小数据</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">Sanity Check通过：在小数据集上loss能降到很低，准确率接近100%，说明模型和代码没问题。</span>
+      </div>
+      <div class="flow-node hl" style="text-align:left;min-width:auto;border-left:4px solid var(--accent);padding-left:1.5rem">
+        <strong style="color:var(--accent)">✅ 标准2：训练和验证曲线收敛且接近</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">train loss和val loss都下降到一个稳定值，两者gap不大。没有明显过拟合（val loss上升）。</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--accent2);padding-left:1.5rem">
+        <strong style="color:var(--accent2)">✅ 标准3：验证集指标达到期望</strong>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">验证集准确率/loss达到你预期的目标（或比baseline好）。不是追求100%，要满足业务需求。</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;border-left:4px solid var(--warning);padding-left:1.5rem">
+        <strong style="color:var(--warning)">✅ 标准4：测试集泛化良好</h3>
+        <span style="color:var(--muted);display:block;margin-top:0.3rem;font-size:0.95rem">在从未见过的test集上评估，结果和val集差不多（差距<2-3%）。如果差很多，说明val集可能过拟合了或者数据分布不对。</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">26 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">实践经验：老司机的建议</h2>
+    <h3 class="sub">这些经验能帮你少走很多弯路</h3>
+    <div class="hbox success">
+      <h4>1. 从简单开始，逐步迭代</h4>
+      <p>先跑通一个最简单的baseline，哪怕准确率很低。不要一上来就堆各种tricks。先有结果，再优化。</p>
+    </div>
+    <div class="hbox">
+      <h4>2. 做Sanity Check！</h4>
+      <p>永远先在小数据集上过拟合，确认代码没问题再全量训练。这一个小步骤能节省你无数时间。</p>
+    </div>
+    <div class="hbox rose">
+      <h4>3. 固定随机种子</h4>
+      <p>torch.manual_seed(42)、np.random.seed(42)、random.seed(42)——固定随机种子让结果可复现，不然改进了也不知道是不是随机因素。</p>
+    </div>
+    <div class="hbox warn">
+      <h4>4. 记录实验</h4>
+      <p>每次实验记录用了什么超参数、得到什么结果，不要凭记忆。用Excel、txt或者WandB。不记录的话你会反复试同样的参数。</p>
+    </div>
+    <div class="hbox pink">
+      <h4>5. 先看数据再看模型</h4>
+      <p>出问题先看数据对不对、标签对不对、可视化几个样本。90%的问题其实是数据问题，不是模型问题。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">27 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">固定随机种子模板</h2>
+    <h3 class="sub">让实验可复现</h3>
+    <div class="code">
+<span class="kw">def</span> <span class="func">set_seed</span>(seed=<span class="str">42</span>):<br>
+&nbsp;&nbsp;random.seed(seed)<br>
+&nbsp;&nbsp;np.random.seed(seed)<br>
+&nbsp;&nbsp;torch.manual_seed(seed)<br>
+&nbsp;&nbsp;torch.cuda.manual_seed(seed)<br>
+&nbsp;&nbsp;torch.cuda.manual_seed_all(seed)<br>
+&nbsp;&nbsp;torch.backends.cudnn.deterministic = <span class="kw">True</span><br>
+&nbsp;&nbsp;torch.backends.cudnn.benchmark = <span class="kw">False</span><br>
+<br>
+set_seed(<span class="str">42</span>)  <span class="cmt"># 训练开始前调用</span>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 注意</h4>
+      <p>完全可复现会牺牲一点速度（cudnn.benchmark=False）。做对比实验时需要固定，最终训练可以不用固定追求速度。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">28 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">本集核心要点总结</h2>
+    <h3 class="sub">训练DL模型的完整方法论</h3>
+    <div class="hbox success">
+      <h4>📋 完整流程</h4>
+      <p>数据准备→选模型→选loss/优化器→设超参数→训练循环→验证监控→诊断问题→调参迭代。先做Sanity Check！</p>
+    </div>
+    <div class="hbox rose">
+      <h4>🔍 曲线诊断</h4>
+      <p>loss不动→lr/模型/数据bug；过拟合→加数据/正则/早停；收敛慢→调大lr/检查初始化/BN/残差；NaN→降lr/梯度裁剪/检查数据。</p>
+    </div>
+    <div class="hbox">
+      <h4>🔧 调参优先级</h4>
+      <p>学习率 > batch size > 网络大小 > 优化器 > 正则化。一次只调一个参数。默认AdamW+CosineAnnealing。</p>
+    </div>
+    <div class="hbox pink">
+      <h4>⚠️ 常见坑</h4>
+      <p>忘记zero_grad()、忘记model.eval()、数据泄露、标签类型错误、设备不一致。用小数据集做Sanity Check能避免90%的坑。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-chapter">第14集 · 如何训练DL模型</div>
+  <div class="slide-number">29 / 30</div>
+  <div class="slide-content">
+    <h1>🎉 第14集学习完成！</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      你现在掌握了训练DL模型的完整方法论<br><br>
+      <strong style="color:var(--accent3)">核心收获</strong><br>
+      知道完整训练8步流程<br>
+      能根据训练曲线诊断问题<br>
+      掌握调参优先级和实用技巧<br>
+      能避开新手常见坑
+    </p>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag pi">✅ 训练流程</span>
+      <span class="tag p">✅ 曲线诊断</span>
+      <span class="tag g">✅ Sanity Check</span>
+      <span class="tag w">✅ 实战经验</span>
+    </div>
+    <div class="end-buttons">
+      <a href="ppt-29.html" class="end-btn secondary">← 上一集</a>
+      <a href="chapter6.html" class="end-btn secondary">📺 回到视频页</a>
+      <a href="ppt-31.html" class="end-btn primary">下一集：章节总结 →</a>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-number">30 / 30</div>
+  <div class="slide-content">
+    <h1>下集预告：第6章总结</h1>
+    <p class="cover-sub" style="margin-top:1rem">
+      第6章训练技巧与实战——7集内容大总结！<br><br>
+      <strong style="color:var(--accent3)">损失函数→MNIST实战→学习率→参数初始化→归一化→正则化→训练流程</strong><br><br>
+      核心API回顾、代码模板汇总、问题诊断表、下章预告<br>
+      从懂组件到会训练，完成PyTorch入门！
+    </p>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag d">📚 知识总结</span>
+      <span class="tag pi">💻 代码模板</span>
+      <span class="tag p">🚀 CNN/Transformer预告</span>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+});
+</script>
+</body></html>

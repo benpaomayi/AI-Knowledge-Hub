@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第6章 训练技巧与PyTorch实战 - ML学习站</title>
+  <style>
+    :root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--bg4:#334155;--ink:#f8fafc;--ink-muted:#cbd5e1;--muted:#94a3b8;--rule:rgba(244,63,94,0.15);--accent:#f43f5e;--accent2:#e11d48;--accent3:#fb7185;--accent-glow:rgba(244,63,94,0.25);--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace;--max:1100px;--radius:12px;--radius-lg:20px}
+    *{box-sizing:border-box;margin:0;padding:0}html{font-size:16px;scroll-behavior:smooth}
+    body{font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.7;overflow-x:hidden}a{text-decoration:none;color:inherit}
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,14,26,0.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--rule);padding:0 2rem}
+    .navbar-inner{max-width:var(--max);margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+    .logo{display:flex;align-items:center;gap:10px;font-size:1.2rem;font-weight:700;color:var(--accent)}
+    .logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent3),var(--accent));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .nav-links{display:flex;gap:1.2rem;list-style:none;align-items:center}
+    .nav-links a{color:var(--muted);font-weight:500;font-size:0.85rem;transition:color .3s}
+    .nav-links a:hover,.nav-links a.active{color:var(--accent3)}
+    .back-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:var(--bg3);border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;color:var(--ink-muted);transition:all .3s}
+    .back-btn:hover{border-color:var(--accent3);color:var(--accent3)}
+    .chapter-hero{padding-top:100px;padding-bottom:3rem;background:linear-gradient(180deg,rgba(244,63,94,0.06) 0%,transparent 100%)}
+    .chapter-hero-inner{max-width:var(--max);margin:0 auto;padding:0 2rem}
+    .breadcrumb{font-size:0.85rem;color:var(--muted);margin-bottom:1.5rem;display:flex;gap:8px;align-items:center}
+    .breadcrumb a{color:var(--accent3)}
+    .chapter-badge{display:inline-flex;padding:6px 14px;background:rgba(244,63,94,0.12);color:var(--accent3);border-radius:20px;font-size:0.8rem;font-weight:600;margin-bottom:1rem;border:1px solid rgba(244,63,94,0.2)}
+    .chapter-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.2;margin-bottom:1rem}
+    .chapter-subtitle{font-size:1.1rem;color:var(--muted);max-width:700px;line-height:1.8}
+    .chapter-meta{display:flex;gap:2rem;margin-top:1.5rem;flex-wrap:wrap}
+    .meta-item{display:flex;align-items:center;gap:6px;font-size:0.9rem;color:var(--ink-muted)}
+    .video-nav{display:flex;gap:0.5rem;margin-top:2rem;flex-wrap:wrap}
+    .vnav-item{padding:8px 14px;background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius);font-size:0.82rem;color:var(--muted);cursor:pointer;transition:all .3s;font-family:var(--font);text-align:left}
+    .vnav-item:hover,.vnav-item.active{border-color:var(--accent3);color:var(--accent3);background:rgba(244,63,94,0.08)}
+    .vnav-item strong{display:block;color:var(--ink);font-size:0.8rem;margin-bottom:1px}
+    .vnav-item span{font-size:0.72rem}
+    .main{max-width:var(--max);margin:0 auto;padding:0 2rem}
+    .lesson{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+    .lesson:last-child{border-bottom:none}
+    .lesson-header{display:flex;align-items:flex-start;gap:1rem;margin-bottom:2rem}
+    .lesson-num{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;flex-shrink:0;color:var(--bg);background:linear-gradient(135deg,var(--accent3),var(--accent2))}
+    .lesson-info h2{font-size:1.4rem;font-weight:700;margin-bottom:4px;line-height:1.3}
+    .lesson-info .lesson-dur{font-size:0.85rem;color:var(--muted)}
+    .video-wrapper{position:relative;width:100%;padding-bottom:56.25%;margin-bottom:2.5rem;background:var(--bg2);border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--rule)}
+    .video-wrapper iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+    .content-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem}
+    .content-card{background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius-lg);padding:1.75rem;transition:border-color .3s}
+    .content-card:hover{border-color:var(--accent3)}
+    .content-card.full{grid-column:1/-1}
+    .card-tag{display:inline-block;padding:3px 10px;background:rgba(244,63,94,0.1);color:var(--accent3);border-radius:6px;font-size:0.75rem;font-weight:600;margin-bottom:1rem}
+    .content-card h3{font-size:1.1rem;margin-bottom:1rem}
+    .content-card p{font-size:0.92rem;color:var(--ink-muted);line-height:1.8;margin-bottom:0.8rem}
+    .content-card ul{list-style:none;padding:0}
+    .content-card li{padding:0.4rem 0;font-size:0.9rem;color:var(--ink-muted);display:flex;gap:10px;align-items:flex-start;line-height:1.7}
+    .content-card li::before{content:'▸';color:var(--accent3);flex-shrink:0;margin-top:1px}
+    .key-point{background:rgba(244,63,94,0.06);border-left:3px solid var(--accent3);border-radius:0 var(--radius) var(--radius) 0;padding:1.25rem 1.5rem;margin:1.5rem 0}
+    .key-point h4{color:var(--accent3);font-size:0.95rem;margin-bottom:0.5rem}
+    .key-point p{font-size:0.9rem;color:var(--ink-muted);line-height:1.8}
+    .formula-box{background:var(--bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1.25rem 1.5rem;margin:1rem 0;font-family:var(--mono);font-size:0.9rem;color:var(--accent3);text-align:center;letter-spacing:0.02em;overflow-x:auto;line-height:2}
+    .formula-box .comment{color:var(--muted);font-family:var(--font);font-size:0.82rem;display:block;margin-top:0.3rem}
+    .code-block{background:var(--bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1.25rem 1.5rem;margin:1rem 0;overflow-x:auto;font-family:var(--mono);font-size:0.86rem;line-height:1.7;color:var(--ink-muted)}
+    .code-block .kw{color:var(--accent2)}.code-block .fn{color:var(--accent3)}.code-block .str{color:var(--success)}.code-block .cm{color:var(--muted);font-style:italic}.code-block .num{color:var(--warning)}
+    .summary-map{background:var(--bg);border-radius:var(--radius-lg);border:1px solid var(--rule);padding:2rem;margin:1.5rem 0}
+    .map-section{margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--rule)}
+    .map-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+    .map-section h4{font-size:1rem;color:var(--accent3);margin-bottom:0.75rem;display:flex;align-items:center;gap:8px}
+    .map-tags{display:flex;gap:0.5rem;flex-wrap:wrap}
+    .map-tag{padding:5px 14px;background:var(--bg2);border:1px solid var(--rule);border-radius:20px;font-size:0.8rem;color:var(--ink-muted);transition:all .3s}
+    .map-tag:hover{border-color:var(--accent3);color:var(--accent3)}
+    .chapter-nav{display:flex;justify-content:space-between;align-items:center;padding:2rem 0;margin-top:2rem;border-top:1px solid var(--rule)}
+    .chapter-nav .prev,.chapter-nav .next{display:flex;align-items:center;gap:8px;padding:12px 20px;background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius);color:var(--ink-muted);font-size:0.9rem;transition:all .3s}
+    .chapter-nav .next{margin-left:auto;text-align:right}
+    .chapter-nav .prev:hover{border-color:var(--accent2);color:var(--accent2)}
+    .chapter-nav .next:hover{border-color:var(--accent2);color:var(--accent2)}
+    .nav-label{font-size:0.75rem;color:var(--muted);display:block}.nav-title{font-weight:600;color:var(--ink)}
+    footer{background:var(--bg2);border-top:1px solid var(--rule);padding:3rem 2rem 2rem;margin-top:3rem}
+    .footer-inner{max-width:var(--max);margin:0 auto;text-align:center;color:var(--muted);font-size:0.82rem}
+    @media(max-width:768px){.content-grid{grid-template-columns:1fr!important}.nav-links{display:none}}
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="ml-learning-site.html" class="logo"><div class="logo-icon">🧠</div><span>ML学习站</span></a>
+      <ul class="nav-links">
+        <li><a href="ml-learning-site.html">首页</a></li>
+        <li><a href="slides.html">📊 PPT版</a></li>
+        <li><a href="chapter4.html">第4章</a></li>
+        <li><a href="chapter5.html">第5章</a></li>
+        <li><a href="#lessonD8" class="active">DL8</a></li>
+        <li><a href="#lessonD9">DL9</a></li>
+        <li><a href="#lessonD10">DL10</a></li>
+        <li><a href="#lessonD11">DL11</a></li>
+        <li><a href="#lessonD12">DL12</a></li>
+        <li><a href="#lessonD13">DL13</a></li>
+        <li><a href="#lessonD14">DL14</a></li>
+      </ul>
+      <a href="ml-learning-site.html" class="back-btn">← 返回首页</a>
+    </div>
+  </nav>
+
+  <div class="chapter-hero">
+    <div class="chapter-hero-inner">
+      <div class="breadcrumb"><a href="ml-learning-site.html">首页</a> / <span>第6章 训练技巧与PyTorch实战</span></div>
+      <span class="chapter-badge">🔥 深度学习篇 · 第8-14集</span>
+      <h1 class="chapter-title">训练技巧与PyTorch实战</h1>
+      <p class="chapter-subtitle">从损失函数到PyTorch框架实战，掌握学习率、参数初始化、归一化、正则化等核心训练技巧，学会如何系统地训练一个深度学习模型。</p>
+      <div class="chapter-meta">
+        <span class="meta-item">📺 7集视频</span><span class="meta-item">⏱ 约144分钟</span><span class="meta-item">🔥 损失函数</span><span class="meta-item">⚙️ PyTorch实战</span><span class="meta-item">🎯 训练技巧</span>
+      </div>
+      <div class="video-nav">
+        <a href="#lessonD8" class="vnav-item active"><strong>DL8</strong><span>损失函数 (15:50)</span></a>
+        <a href="#lessonD9" class="vnav-item"><strong>DL9</strong><span>MNIST实战 (24:10)</span></a>
+        <a href="#lessonD10" class="vnav-item"><strong>DL10</strong><span>学习率 (24:16)</span></a>
+        <a href="#lessonD11" class="vnav-item"><strong>DL11</strong><span>参数初始化 (17:14)</span></a>
+        <a href="#lessonD12" class="vnav-item"><strong>DL12</strong><span>归一化 (16:49)</span></a>
+        <a href="#lessonD13" class="vnav-item"><strong>DL13</strong><span>正则化 (19:13)</span></a>
+        <a href="#lessonD14" class="vnav-item"><strong>DL14</strong><span>训练全流程 (26:28)</span></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="lesson" id="lessonD8">
+      <div class="lesson-header">
+        <div class="lesson-num">8</div>
+        <div class="lesson-info">
+          <h2>损失函数：告诉模型错了多少</h2>
+          <div class="lesson-dur">⏱ 15分50秒 · BV1jgGB6PE7S</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1jgGB6PE7S&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 损失函数的作用</h4>
+        <p>损失函数（Loss Function）是模型的"裁判"——它量化模型预测值与真实值之间的差距，告诉优化器应该往哪个方向调整参数。没有损失函数，模型就不知道自己错在哪里，也就无法学习。选择合适的损失函数是训练神经网络的关键第一步。</p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">回归损失</span>
+          <h3>📈 回归任务损失函数</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">MSE/L2损失</strong>：均方误差，对大误差惩罚重，梯度随误差减小而减小，收敛稳定</li>
+            <li><strong style="color:var(--ink)">MAE/L1损失</strong>：平均绝对误差，对异常值鲁棒，但在零点处梯度不连续</li>
+            <li><strong style="color:var(--ink)">Huber Loss</strong>：结合MSE和MAE优点，误差小时用MSE，误差大时用MAE</li>
+          </ul>
+          <div class="formula-box">
+            MSE = (1/n)Σ(y<sub>i</sub> - ŷ<sub>i</sub>)²<br>
+            MAE = (1/n)Σ|y<sub>i</sub> - ŷ<sub>i</sub>|
+          </div>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">分类损失</span>
+          <h3>🎯 分类任务损失函数</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">交叉熵Cross-Entropy</strong>：多分类首选，衡量两个概率分布的差异，配合Softmax使用</li>
+            <li><strong style="color:var(--ink)">BCELogits Loss</strong>：二分类专用，内部包含Sigmoid，数值稳定性更好</li>
+            <li>为什么分类用交叉熵而不用MSE？<strong style="color:var(--ink)">梯度特性</strong>——交叉熵在分类错误时梯度大，正确时梯度小，更适合概率输出</li>
+          </ul>
+        </div>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">选择指南</span>
+        <h3>📋 损失函数选择与自定义场景</h3>
+        <div class="content-grid" style="margin-bottom:0">
+          <div>
+            <p><strong style="color:var(--ink)">回归问题</strong>：首选MSE；数据有异常值用Huber或MAE</p>
+            <p><strong style="color:var(--ink)">多分类问题</strong>：CrossEntropyLoss（注意：不需要手动加Softmax，PyTorch内部已包含）</p>
+            <p><strong style="color:var(--ink)">二分类问题</strong>：BCEWithLogitsLoss（比先Sigmoid再BCE更稳定）</p>
+          </div>
+          <div>
+            <p><strong style="color:var(--ink)">自定义损失场景</strong>：</p>
+            <ul>
+              <li>多任务学习：多个损失加权求和</li>
+              <li>不平衡数据：Focal Loss（难样本加权）</li>
+              <li>领域特殊需求：如目标检测的IoU Loss</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson" id="lessonD9">
+      <div class="lesson-header">
+        <div class="lesson-num">9</div>
+        <div class="lesson-info">
+          <h2>识别手写数字：PyTorch实战MNIST</h2>
+          <div class="lesson-dur">⏱ 24分10秒 · BV1uPGj6fEQh</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1uPGj6fEQh&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 MNIST——深度学习的"Hello World"</h4>
+        <p>MNIST手写数字识别是深度学习入门的经典项目，相当于编程中的Hello World。通过这个实战，你将掌握PyTorch的核心工作流：数据加载→模型定义→训练循环→验证测试。<strong style="color:var(--ink)">重要的是理解框架本质，而不是死记API</strong>——PyTorch的核心就是张量运算+自动求导。</p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">数据加载</span>
+          <h3>📦 Dataset & DataLoader</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">Dataset</strong>：封装数据，实现__getitem__和__len__方法</li>
+            <li><strong style="color:var(--ink)">DataLoader</strong>：批量加载、打乱顺序、多线程预取</li>
+            <li>torchvision.datasets内置MNIST等常用数据集</li>
+            <li>transforms.ToTensor()：将PIL图像转为[0,1]范围的张量</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">模型定义</span>
+          <h3>🧩 nn.Module 网络定义</h3>
+          <ul>
+            <li>继承nn.Module，在__init__中定义层</li>
+            <li>实现forward方法定义前向传播</li>
+            <li>简单MLP：Flatten→Linear→ReLU→Linear→ReLU→Linear(10)</li>
+            <li>不用写反向传播——autograd自动计算梯度</li>
+          </ul>
+        </div>
+      </div>
+      <div class="code-block">
+        <span class="cm"># PyTorch MNIST 核心代码</span><br>
+        <span class="kw">import</span> torch<br>
+        <span class="kw">import</span> torch.nn <span class="kw">as</span> nn<br>
+        <span class="kw">from</span> torch.utils.data <span class="kw">import</span> DataLoader<br>
+        <span class="kw">from</span> torchvision <span class="kw">import</span> datasets, transforms<br><br>
+        <span class="cm"># 1. 设备配置（GPU加速）</span><br>
+        device = torch.device(<span class="str">'cuda'</span> <span class="kw">if</span> torch.cuda.is_available() <span class="kw">else</span> <span class="str">'cpu'</span>)<br><br>
+        <span class="cm"># 2. 定义简单MLP网络</span><br>
+        <span class="kw">class</span> <span class="fn">MLP</span>(nn.Module):<br>
+        &nbsp;&nbsp;<span class="kw">def</span> <span class="fn">__init__</span>(self):<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">super</span>().__init__()<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;self.flatten = nn.Flatten()<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;self.layers = nn.Sequential(<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.Linear(<span class="num">28</span>*<span class="num">28</span>, <span class="num">256</span>), nn.ReLU(),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.Linear(<span class="num">256</span>, <span class="num">128</span>), nn.ReLU(),<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nn.Linear(<span class="num">128</span>, <span class="num">10</span>)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;)<br>
+        &nbsp;&nbsp;<span class="kw">def</span> <span class="fn">forward</span>(self, x):<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> self.layers(self.flatten(x))<br><br>
+        <span class="cm"># 3. 训练循环：epoch → iteration</span><br>
+        model = MLP().to(device)<br>
+        optimizer = torch.optim.Adam(model.parameters(), lr=<span class="num">1e-3</span>)<br>
+        criterion = nn.CrossEntropyLoss()<br>
+        <span class="kw">for</span> epoch <span class="kw">in</span> range(<span class="num">10</span>):<br>
+        &nbsp;&nbsp;<span class="kw">for</span> X, y <span class="kw">in</span> train_loader:<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;X, y = X.to(device), y.to(device)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;pred = model(X)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;loss = criterion(pred, y)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;optimizer.zero_grad()<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;loss.backward()<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;optimizer.step()
+      </div>
+    </div>
+
+    <div class="lesson" id="lessonD10">
+      <div class="lesson-header">
+        <div class="lesson-num">10</div>
+        <div class="lesson-info">
+          <h2>学习率：小小参数大影响</h2>
+          <div class="lesson-dur">⏱ 24分16秒 · BV1NMVn6vE7o</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1NMVn6vE7o&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 学习率是最重要的超参数</h4>
+        <p>在所有超参数中，<strong style="color:var(--ink)">学习率对训练结果的影响最大</strong>。它控制参数更新的步长：步子太大容易跨过最优解来回震荡；步子太小收敛极慢甚至陷入局部最优。调参时第一个应该调的就是学习率。</p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">学习率过大vs过小</span>
+          <h3>⚠️ 学习率的影响</h3>
+          <ul>
+            <li><strong style="color:var(--danger)">lr太大</strong>：loss震荡不收敛、甚至NaN（梯度爆炸）、在最优点附近来回跳</li>
+            <li><strong style="color:var(--warning)">lr太小</strong>：收敛极慢、训练停滞、容易陷入局部最优、过拟合风险高</li>
+            <li><strong style="color:var(--success)">合适的lr</strong>：loss稳定下降、快速收敛到较好的解</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">查找方法</span>
+          <h3>🔍 LR Finder 学习率查找</h3>
+          <p>从极小学习率开始，指数级增大lr，记录每个lr对应的loss，选loss下降最快那段的lr（通常取拐点前的值）。PyTorch Lightning等框架内置此功能。</p>
+          <p style="margin-top:0.8rem"><strong style="color:var(--ink)">不同任务推荐值</strong>：</p>
+          <ul>
+            <li>Adam优化器：1e-3 ~ 3e-4（常用起点）</li>
+            <li>SGD+动量：1e-2 ~ 1e-1（需要更大初始lr）</li>
+            <li>Transformer微调：1e-5 ~ 5e-5（要小）</li>
+          </ul>
+        </div>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">学习率调度</span>
+        <h3>📉 学习率调度器与Warmup</h3>
+        <div class="content-grid" style="margin-bottom:0">
+          <div>
+            <p><strong style="color:var(--ink)">常见调度器</strong>：</p>
+            <ul>
+              <li><strong>StepLR</strong>：固定步长衰减（如每30轮乘0.1）</li>
+              <li><strong>CosineAnnealingLR</strong>：余弦退火，平滑下降到最小值</li>
+              <li><strong>ReduceLROnPlateau</strong>：监控指标，停滞时自动降低lr</li>
+            </ul>
+          </div>
+          <div>
+            <p><strong style="color:var(--ink)">Warmup预热策略</strong>：</p>
+            <ul>
+              <li>训练开始时先用很小的lr，逐渐线性增大到设定值</li>
+              <li>为什么？训练初期参数随机，大lr容易导致不稳定</li>
+              <li>Transformer等大模型必备技巧</li>
+              <li>通常warmup步数占总步数的5%~10%</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson" id="lessonD11">
+      <div class="lesson-header">
+        <div class="lesson-num">11</div>
+        <div class="lesson-info">
+          <h2>参数初始化：调参高手的秘诀</h2>
+          <div class="lesson-dur">⏱ 17分14秒 · BV17i7Q6HEFt</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV17i7Q6HEFt&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 好的初始化是成功的一半</h4>
+        <p>很多人忽略参数初始化，但初始值直接影响训练速度和最终效果。<strong style="color:var(--ink)">为什么不能全零初始化？</strong>——对称性问题：所有神经元初始状态相同，梯度更新也相同，永远学不出不同的特征，相当于只有一个神经元在工作。</p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">Xavier初始化</span>
+          <h3>⚖️ Xavier/Glorot初始化</h3>
+          <p>保持前向传播和反向传播时的方差一致，防止信号逐层放大或缩小。</p>
+          <div class="formula-box" style="font-size:0.82rem">
+            W ~ U(-√(6/(n<sub>in</sub>+n<sub>out</sub>)), √(6/(n<sub>in</sub>+n<sub>out</sub>)))<br>
+            <span class="comment">适合：Sigmoid、Tanh激活函数<br>PyTorch: nn.init.xavier_uniform_()</span>
+          </div>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">He初始化</span>
+          <h3>🔥 He/Kaiming初始化</h3>
+          <p>针对ReLU的非线性特性设计，考虑了ReLU会将一半神经元置零的情况。</p>
+          <div class="formula-box" style="font-size:0.82rem">
+            W ~ N(0, √(2/n<sub>in</sub>))<br>
+            <span class="comment">适合：ReLU及其变体（LeakyReLU等）<br>PyTorch: nn.init.kaiming_normal_()<br>现代网络默认首选！</span>
+          </div>
+        </div>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">要点总结</span>
+        <h3>📋 初始化方法对比与BatchNorm</h3>
+        <div class="content-grid" style="margin-bottom:0">
+          <div>
+            <ul>
+              <li><strong style="color:var(--ink)">随机高斯</strong>：简单但方差需要手动调整，可能梯度消失/爆炸</li>
+              <li><strong style="color:var(--ink)">Xavier</strong>：Sigmoid/Tanh时代的标准</li>
+              <li><strong style="color:var(--ink)">He/Kaiming</strong>：ReLU网络的最佳选择</li>
+              <li>合适的初始化能大幅加快收敛速度</li>
+            </ul>
+          </div>
+          <div>
+            <p><strong style="color:var(--accent3)">BatchNorm降低对初始化的敏感度</strong>：</p>
+            <p>Batch Normalization层将每层输出归一化到均值0方差1，大大缓解了不好的初始化带来的问题，使得网络更容易训练。这也是为什么现代深度网络对初始化不那么敏感的重要原因。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson" id="lessonD12">
+      <div class="lesson-header">
+        <div class="lesson-num">12</div>
+        <div class="lesson-info">
+          <h2>归一化：Transformer都在用的训练技巧</h2>
+          <div class="lesson-dur">⏱ 16分49秒 · BV1X2Ex6rEu9</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1X2Ex6rEu9&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 内部协变量偏移（ICS）</h4>
+        <p>训练深度网络时，每一层参数更新都会改变下一层输入数据的分布——这就是<strong style="color:var(--ink)">内部协变量偏移</strong>。就像你在学射箭时，靶子一直在动，你永远也射不准。归一化层让每一层输入分布保持稳定，网络训练更快更稳定。</p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">BatchNorm原理</span>
+          <h3>📦 Batch Normalization</h3>
+          <ul>
+            <li>对一个batch内的特征做：减均值→除方差→可学习缩放γ和平移β</li>
+            <li><strong style="color:var(--ink)">训练时</strong>：用当前batch的均值/方差，同时累计移动平均running mean/var</li>
+            <li><strong style="color:var(--ink)">测试时</strong>：用训练时累计的全局均值/方差，不依赖batch</li>
+            <li><strong style="color:var(--ink)">位置</strong>：通常放在Conv/Linear之后、激活函数之前（也有放在激活后的做法）</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">其他归一化</span>
+          <h3>🔄 常用归一化方法</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">BatchNorm (BN)</strong>：沿batch维度归一化，batch小效果差，CNN常用</li>
+            <li><strong style="color:var(--ink)">LayerNorm (LN)</strong>：沿特征维度归一化，不依赖batch大小，<strong style="color:var(--accent3)">Transformer标配</strong></li>
+            <li><strong style="color:var(--ink)">InstanceNorm</strong>：每个样本每个通道单独归一化，风格迁移常用</li>
+            <li><strong style="color:var(--ink)">GroupNorm</strong>：将通道分组后归一化，batch小时可替代BN</li>
+          </ul>
+        </div>
+      </div>
+      <div class="formula-box" style="text-align:left">
+        BN(x) = γ · (x - μ<sub>batch</sub>) / √(σ<sub>batch</sub>² + ε) + β<br>
+        <span class="comment">μ<sub>batch</sub>, σ<sub>batch</sub>²: 当前batch的均值和方差<br>γ, β: 可学习的缩放和平移参数（让网络有机会恢复原分布）<br>ε: 防止除零的小常数，通常1e-5</span>
+      </div>
+    </div>
+
+    <div class="lesson" id="lessonD13">
+      <div class="lesson-header">
+        <div class="lesson-num">13</div>
+        <div class="lesson-info">
+          <h2>过拟合克星：深度学习正则化</h2>
+          <div class="lesson-dur">⏱ 19分13秒 · BV1DHJ76SEmj</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1DHJ76SEmj&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 深度学习的过拟合问题更严重</h4>
+        <p>经典机器学习模型参数量通常是万级别，而深度神经网络动辄百万、千万甚至千亿参数——<strong style="color:var(--ink)">参数远大于数据量时，过拟合几乎必然发生</strong>。正则化就是一系列防止模型"死记硬背"训练数据、提高泛化能力的技术。</p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">权重衰减</span>
+          <h3>⚖️ L1/L2正则化 (Weight Decay)</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">L2正则化</strong>：在损失函数中加λΣw²，惩罚大权重，让权重趋向小值，最常用</li>
+            <li><strong style="color:var(--ink)">L1正则化</strong>：加λΣ|w|，倾向于产生稀疏权重（很多w=0），可用于特征选择</li>
+            <li>PyTorch优化器中直接设置weight_decay参数（Adam默认0，SGD常用1e-4）</li>
+            <li>直觉：小权重意味着模型更"简单"，不容易拟合噪声</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">Dropout</span>
+          <h3>🎲 Dropout随机失活</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">训练时</strong>：以概率p（通常0.5）随机将神经元输出置零</li>
+            <li><strong style="color:var(--ink)">推理时</strong>：所有神经元都用，但输出要乘以(1-p)缩放（或训练时除以1-p——Inverted Dropout）</li>
+            <li><strong style="color:var(--ink)">为什么有效</strong>：防止神经元之间"共谋"，强迫网络学习鲁棒特征，类似集成学习的效果</li>
+            <li><strong style="color:var(--ink)">Dropout率选择</strong>：隐藏层0.2~0.5，输入层0.1~0.2</li>
+          </ul>
+        </div>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">其他正则化</span>
+        <h3>🛡️ 更多正则化方法</h3>
+        <div class="content-grid" style="margin-bottom:0">
+          <div>
+            <p><strong style="color:var(--ink)">数据增强（Data Augmentation）</strong>：</p>
+            <ul>
+              <li>图像：随机裁剪、翻转、旋转、颜色抖动、Mixup、Cutout</li>
+              <li>文本：同义词替换、随机删除、回译</li>
+              <li><strong style="color:var(--accent3)">最便宜最有效的正则化！</strong> 本质是增加训练数据</li>
+            </ul>
+          </div>
+          <div>
+            <p><strong style="color:var(--ink)">Early Stopping早停</strong>：</p>
+            <ul>
+              <li>监控验证集性能，当验证集loss不再下降时停止训练</li>
+              <li>保存验证集表现最好的checkpoint</li>
+              <li>简单有效，几乎是训练标配</li>
+            </ul>
+            <p style="margin-top:0.8rem"><strong style="color:var(--ink)">还有</strong>：标签平滑、DropConnect、随机深度（Stochastic Depth）等</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson" id="lessonD14">
+      <div class="lesson-header">
+        <div class="lesson-num">14</div>
+        <div class="lesson-info">
+          <h2>如何训练一个深度学习模型</h2>
+          <div class="lesson-dur">⏱ 26分28秒 · BV1FmJJ6rEqS</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1FmJJ6rEqS&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 训练DL模型是系统工程</h4>
+        <p>很多新手调参靠"玄学"——瞎试、凭感觉。实际上训练深度学习模型有科学的流程和方法论。掌握了这套方法论，你就能系统地诊断问题、有针对性地调参，而不是乱猜。<strong style="color:var(--ink)">调参也是有优先级的</strong>，不要一上来就改网络结构。</p>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">全流程</span>
+        <h3>🗺️ 深度学习训练完整流程</h3>
+        <div class="summary-map">
+          <div class="map-section">
+            <h4>1️⃣ 数据准备</h4>
+            <div class="map-tags">
+              <span class="map-tag">数据清洗</span><span class="map-tag">训练/验证/测试划分</span><span class="map-tag">数据归一化</span><span class="map-tag">DataLoader配置</span><span class="map-tag">数据增强</span><span class="map-tag">类别不平衡处理</span>
+            </div>
+          </div>
+          <div class="map-section">
+            <h4>2️⃣ 模型构建</h4>
+            <div class="map-tags">
+              <span class="map-tag">选择网络结构</span><span class="map-tag">参数初始化(He/Xavier)</span><span class="map-tag">前向传播测试</span><span class="map-tag">参数量统计</span><span class="map-tag">转移到GPU</span>
+            </div>
+          </div>
+          <div class="map-section">
+            <h4>3️⃣ 训练配置</h4>
+            <div class="map-tags">
+              <span class="map-tag">损失函数选择</span><span class="map-tag">优化器(Adam/SGD)</span><span class="map-tag">学习率设置</span><span class="map-tag">学习率调度器</span><span class="map-tag">正则化配置</span>
+            </div>
+          </div>
+          <div class="map-section">
+            <h4>4️⃣ 训练循环</h4>
+            <div class="map-tags">
+              <span class="map-tag">前向传播算loss</span><span class="map-tag">反向传播算梯度</span><span class="map-tag">梯度裁剪</span><span class="map-tag">参数更新</span><span class="map-tag">验证集评估</span><span class="map-tag">保存best模型</span><span class="map-tag">TensorBoard可视化</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="content-grid" style="margin-top:2rem">
+        <div class="content-card">
+          <span class="card-tag">常见问题</span>
+          <h3>🔧 问题诊断指南</h3>
+          <ul>
+            <li><strong style="color:var(--danger)">Train loss不下降</strong>：学习率太大/太小、初始化问题、梯度爆炸（加梯度裁剪）、数据/标签有问题、优化器错了</li>
+            <li><strong style="color:var(--warning)">Train loss下降但Val loss上升</strong>：过拟合！加正则化/数据增强/Early Stopping/减少模型复杂度</li>
+            <li><strong style="color:var(--warning)">收敛太慢</strong>：增大学习率、换更好的优化器（Adam）、检查数据归一化</li>
+            <li><strong style="color:var(--danger)">出现NaN</strong>：学习率太大梯度爆炸、除零、loss计算有问题（如log(0)）</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">调参优先级</span>
+          <h3>🎯 调参顺序建议</h3>
+          <p>按这个顺序调，效率最高：</p>
+          <div style="margin-top:0.8rem;padding:1rem;background:var(--bg);border-radius:var(--radius);">
+            <ol style="list-style:none;padding:0;margin:0">
+              <li style="padding:0.5rem 0;color:var(--accent3);font-weight:600">1️⃣ 学习率 & 优化器 🔝 最重要！</li>
+              <li style="padding:0.5rem 0;color:var(--ink-muted)">2️⃣ Batch size</li>
+              <li style="padding:0.5rem 0;color:var(--ink-muted)">3️⃣ 正则化（weight decay/dropout）</li>
+              <li style="padding:0.5rem 0;color:var(--ink-muted)">4️⃣ 网络结构（层数/宽度）</li>
+              <li style="padding:0.5rem 0;color:var(--muted);font-size:0.9rem">5️⃣ 其他trick（初始化/激活函数/调度器）</li>
+            </ol>
+          </div>
+          <p style="margin-top:0.8rem"><strong style="color:var(--ink)">记住</strong>：从一个能work的baseline开始，每次只改一个变量，做对照实验！</p>
+        </div>
+      </div>
+      <div class="key-point">
+        <h4>🚀 从实践中积累经验</h4>
+        <p>训练深度学习模型是一门实践的手艺。看视频只是第一步，<strong style="color:var(--ink)">一定要动手写代码、跑实验、观察loss曲线、分析错误案例</strong>。刚开始可能会遇到各种bug和问题，这是正常的——每个DL工程师都是在debug中成长的。用好TensorBoard等可视化工具，让训练过程"看得见"，你会进步得更快。下一步就是学习CNN、Transformer等具体网络结构，在计算机视觉、NLP等领域实战！</p>
+      </div>
+    </div>
+
+    <div class="chapter-nav">
+      <a href="chapter5.html" class="prev">
+        <span>←</span><span><span class="nav-label">上一章</span><span class="nav-title">第5章 神经网络基础</span></span>
+      </a>
+      <a href="chapter7.html" class="next">
+        <span><span class="nav-label">下一章</span><span class="nav-title">第7章 计算机视觉与CNN</span></span><span>→</span>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <p>🔥 掌握训练技巧，让你的深度学习模型又快又好！ | © 2026 ML学习站</p>
+      <p style="margin-top:0.5rem"><a href="https://space.bilibili.com/291215958/lists/7984530?type=season" target="_blank" style="color:var(--accent3)">前往B站观看原视频 →</a></p>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('a[href^="#"]').forEach(function(a){a.addEventListener('click',function(e){var h=this.getAttribute('href');if(h==='#')return;e.preventDefault();var t=document.querySelector(h);if(t)t.scrollIntoView({behavior:'smooth',block:'start'})})});
+    var vnavs=document.querySelectorAll('.vnav-item');var lessons=document.querySelectorAll('.lesson');window.addEventListener('scroll',function(){var cur=0;lessons.forEach(function(l,i){if(window.scrollY>=l.offsetTop-120)cur=i});vnavs.forEach(function(n,i){n.classList.toggle('active',i===cur)})});
+  </script>
+</body>
+</html>

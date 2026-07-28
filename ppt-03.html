@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>第3集 机器学习的三大类型 - ML学习站PPT</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#38bdf8;--accent2:#818cf8;--accent3:#c084fc;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--success);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(52,211,153,0.1) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(56,189,248,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);border-radius:50px;font-size:1rem;color:var(--success);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--success),var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:700px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(56,189,248,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:2rem;margin:1.5rem 0;text-align:center;font-family:var(--mono);font-size:clamp(1rem,1.8vw,1.3rem);color:var(--accent);line-height:2}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:1rem;display:block;text-align:left;line-height:1.7}
+.katex{color:var(--accent3)}.katex .mord.text{color:var(--ink2)}
+.hbox{background:rgba(56,189,248,0.08);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1.5rem 0}
+.hbox h4{color:var(--accent);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(251,191,36,0.08);border-left-color:var(--warning)}.hbox.warn h4{color:var(--warning)}
+.hbox.danger{background:rgba(248,113,113,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.purple{background:rgba(129,140,248,0.08);border-left-color:var(--accent2)}.hbox.purple h4{color:var(--accent2)}
+.hbox.pink{background:rgba(192,132,252,0.08);border-left-color:var(--accent3)}.hbox.pink h4{color:var(--accent3)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:1rem}
+table.cmp th{background:var(--bg3);color:var(--accent);padding:12px 16px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.95rem}
+table.cmp td{padding:10px 16px;border-bottom:1px solid var(--rule);color:var(--ink2)}
+table.cmp tr:hover td{background:rgba(56,189,248,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent);background:rgba(56,189,248,0.1);color:var(--accent);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent)}
+.tag.p{color:var(--accent2)}.tag.pi{color:var(--accent3)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}.tag.r{color:var(--danger)}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent);color:var(--accent)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent)}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;background:linear-gradient(135deg,var(--success),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.code{background:var(--bg);border:1px solid var(--rule);border-radius:14px;padding:1.5rem 2rem;margin:1.5rem 0;font-family:var(--mono);font-size:clamp(0.85rem,1.4vw,1rem);line-height:1.8;color:var(--ink2);overflow-x:auto;white-space:pre}
+.code .kw{color:var(--accent3)}.code .fn{color:var(--accent)}.code .str{color:var(--success)}.code .cm{color:var(--muted);font-style:italic}.code .num{color:var(--warning)}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:2rem;align-items:center;margin:2rem 0}
+.vs-side{padding:2rem;border-radius:16px;text-align:center}.vs-left{background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.2)}
+.vs-right{background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.2)}
+.vs-divider{font-size:2rem;font-weight:800;color:var(--muted)}
+.three-type-card{padding:2rem;border-radius:16px;text-align:center;flex:1}
+.type-supervised{background:rgba(56,189,248,0.08);border:2px solid rgba(56,189,248,0.3)}
+.type-unsupervised{background:rgba(251,191,36,0.08);border:2px solid rgba(251,191,36,0.3)}
+.type-reinforcement{background:rgba(192,132,252,0.08);border:2px solid rgba(192,132,252,0.3)}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col,.vs{grid-template-columns:1fr}.vs-divider{text-align:center}.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="slides.html" style="font-weight:600;color:var(--success)">📊 PPT课件</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="ppt-02.html">← 上一集</a>
+    <a href="chapter1.html">回到视频页</a>
+    <a href="ppt-04.html" style="color:var(--success);font-weight:600">下一章 →</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">机器学习入门教程 · 第3集</div>
+    <h1 class="cover-title">机器学习的三大类型</h1>
+    <p class="cover-sub">监督学习 · 非监督学习 · 强化学习<br>理解不同学习范式的核心区别与应用场景<br>BV13e41167ZS · 时长 21分22秒</p>
+    <div class="tags">
+      <span class="tag">监督学习</span>
+      <span class="tag w">非监督学习</span>
+      <span class="tag pi">强化学习</span>
+      <span class="tag g">分类回归</span>
+      <span class="tag p">聚类降维</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">2 / 30</div>
+  <div class="slide-content">
+    <h1 class="st">本集学习目标</h1>
+    <h3 class="sub">学完这一集，你将能够清晰区分三大机器学习类型</h3>
+    <div class="body">
+      <ul>
+        <li><strong>理解"标签"(Label)的概念</strong>——什么是"有答案"，什么是"没答案"？</li>
+        <li><strong>掌握监督学习</strong>——分类vs回归问题的区别，典型算法和应用</li>
+        <li><strong>掌握非监督学习</strong>——聚类、降维、异常检测等任务的核心思想</li>
+        <li><strong>了解强化学习</strong>——智能体、环境、奖励等核心要素，典型应用</li>
+        <li><strong>能从多个维度对比三大类型</strong>——标签、学习方式、任务类型、代表算法、应用场景</li>
+        <li><strong>学会根据问题选择合适的学习类型</strong>——拿到一个问题知道该用哪类方法</li>
+      </ul>
+    </div>
+    <div class="hbox success">
+      <h4>🎯 重要性</h4>
+      <p>这是机器学习最基础、最重要的分类框架！几乎所有机器学习算法都可以归入这三大类之一。理解这个分类，就像学编程先懂"顺序/分支/循环"三大结构一样，是后续学习所有具体算法的基础地图。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">3 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">复习：T-E-P框架</h2>
+    <h3 class="sub">Tom Mitchell的经典定义——什么是"学习"？</h3>
+    <div class="formula">
+      <strong>对于某类任务 <span style="color:var(--warning)">T</span> (Task)，<br>
+      随着经验 <span style="color:var(--success)">E</span> (Experience) 的增加，<br>
+      在性能度量 <span style="color:var(--accent3)">P</span> (Performance) 上不断提高</strong>
+      <span class="desc">—— Tom Mitchell, 1997 《Machine Learning》</span>
+    </div>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="card-icon" style="color:var(--warning)">🎯</div>
+        <h4>任务 T</h4>
+        <p>我们要解决什么问题？识别猫？下棋？推荐商品？</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--success)">📚</div>
+        <h4>经验 E</h4>
+        <p>机器通过什么方式"学习"？看标注数据？自己探索？</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">📊</div>
+        <h4>性能 P</h4>
+        <p>怎么衡量学好了？准确率？奖励值？误差大小？</p>
+      </div>
+    </div>
+    <div class="hbox purple">
+      <h4>💡 关键过渡</h4>
+      <p>三大机器学习类型的本质区别，就在于<strong>经验E的获取方式不同</strong>——也就是机器"以什么样的方式获得反馈、进行学习"。这是今天分类的核心依据。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">4 / 30</div>
+  <div class="slide-content">
+    <h1 class="st">引入：不同类型的学习问题</h1>
+    <h3 class="sub">同样是"学习"，在不同场景下含义完全不同</h3>
+    <div class="body">
+      <p>想一想，人有多少种学习方式？</p>
+    </div>
+    <div class="two-col" style="margin:1rem 0">
+      <div class="card">
+        <h4>👨‍🏫 有老师教的学习</h4>
+        <p>上课做练习题，每道题都有标准答案，做完老师批改告诉你对错，你对照答案改错。</p>
+        <p style="margin-top:0.8rem"><strong style="color:var(--accent)">→ 对应监督学习</strong></p>
+      </div>
+      <div class="card">
+        <h4>🔍 自己观察总结</h4>
+        <p>没人告诉你答案，你自己看大量东西，自己发现"这些东西好像可以分成几类"。</p>
+        <p style="margin-top:0.8rem"><strong style="color:var(--warning)">→ 对应非监督学习</strong></p>
+      </div>
+    </div>
+    <div class="card accent" style="margin-top:1rem">
+      <h4>🎮 在试错中学习</h4>
+      <p>学骑车、学打游戏——没人告诉你每一步该怎么做，你做对了有奖励（骑稳了/得分了），做错了有惩罚（摔倒了/游戏结束），在反复尝试中学会。</p>
+      <p style="margin-top:0.8rem"><strong style="color:var(--accent3)">→ 对应强化学习</strong></p>
+    </div>
+    <div class="hbox">
+      <h4>🧠 直觉建立</h4>
+      <p>机器的学习方式和人类学习高度相似！这三种场景对应了机器学习的三大基本范式。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">5 / 30</div>
+  <div class="slide-content">
+    <h1 class="st">机器学习分类总览</h1>
+    <h3 class="sub">按"监督程度"（反馈方式）划分——最核心的分类维度</h3>
+    <div class="flow" style="margin:2rem 0;flex-direction:column;gap:1.5rem;align-items:stretch">
+      <div style="display:flex;gap:1.5rem">
+        <div class="three-type-card type-supervised" style="flex:1">
+          <h3 style="color:var(--accent);margin-bottom:0.8rem">🏷️ 监督学习</h3>
+          <p style="color:var(--muted);font-size:0.95rem">训练数据有正确答案（标签）<br>像有老师手把手教</p>
+          <div class="tags" style="justify-content:center;margin-top:1rem">
+            <span class="tag">分类</span><span class="tag">回归</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:1.5rem">
+        <div class="three-type-card type-unsupervised" style="flex:1">
+          <h3 style="color:var(--warning);margin-bottom:0.8rem">🔍 非监督学习</h3>
+          <p style="color:var(--muted);font-size:0.95rem">没有正确答案，自己发现结构<br>像没人教自己观察总结</p>
+          <div class="tags" style="justify-content:center;margin-top:1rem">
+            <span class="tag w">聚类</span><span class="tag w">降维</span><span class="tag w">异常检测</span>
+          </div>
+        </div>
+        <div class="three-type-card type-reinforcement" style="flex:1">
+          <h3 style="color:var(--accent3);margin-bottom:0.8rem">🎮 强化学习</h3>
+          <p style="color:var(--muted);font-size:0.95rem">在环境中试错，奖励惩罚学习<br>像学骑车在实践中摸索</p>
+          <div class="tags" style="justify-content:center;margin-top:1rem">
+            <span class="tag pi">策略学习</span><span class="tag pi">试错</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>📌 记住这个分类</h4>
+      <p>这是机器学习领域最基本、最常用的分类框架。除了这三大类，还有半监督学习、自监督学习等"混血"类型，但本质都是这三者的组合。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">6 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">三大类型一览图</h2>
+    <h3 class="sub">从"有没有老师教"这个角度直观理解</h3>
+    <div class="flow" style="margin:2rem 0">
+      <div class="flow-node hl" style="min-width:200px;padding:1.5rem">
+        <div style="font-size:2rem;margin-bottom:0.5rem">👨‍🏫</div>
+        <strong style="color:var(--accent)">监督学习</strong><br>
+        <small style="color:var(--muted)">老师给标准答案</small>
+      </div>
+      <div class="flow-arrow" style="font-size:2rem">|</div>
+      <div class="flow-node" style="min-width:200px;padding:1.5rem;border-color:rgba(251,191,36,0.3)">
+        <div style="font-size:2rem;margin-bottom:0.5rem">📖</div>
+        <strong style="color:var(--warning)">非监督学习</strong><br>
+        <small style="color:var(--muted)">自学找规律</small>
+      </div>
+      <div class="flow-arrow" style="font-size:2rem">|</div>
+      <div class="flow-node" style="min-width:200px;padding:1.5rem;border-color:rgba(192,132,252,0.3)">
+        <div style="font-size:2rem;margin-bottom:0.5rem">🏋️</div>
+        <strong style="color:var(--accent3)">强化学习</strong><br>
+        <small style="color:var(--muted)">奖惩中摸索</small>
+      </div>
+    </div>
+    <div class="three-col">
+      <div class="hbox" style="margin:0">
+        <h4>有标签</h4>
+        <p>每个训练样本都有对应的正确答案，模型直接学习"输入→输出"的映射。</p>
+      </div>
+      <div class="hbox warn" style="margin:0">
+        <h4>无标签</h4>
+        <p>只有输入数据，没有任何答案，模型自己发现数据内在的结构和模式。</p>
+      </div>
+      <div class="hbox pink" style="margin:0">
+        <h4>延迟奖励</h4>
+        <p>没有即时答案，做对了给奖励、做错了给惩罚，在反复试错中学习策略。</p>
+      </div>
+    </div>
+    <div class="hbox purple">
+      <h4>🔑 核心区分点："答案"的形式</h4>
+      <p>区分三者最简单的方法就是问：训练时有没有"正确答案"？答案是什么形式？是直接给标签？还是做完才给奖励？还是根本不给答案？</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">7 / 30</div>
+  <div class="slide-content">
+    <h1 class="st">什么是"标签"(Label)？</h1>
+    <h3 class="sub">理解标签，是理解监督vs非监督的关键</h3>
+    <div class="vs">
+      <div class="vs-side vs-left">
+        <h3 style="color:var(--success);margin-bottom:1rem">✅ 有标签 = 有答案</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <p style="margin-bottom:0.8rem"><strong>例子1：垃圾邮件分类</strong></p>
+          <ul style="font-size:0.9rem">
+            <li>邮件内容："恭喜您中奖了！点击领取..."</li>
+            <li><strong style="color:var(--success)">标签：垃圾邮件 ✓</strong></li>
+          </ul>
+          <p style="margin:1rem 0 0.8rem"><strong>例子2：房价预测</strong></p>
+          <ul style="font-size:0.9rem">
+            <li>房屋特征：100平、3室、市中心...</li>
+            <li><strong style="color:var(--success)">标签：500万元 ✓</strong></li>
+          </ul>
+        </div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side vs-right">
+        <h3 style="color:var(--muted);margin-bottom:1rem">❓ 无标签 = 没答案</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <p style="margin-bottom:0.8rem"><strong>例子1：客户分群</strong></p>
+          <ul style="font-size:0.9rem">
+            <li>客户数据：消费记录、浏览行为...</li>
+            <li><strong style="color:var(--muted)">标签：？？？</strong></li>
+          </ul>
+          <p style="margin:1rem 0 0.8rem"><strong>例子2：新闻分类</strong></p>
+          <ul style="font-size:0.9rem">
+            <li>新闻内容：一堆文字文章</li>
+            <li><strong style="color:var(--muted)">标签：？？？</strong></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="formula" style="font-size:1rem">
+      <strong>标签(Label) = 我们希望模型学习预测的<strong style="color:var(--success)">正确答案</strong></strong>
+      <span class="desc">在监督学习中，训练数据的每一个样本都由 (特征X, 标签y) 组成。模型的目标就是学习从 X 到 y 的映射函数 f: X → y。</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">8 / 30</div>
+  <div class="slide-content">
+    <h1 class="st">🏷️ 监督学习详解</h1>
+    <h3 class="sub">Supervised Learning —— 目前工业界应用最广泛的范式</h3>
+    <div class="card accent" style="margin-bottom:1.5rem">
+      <h4>📖 定义</h4>
+      <p>监督学习是从<strong style="color:var(--accent)">标注数据</strong>中学习模型的机器学习方法。训练数据中每个样本都包含输入特征和对应的正确输出（标签），模型通过学习这些"输入-答案"对，学会对新的未知输入做出预测。</p>
+    </div>
+    <div class="flow">
+      <div class="flow-node">📥 输入数据 X</div>
+      <div class="flow-arrow">+</div>
+      <div class="flow-node hl">🏷️ 正确标签 y</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:150px">🧠 训练模型</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">🔮 预测新数据</div>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="hbox success">
+        <h4>👨‍🏫 为什么叫"监督"？</h4>
+        <p>可以想象有一个"老师"在监督整个学习过程——老师提前知道正确答案，模型每做一次预测，老师就告诉它："你答对了"或"你答错了，正确答案应该是这个"，模型根据反馈调整自己。</p>
+      </div>
+      <div class="hbox">
+        <h4>📊 数据格式</h4>
+        <p>训练集：{(x₁,y₁), (x₂,y₂), ..., (xₙ,yₙ)}<br>其中xᵢ是输入特征，yᵢ是对应的标签（正确答案）。<br>目标：学到 f(x) ≈ y 的映射关系。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">9 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">监督学习：像有老师指导</h2>
+    <h3 class="sub">做习题→对答案→改错，和你准备考试一模一样！</h3>
+    <div class="flow" style="margin:2rem 0">
+      <div class="flow-node">📝 做练习题</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="color:var(--success)">✅ 对照答案</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="color:var(--warning)">❌ 知道错在哪</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="color:var(--accent)">🔄 调整改进</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl">🎯 考试考好</div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h4>👨‍🎓 学生备考</h4>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>做大量练习题（训练数据）</li>
+          <li>每道题都有标准答案（标签）</li>
+          <li>做完对答案，算得分（损失函数）</li>
+          <li>做错了就回头改，理解正确解法（调整参数）</li>
+          <li>反复练习直到掌握（模型收敛）</li>
+          <li><strong>最终目标：高考考场上遇到新题也会做（泛化能力）</strong></li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <h4>🤖 监督学习</h4>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>输入大量训练样本（练习题）</li>
+          <li>每个样本都有正确标签（标准答案）</li>
+          <li>模型做预测，计算预测值与真实标签的差距（损失函数）</li>
+          <li>根据误差调整模型内部参数（梯度下降）</li>
+          <li>重复多轮直到误差很小（训练完成）</li>
+          <li><strong>最终目标：新的没见过的数据也能预测准确（泛化）</strong></li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox purple">
+      <h4>💡 记住这个类比</h4>
+      <p>监督学习的过程和你准备考试几乎完全一样！这个直觉非常重要——模型就是那个备考的学生，目标是在"新题"（测试数据）上考好，而不是只会背"练习题"（过拟合）。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">10 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">监督学习的两类问题</h2>
+    <h3 class="sub">根据标签y的类型不同，监督学习分为两大阵营</h3>
+    <div class="vs">
+      <div class="vs-side vs-left">
+        <h3 style="color:var(--warning);margin-bottom:1rem">🏷️ 分类问题</h3>
+        <p style="font-size:2rem;font-weight:800;color:var(--warning);margin-bottom:1rem">离散类别</p>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <p>输出是<strong>有限个离散的类别</strong></p>
+          <ul style="font-size:0.9rem">
+            <li>是/不是（二分类）</li>
+            <li>猫/狗/鸟（多分类）</li>
+            <li>答案是一个"类别"</li>
+          </ul>
+        </div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side vs-right">
+        <h3 style="color:var(--accent);margin-bottom:1rem">📈 回归问题</h3>
+        <p style="font-size:2rem;font-weight:800;color:var(--accent);margin-bottom:1rem">连续数值</p>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <p>输出是<strong>连续的实数值</strong></p>
+          <ul style="font-size:0.9rem">
+            <li>价格：500万、320万...</li>
+            <li>温度：23.5℃、18.2℃...</li>
+            <li>答案是一个"数字"</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>🤔 怎么快速区分？</h4>
+      <p>问自己一个问题：输出的结果之间有没有"顺序"和"大小"关系？<br>• "猫"和"狗"之间没有谁大谁小——这是<strong style="color:var(--warning)">分类</strong><br>• 房价500万比300万贵，有大小关系——这是<strong style="color:var(--accent)">回归</strong></p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">11 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">分类问题：输出离散类别</h2>
+    <h3 class="sub">Classification —— 预测"属于哪一类"</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="card-icon">📧</div>
+        <h4>垃圾邮件检测</h4>
+        <p><strong style="color:var(--warning)">二分类问题</strong></p>
+        <p style="margin-top:0.5rem">输入：邮件内容<br>输出：垃圾邮件 / 正常邮件</p>
+        <div class="tags"><span class="tag w">是/否</span></div>
+      </div>
+      <div class="card accent">
+        <div class="card-icon">🏥</div>
+        <h4>肿瘤诊断</h4>
+        <p><strong style="color:var(--danger)">医疗领域</strong></p>
+        <p style="margin-top:0.5rem">输入：患者检查指标<br>输出：良性 / 恶性</p>
+        <div class="tags"><span class="tag r">生死攸关</span></div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🐱</div>
+        <h4>图像识别</h4>
+        <p><strong style="color:var(--accent2)">多分类问题</strong></p>
+        <p style="margin-top:0.5rem">输入：图片像素<br>输出：猫/狗/鸟/车/人...</p>
+        <div class="tags"><span class="tag p">千类</span></div>
+      </div>
+    </div>
+    <div class="body">
+      <p><strong>分类问题的特点：</strong></p>
+      <ul>
+        <li>输出是离散的、有限的类别集合</li>
+        <li>二分类（是/否）是最基础、最常见的形式</li>
+        <li>多分类可以转化为多个二分类问题解决</li>
+        <li>模型通常输出"属于每个类别的概率"，取概率最大的作为预测结果</li>
+      </ul>
+    </div>
+    <div class="hbox">
+      <h4>🎯 分类问题评估指标</h4>
+      <p>准确率(Accuracy)、精确率(Precision)、召回率(Recall)、F1分数、AUC-ROC等——后面会详细讲。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">12 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">回归问题：输出连续数值</h2>
+    <h3 class="sub">Regression —— 预测"具体是多少"</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="card-icon">🏠</div>
+        <h4>房价预测</h4>
+        <p><strong style="color:var(--success)">经典回归问题</strong></p>
+        <p style="margin-top:0.5rem">输入：面积、卧室数、位置...<br>输出：房屋价格（万元）</p>
+        <div class="tags"><span class="tag g">连续值</span></div>
+      </div>
+      <div class="card accent">
+        <div class="card-icon">🌡️</div>
+        <h4>天气预测</h4>
+        <p><strong style="color:var(--accent)">时间序列</strong></p>
+        <p style="margin-top:0.5rem">输入：历史气象数据<br>输出：明天气温（℃）</p>
+        <div class="tags"><span class="tag">23.5°C</span></div>
+      </div>
+      <div class="card">
+        <div class="card-icon">💰</div>
+        <h4>销售额预测</h4>
+        <p><strong style="color:var(--warning)">商业应用</strong></p>
+        <p style="margin-top:0.5rem">输入：广告投入、季节因素...<br>输出：下月销售额（万元）</p>
+        <div class="tags"><span class="tag w">预测</span></div>
+      </div>
+    </div>
+    <div class="body">
+      <p><strong>回归问题的特点：</strong></p>
+      <ul>
+        <li>输出是连续的实数值，理论上可以取某个范围内的任意值</li>
+        <li>预测值和真实值之间的"差"有意义（差5万就是差5万）</li>
+        <li>线性回归是最基础、最经典的回归算法（也是我们后面第一个要学的算法！）</li>
+        <li>生活中的"预测多少"问题，大多是回归问题</li>
+      </ul>
+    </div>
+    <div class="hbox success">
+      <h4>📐 回归问题评估指标</h4>
+      <p>均方误差(MSE)、平均绝对误差(MAE)、R²决定系数等——衡量预测值和真实值"差多少"。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">13 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">分类 vs 回归 对比表</h2>
+    <h3 class="sub">一张表彻底分清两类监督学习问题</h3>
+    <table class="cmp">
+      <tr>
+        <th style="width:18%">对比维度</th>
+        <th style="width:41%">🏷️ 分类 (Classification)</th>
+        <th style="width:41%">📈 回归 (Regression)</th>
+      </tr>
+      <tr>
+        <td><strong>输出类型</strong></td>
+        <td><strong style="color:var(--warning)">离散类别</strong>（有限个取值）</td>
+        <td><strong style="color:var(--accent)">连续数值</strong>（无限个可能取值）</td>
+      </tr>
+      <tr>
+        <td><strong>核心问题</strong></td>
+        <td>"这是什么？""属于哪一类？"</td>
+        <td>"是多少？""具体数值是？"</td>
+      </tr>
+      <tr>
+        <td><strong>标签示例</strong></td>
+        <td>{猫, 狗, 鸟}, {垃圾, 正常}, {0,1,2,3...}</td>
+        <td>500万, 23.5℃, 75kg, 95分</td>
+      </tr>
+      <tr>
+        <td><strong>输出之间</strong></td>
+        <td>无大小顺序关系（猫≠比狗"大"）</td>
+        <td>有大小顺序关系（500万 > 300万）</td>
+      </tr>
+      <tr>
+        <td><strong>模型输出</strong></td>
+        <td>通常输出各类别概率，取最大者</td>
+        <td>直接输出一个实数值</td>
+      </tr>
+      <tr>
+        <td><strong>损失函数</strong></td>
+        <td>交叉熵损失 (Cross-Entropy)</td>
+        <td>均方误差 (MSE)</td>
+      </tr>
+      <tr>
+        <td><strong>评估指标</strong></td>
+        <td>准确率、精确率、召回率、F1、AUC</td>
+        <td>MSE、MAE、RMSE、R²</td>
+      </tr>
+      <tr>
+        <td><strong>典型算法</strong></td>
+        <td>逻辑回归、SVM、决策树、随机森林、神经网络</td>
+        <td>线性回归、岭回归、Lasso、决策树、神经网络</td>
+      </tr>
+    </table>
+    <div class="hbox warn">
+      <h4>⚠️ 注意：逻辑回归是分类算法！</h4>
+      <p>虽然名字叫"回归"，但逻辑回归(Logistic Regression)是用来做<strong>二分类</strong>的！这是初学者最容易搞混的一个点，后面会专门讲。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">14 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">监督学习代表算法一览</h2>
+    <h3 class="sub">从简单到复杂，这些都是工业界常用的监督学习算法</h3>
+    <div class="flow" style="margin:2rem 0;flex-direction:column;gap:1rem;align-items:stretch">
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem">
+        <span style="font-size:1.5rem">📏</span>
+        <div>
+          <strong>线性回归 (Linear Regression)</strong>
+          <span style="color:var(--muted);margin-left:1rem">最简单的回归算法，拟合一条直线，所有算法的基础</span>
+        </div>
+        <span class="tag g" style="margin-left:auto">第4集讲</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem">
+        <span style="font-size:1.5rem">📊</span>
+        <div>
+          <strong>逻辑回归 (Logistic Regression)</strong>
+          <span style="color:var(--muted);margin-left:1rem">最基础的二分类算法，不是回归是分类！</span>
+        </div>
+        <span class="tag g" style="margin-left:auto">第5集讲</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem">
+        <span style="font-size:1.5rem">🌳</span>
+        <div>
+          <strong>决策树 & 随机森林 (Decision Tree / Random Forest)</strong>
+          <span style="color:var(--muted);margin-left:1rem">基于规则的树模型，解释性强，表格数据利器</span>
+        </div>
+        <span class="tag p" style="margin-left:auto">进阶</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem">
+        <span style="font-size:1.5rem">📐</span>
+        <div>
+          <strong>支持向量机 (SVM)</strong>
+          <span style="color:var(--muted);margin-left:1rem">最大化分类间隔，小样本表现好</span>
+        </div>
+        <span class="tag p" style="margin-left:auto">进阶</span>
+      </div>
+      <div class="flow-node hl" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem">
+        <span style="font-size:1.5rem">🧠</span>
+        <div>
+          <strong>神经网络 / 深度学习 (Neural Networks)</strong>
+          <span style="color:var(--muted);margin-left:1rem">最强大的模型，CV/NLP/大模型都靠它</span>
+        </div>
+        <span class="tag pi" style="margin-left:auto">高级</span>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🗺️ 课程路线</h4>
+      <p>我们会从<strong>线性回归</strong>开始，逐个讲解这些经典算法，每个算法都讲清楚核心思想、数学推导、代码实现。先把基础打牢，再学复杂模型。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">15 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">监督学习典型应用场景</h2>
+    <h3 class="sub">你每天都在被监督学习算法服务着</h3>
+    <div class="two-col">
+      <div>
+        <div class="card" style="margin-bottom:1rem">
+          <h4>👤 人脸识别 / 图像分类</h4>
+          <p>手机解锁、相册自动分类、自动驾驶识别行人车辆……训练时每张图片都标好了"这是谁""这是什么"。</p>
+        </div>
+        <div class="card" style="margin-bottom:1rem">
+          <h4>📧 垃圾邮件过滤</h4>
+          <p>邮箱自动把垃圾邮件挪到垃圾筒——模型在大量人工标注过的"垃圾/正常"邮件上训练出来。</p>
+        </div>
+        <div class="card">
+          <h4>💳 信用评分 / 风控</h4>
+          <p>银行判断给不给你贷款、额度多少——根据历史还款数据（谁还了、谁没还）训练模型预测违约风险。</p>
+        </div>
+      </div>
+      <div>
+        <div class="card accent" style="margin-bottom:1rem">
+          <h4>📊 销量预测 / 库存管理</h4>
+          <p>电商预测每个商品明天卖多少，提前备货——用历史销量数据做回归预测。</p>
+        </div>
+        <div class="card" style="margin-bottom:1rem">
+          <h4>🎯 广告点击率预估 (CTR)</h4>
+          <p>你在网页上看到什么广告，是模型预测你"有多大概率点击这个广告"——这是互联网公司最赚钱的模型之一，本质是二分类（点/不点）。</p>
+        </div>
+        <div class="card">
+          <h4>🩺 医疗诊断辅助</h4>
+          <p>看CT片判断有没有肿瘤、看验血报告预测疾病风险——用大量医生标注过的病例训练。</p>
+        </div>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>💼 工业界地位</h4>
+      <p>目前商业应用中，<strong>90%以上</strong>的机器学习落地项目都是监督学习。因为它目标明确、效果可控、有成熟的方法论和工具链。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">16 / 30</div>
+  <div class="slide-content">
+    <h1 class="st">🔍 非监督学习详解</h1>
+    <h3 class="sub">Unsupervised Learning —— 让机器自己"找规律"</h3>
+    <div class="card" style="margin-bottom:1.5rem;border-color:rgba(251,191,36,0.3)">
+      <h4 style="color:var(--warning)">📖 定义</h4>
+      <p>非监督学习是从<strong style="color:var(--warning)">无标注数据</strong>中学习模式的机器学习方法。训练数据只有输入特征X，没有对应的标签y，也没人告诉模型"正确答案是什么"，模型需要自己发现数据中隐藏的结构、规律和关系。</p>
+    </div>
+    <div class="flow">
+      <div class="flow-node">📥 只有输入数据 X</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:150px;border-color:rgba(251,191,36,0.3);color:var(--warning)">🧠 自动发现模式</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="border-color:rgba(251,191,36,0.3)">💡 发现隐藏结构</div>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="hbox warn">
+        <h4>🤔 为什么叫"非监督"？</h4>
+        <p>没有"老师"在旁边告诉你答案对错了，就像给你一堆东西，没人告诉你怎么分类，你自己观察发现："哦，这些圆的是一类，那些方的是一类"——完全靠自己观察总结。</p>
+      </div>
+      <div class="hbox">
+        <h4>📊 数据格式</h4>
+        <p>训练集：{x₁, x₂, ..., xₙ}<br>只有x，没有y！<br>目标：发现数据的内在结构（聚类、降维、概率分布等）。</p>
+      </div>
+    </div>
+    <div class="hbox purple">
+      <h4>💡 非监督学习的价值</h4>
+      <p>现实世界中，绝大多数数据都是没有标签的——标注数据昂贵又费时。非监督学习可以直接利用海量无标注数据，常用来做<strong>数据分析、特征工程、预处理</strong>。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">17 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">非监督学习：自己发现结构</h2>
+    <h3 class="sub">给你一堆东西，你会怎么整理？</h3>
+    <div class="card" style="margin-bottom:1.5rem">
+      <h4>🎨 想象一下这个场景：</h4>
+      <p>给你一箱子各种颜色、各种形状的积木，没人告诉你应该怎么分，你会怎么做？</p>
+      <ul style="color:var(--muted);font-size:0.95rem;margin-top:0.8rem">
+        <li>你可能按颜色分：红色一堆、蓝色一堆、黄色一堆</li>
+        <li>你可能按形状分：方块一堆、圆球一堆、三角一堆</li>
+        <li>你可能按大小分：大的一堆、小的一堆</li>
+        <li>不管怎么分，都是你自己发现的"相似性"——这就是非监督学习在做的事！</li>
+      </ul>
+    </div>
+    <div class="body">
+      <p><strong>非监督学习主要解决三类问题：</strong></p>
+      <ul>
+        <li><strong style="color:var(--warning)">聚类 (Clustering)</strong>——把相似的东西自动分到一组</li>
+        <li><strong style="color:var(--accent2)">降维 (Dimensionality Reduction)</strong>——把高维数据压缩到低维，方便可视化和处理</li>
+        <li><strong style="color:var(--danger)">异常检测 (Anomaly Detection)</strong>——找出和大多数数据"不一样"的异常点</li>
+      </ul>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 和监督学习的本质区别</h4>
+      <p>监督学习有明确的"对错"标准（答案就是标准），而非监督学习<strong>没有客观的"对"或"错"</strong>——分成几类合理？怎么分更好？往往取决于具体场景和目标，带有一定主观性。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">18 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">聚类(Clustering)：相似的分到一组</h2>
+    <h3 class="sub">"物以类聚，人以群分"——最经典的非监督学习任务</h3>
+    <div class="formula" style="font-size:1.1rem">
+      <strong>聚类的目标：<br>让<strong style="color:var(--warning)">同一组内</strong>的样本尽可能相似<br>让<strong style="color:var(--accent)">不同组之间</strong>的样本尽可能不同</strong>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h4>🎯 核心思想</h4>
+        <p>算法自动计算样本之间的"距离"或"相似度"，把距离近的归为一类。</p>
+        <p style="margin-top:0.8rem">注意：聚类不会告诉你"这一类叫什么名字"，它只告诉你"这些东西比较像"——类别名字需要人来解读。</p>
+      </div>
+      <div class="card accent">
+        <h4>📌 最经典算法：K-Means</h4>
+        <p>K-Means是最简单、最常用的聚类算法：</p>
+        <ul style="color:var(--muted);font-size:0.9rem;margin-top:0.5rem">
+          <li>先指定要分成K类</li>
+          <li>随机选K个中心点</li>
+          <li>迭代：每个点归到最近中心 → 重新计算中心</li>
+          <li>直到中心点不再变化，聚类完成</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🆚 聚类 vs 分类</h4>
+      <p><strong>分类</strong>是监督学习：提前知道有几类、每类是什么，目标是把新样本分到已有类别中。<br><strong>聚类</strong>是是非监督学习：提前不知道有几类、也不知道类是什么，目标是自动发现分组结构。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">19 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">聚类案例</h2>
+    <h3 class="sub">聚类在商业和数据分析中非常实用</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="card-icon">👥</div>
+        <h4>客户分群</h4>
+        <p><strong style="color:var(--success)">用户画像/精准营销</strong></p>
+        <p style="margin-top:0.5rem">根据消费行为把客户自动分成几类：高价值客户、价格敏感客户、流失风险客户...然后针对不同群体采取不同营销策略。</p>
+        <div class="tags"><span class="tag g">电商/零售</span></div>
+      </div>
+      <div class="card accent">
+        <div class="card-icon">📰</div>
+        <h4>新闻分类</h4>
+        <p><strong style="color:var(--accent)">内容组织</strong></p>
+        <p style="margin-top:0.5rem">给你10万篇新闻文章，没人标注类别，聚类算法自动把相似主题的文章聚到一起：财经类、体育类、娱乐类、科技类...</p>
+        <div class="tags"><span class="tag">内容平台</span></div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🖼️</div>
+        <h4>图像分割</h4>
+        <p><strong style="color:var(--accent3)">计算机视觉</strong></p>
+        <p style="margin-top:0.5rem">把一张图片中颜色/纹理相似的像素聚成区域：前景/背景分离、医学影像中分割肿瘤区域、卫星图像识别地物。</p>
+        <div class="tags"><span class="tag pi">CV</span></div>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>🔬 其他聚类应用</h4>
+      <p>社交网络分析（发现社区/圈子）、基因序列分析（发现相似基因家族）、推荐系统（给相似用户推荐相似物品）、异常检测前的预处理。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">20 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">降维：PCA——高维数据压缩</h2>
+    <h3 class="sub">Dimensionality Reduction —— 把复杂数据变简单，还不丢失关键信息</h3>
+    <div class="card" style="margin-bottom:1.5rem">
+      <h4>❓ 什么是"维数灾难"？</h4>
+      <p>现实数据往往有成百上千甚至上万个特征（维度）：一张256×256的图片有65536个像素维度！<br>
+      维度太高会导致：数据稀疏、距离计算失效、模型训练慢、容易过拟合、无法可视化。<br>
+      <strong style="color:var(--accent)">降维就是在尽量保留信息的前提下，把数据从高维压缩到低维。</strong></p>
+    </div>
+    <div class="two-col">
+      <div class="hbox purple">
+        <h4>📐 PCA（主成分分析）</h4>
+        <p>最经典的降维算法，核心思想：<br>
+        找到数据中方差最大的方向（主成分），把数据投影到这些方向上，用少数几个新特征代替原来的成百上千个特征，同时保留最多的信息。</p>
+      </div>
+      <div class="hbox success">
+        <h4>🎨 可视化是降维的一大用途</h4>
+        <p>人只能理解2D/3D。把几百维的数据用PCA降到2维，就能画成散点图，直观看出数据有没有聚类、有没有离群点，对理解数据非常有帮助！</p>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>💡 生活中的降维类比</h4>
+      <p>你给朋友描述一个人："男，30岁左右，戴眼镜，穿黑T恤"——你没有把这个人所有像素信息都描述，而是提取了最关键的"特征"。这就是降维的思想：保留最重要的信息，扔掉冗余。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">21 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">非监督学习其他任务</h2>
+    <h3 class="sub">聚类和降维之外，还有这些重要方向</h3>
+    <div class="two-col">
+      <div class="card" style="margin-bottom:1.5rem;border-color:rgba(248,113,113,0.3)">
+        <h4 style="color:var(--danger)">🚨 异常检测 (Anomaly Detection)</h4>
+        <p><strong>目标：找出和大多数数据"不一样"的异常点/离群点</strong></p>
+        <ul style="color:var(--muted);font-size:0.95rem;margin-top:0.8rem">
+          <li><strong>信用卡欺诈检测</strong>——大多数交易是正常的，极少数盗刷交易模式异常，自动揪出来</li>
+          <li><strong>网络入侵检测</strong>——正常访问是规律的，黑客攻击行为是异常的</li>
+          <li><strong>工业缺陷检测</strong>——产品大多是合格的，有缺陷的产品是异常</li>
+          <li><strong>服务器监控</strong>——CPU/内存突然飙高可能是故障</li>
+        </ul>
+        <div class="tags" style="margin-top:1rem"><span class="tag r">安全/风控</span></div>
+      </div>
+      <div class="card" style="margin-bottom:1.5rem;border-color:rgba(129,140,248,0.3)">
+        <h4 style="color:var(--accent2)">🛒 关联规则挖掘 (Association Rule)</h4>
+        <p><strong>目标：发现数据中"经常一起出现"的模式</strong></p>
+        <ul style="color:var(--muted);font-size:0.95rem;margin-top:0.8rem">
+          <li><strong>经典案例：啤酒与尿布</strong>——超市发现买尿布的男人经常顺便买啤酒，把它们放一起增加销量</li>
+          <li><strong>电商推荐</strong>"买了A的人也经常买B"</li>
+          <li><strong>购物篮分析</strong>——哪些商品经常被同时购买</li>
+          <li><strong>医疗诊断</strong>——哪些症状经常一起出现对应什么病</li>
+        </ul>
+        <div class="tags" style="margin-top:1rem"><span class="tag p">零售/电商</span></div>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>🧩 其他非监督任务</h4>
+      <p>密度估计（估计数据的概率分布）、主题模型（LDA，从文本中发现抽象主题）、生成模型（GAN/VAE，学习生成新数据）等。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">22 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">非监督学习代表算法</h2>
+    <h3 class="sub">这些是你需要知道的非监督学习经典算法</h3>
+    <div class="three-col" style="margin:2rem 0">
+      <div class="card">
+        <div class="card-icon" style="color:var(--warning)">🎯</div>
+        <h4>K-Means</h4>
+        <p>最经典、最常用的聚类算法，简单高效，适合大规模数据。我们会在进阶部分讲解。</p>
+        <div class="tags"><span class="tag w">聚类</span></div>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent2)">📐</div>
+        <h4>PCA</h4>
+        <p>主成分分析，最基础的降维算法，线性降维的标杆，数学非常优美。</p>
+        <div class="tags"><span class="tag p">降维</span></div>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--danger)">🚨</div>
+        <h4>Isolation Forest</h4>
+        <p>孤立森林，高效的异常检测算法，专门用来"孤立"异常点，工业界常用。</p>
+        <div class="tags"><span class="tag r">异常检测</span></div>
+      </div>
+    </div>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-icon">🌳</div>
+        <h4>层次聚类</h4>
+        <p>不需要预先指定K，一层一层合并/分裂，形成树状结构（系统树图），适合小数据。</p>
+        <div class="tags"><span class="tag w">聚类</span></div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎲</div>
+        <h4>DBSCAN</h4>
+        <p>基于密度的聚类，可以发现任意形状的簇，还能自动识别噪声点，不需要指定K。</p>
+        <div class="tags"><span class="tag w">聚类</span></div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧬</div>
+        <h4>t-SNE / UMAP</h4>
+        <p>非线性降维算法，专门用于高维数据可视化，把高维数据嵌入2D/3D，效果比PCA更"好看"。</p>
+        <div class="tags"><span class="tag p">可视化</span></div>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>📌 学习建议</h4>
+      <p>非监督学习在入门阶段用得相对少一些，K-Means和PCA了解核心思想即可。我们的重点还是放在监督学习的经典算法上，先把监督学习吃透。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">23 / 30</div>
+  <div class="slide-content">
+    <h1 class="st">🎮 强化学习简介</h1>
+    <h3 class="sub">Reinforcement Learning —— 最"酷"、也最有想象力的机器学习范式</h3>
+    <div class="card" style="margin-bottom:1.5rem;border-color:rgba(192,132,252,0.3)">
+      <h4 style="color:var(--accent3)">📖 定义</h4>
+      <p>强化学习是<strong style="color:var(--accent3)">智能体(Agent)在与环境(Environment)的交互中，通过不断试错，根据奖励(Reward)信号学习最优行为策略</strong>的机器学习方法。没有现成的标签告诉你每一步对不对，只有做完之后才得到奖励或惩罚，目标是最大化长期累计奖励。</p>
+    </div>
+    <div class="flow">
+      <div class="flow-node" style="min-width:150px;border-color:rgba(192,132,252,0.3);color:var(--accent3)">🤖 智能体 Agent</div>
+      <div class="flow-arrow" style="color:var(--accent3)">做出动作 Action →</div>
+      <div class="flow-node" style="min-width:150px;border-color:rgba(192,132,252,0.3)">🌍 环境 Environment</div>
+      <div class="flow-arrow" style="color:var(--success)">→ 返回状态+奖励 ←</div>
+      <div class="flow-node" style="min-width:150px;border-color:rgba(192,132,252,0.3);color:var(--accent3)">🎁 奖励 Reward</div>
+    </div>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="hbox pink">
+        <h4>🏋️ 为什么叫"强化"？</h4>
+        <p>心理学中的"操作性条件反射"：做对了给奖励（正强化），这个行为就会被加强；做错了给惩罚，这个行为就会被减弱。强化学习就是模拟这个过程。</p>
+      </div>
+      <div class="hbox">
+        <h4>🎯 和监督学习的区别</h4>
+        <p>没有即时的正确标签！你走一步没人告诉你"这步对/错"，直到最后游戏结束才知道赢了还是输了——奖励是延迟的，需要规划长远。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">24 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">强化学习：试错中学习</h2>
+    <h3 class="sub">学骑车、打游戏——都是典型的强化学习过程！</h3>
+    <div class="flow" style="margin:2rem 0">
+      <div class="flow-node" style="border-color:rgba(192,132,252,0.3)">🤔 观察当前状态</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="border-color:rgba(192,132,252,0.3)">🎮 选择一个动作</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="color:var(--danger)">😵 摔倒了！（惩罚）</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="color:var(--warning)">🔄 记住这个教训</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="color:var(--success)">✅ 下次换个动作</div>
+      <div class="flow-arrow" style="color:var(--muted)">循环千万次...</div>
+      <div class="flow-node hl" style="border-color:var(--accent3);background:rgba(192,132,252,0.1);color:var(--accent3)">🏆 学会了！</div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h4>🚲 学骑车的过程</h4>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>没人能精确告诉你"身体往左歪3.2度"</li>
+          <li>你骑上去，歪了、摔了——得到<strong style="color:var(--danger)">惩罚（疼）</strong></li>
+          <li>你调整身体，骑稳了几步——得到<strong style="color:var(--success)">奖励（没摔倒）</strong></li>
+          <li>反复试，你的大脑慢慢学会了在各种情况下怎么保持平衡</li>
+          <li>没有标准答案，只有"摔没摔"这个最终反馈</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <h4>🎮 玩超级马里奥</h4>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>向左走？向右走？跳？蹲？每一步都要选动作</li>
+          <li>吃到金币：+100分（<strong style="color:var(--success)">正奖励</strong>）</li>
+          <li>踩死乌龟：+200分（<strong style="color:var(--success)">正奖励</strong>）</li>
+          <li>掉进坑里：游戏结束（<strong style="color:var(--danger)">负奖励</strong>）</li>
+          <li>通关：+1000分（<strong style="color:var(--accent3)">超大奖励</strong>）</li>
+          <li>AI玩上亿次，自己摸索出最优通关路线</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox pink">
+      <h4>🔑 强化学习的核心难题</h4>
+      <p><strong>信用分配问题(Credit Assignment)</strong>：当你最后赢了游戏，之前这几百步中，到底哪些步骤是真正有用的？哪些是昏招但凑巧赢了？这需要聪明的算法来分配功劳。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">25 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">强化学习五大核心要素</h2>
+    <h3 class="sub">所有强化学习问题都可以抽象为这五个部分</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card" style="border-color:rgba(192,132,252,0.3)">
+        <div class="card-icon" style="color:var(--accent3)">🤖</div>
+        <h4>Agent 智能体</h4>
+        <p>做决策、学习的主体——也就是我们的"学习者"和"决策者"，比如下棋AI、自动驾驶汽车、游戏机器人。</p>
+      </div>
+      <div class="card" style="border-color:rgba(192,132,252,0.3)">
+        <div class="card-icon" style="color:var(--accent3)">🌍</div>
+        <h4>Environment 环境</h4>
+        <p>智能体所处的、与之交互的外部世界。环境会接收智能体的动作，返回新的状态和奖励。比如棋盘、游戏世界、真实道路。</p>
+      </div>
+      <div class="card" style="border-color:rgba(192,132,252,0.3)">
+        <div class="card-icon" style="color:var(--accent3)">📸</div>
+        <h4>State 状态</h4>
+        <p>当前环境的状态描述，也就是智能体看到的"局面"。比如当前棋盘布局、游戏画面、车辆位置速度。</p>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card accent" style="border-color:rgba(192,132,252,0.3)">
+        <div class="card-icon" style="color:var(--accent3)">🎮</div>
+        <h4>Action 动作</h4>
+        <p>智能体可以做的选择/操作。比如：左移/右移/跳、走哪步棋、踩油门/刹车/打方向。动作空间可以是离散的也可以是连续的。</p>
+      </div>
+      <div class="card" style="border-color:rgba(52,211,153,0.3)">
+        <div class="card-icon" style="color:var(--success)">🎁</div>
+        <h4>Reward 奖励</h4>
+        <p>环境给智能体的反馈信号——单步的即时奖励。做对了给正奖励，做错了给负奖励（惩罚）。智能体的唯一目标就是最大化长期累计奖励。</p>
+      </div>
+    </div>
+    <div class="hbox purple">
+      <h4>🔁 强化学习的循环</h4>
+      <p>Agent观察State → 选择Action → Env反馈新State + Reward → 循环往复。Agent在这个循环中不断学习"什么状态下做什么动作能拿到最多奖励"——这就是<strong>策略(Policy)</strong>。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">26 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">强化学习典型应用</h2>
+    <h3 class="sub">从打败世界冠军到改变世界，RL正在创造奇迹</h3>
+    <div class="two-col">
+      <div>
+        <div class="card" style="margin-bottom:1rem;border-color:rgba(192,132,252,0.3)">
+          <h4 style="color:var(--accent3)">♟️ AlphaGo / AlphaZero</h4>
+          <p>2016年击败李世石，2017年击败柯洁——AI第一次在围棋这个人类最复杂的棋类游戏上超越人类。AlphaZero甚至不用人类棋谱，完全靠自我对弈，几天就超越了人类几千年的围棋积累。</p>
+          <div class="tags"><span class="tag pi">DeepMind</span></div>
+        </div>
+        <div class="card" style="margin-bottom:1rem;border-color:rgba(192,132,252,0.3)">
+          <h4 style="color:var(--accent3)">🚗 自动驾驶</h4>
+          <p>自动驾驶的决策模块——什么时候变道、什么时候加速、遇到行人怎么处理——可以用强化学习在模拟环境中训练 billions of miles，学会安全驾驶策略。</p>
+          <div class="tags"><span class="tag pi">Tesla/Waymo</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:1rem;border-color:rgba(192,132,252,0.3)">
+          <h4 style="color:var(--accent3)">🎮 游戏AI</h4>
+          <p>OpenAI打Dota2的OpenAI Five、腾讯打王者荣耀的绝悟、DeepMind打星际争霸的AlphaStar——在复杂电竞游戏中击败职业选手，都靠强化学习。</p>
+          <div class="tags"><span class="tag pi">电竞</span></div>
+        </div>
+        <div class="card" style="margin-bottom:1rem;border-color:rgba(192,132,252,0.3)">
+          <h4 style="color:var(--accent3)">🤖 机器人控制</h4>
+          <p>让机器人学会走路、抓取物体、开门、做后空翻——波士顿动力的机器人、工业装配机器人，很多都是用强化学习训练的运动控制策略。</p>
+          <div class="tags"><span class="tag pi">机器人</span></div>
+        </div>
+        <div class="card" style="border-color:rgba(192,132,252,0.3)">
+          <h4 style="color:var(--accent3)">💡 其他应用</h4>
+          <p>推荐系统（长期用户 engagement）、资源调度（数据中心节能）、金融交易、药物分子设计、对话系统等。</p>
+        </div>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 强化学习的现状</h4>
+      <p>RL非常酷，做出了很多里程碑成果，但<strong>样本效率极低</strong>（需要玩几百万局游戏才能学会）、训练不稳定、复现困难，目前工业界落地比监督学习少很多。作为入门，了解核心概念即可。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">27 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">三大类型对比总结</h2>
+    <h3 class="sub">一张表彻底掌握机器学习三大范式的区别</h3>
+    <table class="cmp">
+      <tr>
+        <th style="width:14%">对比维度</th>
+        <th style="width:28.7%">🏷️ 监督学习</th>
+        <th style="width:28.7%">🔍 非监督学习</th>
+        <th style="width:28.7%">🎮 强化学习</th>
+      </tr>
+      <tr>
+        <td><strong>标签/反馈</strong></td>
+        <td style="color:var(--accent)"><strong>有完整标签</strong><br>每步都有正确答案</td>
+        <td style="color:var(--warning)"><strong>无标签</strong><br>没有任何答案</td>
+        <td style="color:var(--accent3)"><strong>延迟奖励</strong><br>只有最终奖惩</td>
+      </tr>
+      <tr>
+        <td><strong>学习方式</strong></td>
+        <td>跟着老师学，有例有答</td>
+        <td>自己观察，找规律</td>
+        <td>在环境中反复试错</td>
+      </tr>
+      <tr>
+        <td><strong>典型任务</strong></td>
+        <td>分类、回归</td>
+        <td>聚类、降维、异常检测</td>
+        <td>策略学习、序列决策</td>
+      </tr>
+      <tr>
+        <td><strong>数据格式</strong></td>
+        <td>(X, y) 对</td>
+        <td>只有 X</td>
+        <td>(状态, 动作, 奖励) 序列</td>
+      </tr>
+      <tr>
+        <td><strong>代表算法</strong></td>
+        <td>线性/逻辑回归、SVM、决策树、神经网络</td>
+        <td>K-Means、PCA、DBSCAN、Isolation Forest</td>
+        <td>Q-Learning、DQN、Policy Gradient、PPO</td>
+      </tr>
+      <tr>
+        <td><strong>应用场景</strong></td>
+        <td>识别、预测、分类——工业界最常用</td>
+        <td>数据分析、预处理、分群、异常检测</td>
+        <td>游戏AI、机器人、自动驾驶、决策问题</td>
+      </tr>
+      <tr>
+        <td><strong>成熟度</strong></td>
+        <td><strong style="color:var(--success)">非常成熟</strong><br>落地广泛</td>
+        <td><strong style="color:var(--warning)">比较成熟</strong><br>多作为辅助</td>
+        <td><strong style="color:var(--accent3)">正在发展</strong><br>落地相对少</td>
+      </tr>
+      <tr>
+        <td><strong>人类类比</strong></td>
+        <td>上课做习题对答案</td>
+        <td>自己观察总结分类</td>
+        <td>学骑车/学游泳</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">28 / 30</div>
+  <div class="slide-content">
+    <h1 class="st">如何选择合适的学习类型？</h1>
+    <h3 class="sub">拿到一个问题，先问自己这几个问题</h3>
+    <div class="flow" style="margin:2rem 0;flex-direction:column;gap:1.2rem;align-items:stretch">
+      <div class="flow-node hl" style="text-align:left;min-width:auto;padding:1.5rem">
+        <strong style="color:var(--accent);font-size:1.1rem">问题1：你有标注好的正确答案吗？</strong>
+        <p style="color:var(--muted);margin-top:0.5rem">✅ 有 → 优先考虑 <strong style="color:var(--accent)">监督学习</strong>（先判断是分类还是回归）<br>❌ 没有 → 继续往下看</p>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;padding:1.5rem;border-color:rgba(251,191,36,0.3)">
+        <strong style="color:var(--warning);font-size:1.1rem">问题2：你的目标是发现数据中的结构/模式吗？</strong>
+        <p style="color:var(--muted);margin-top:0.5rem">✅ 是（想分组、想压缩、想找异常）→ 用 <strong style="color:var(--warning)">非监督学习</strong><br>❌ 不是 → 继续往下看</p>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;padding:1.5rem;border-color:rgba(192,132,252,0.3)">
+        <strong style="color:var(--accent3);font-size:1.1rem">问题3：是需要做连续决策、在交互中学习吗？</strong>
+        <p style="color:var(--muted);margin-top:0.5rem">✅ 是（下棋、游戏、机器人控制、多步决策）→ 用 <strong style="color:var(--accent3)">强化学习</strong></p>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>💡 实用建议</h4>
+      <p><strong>现实中没有绝对的界限！</strong>很多复杂系统会混合使用多种范式：比如先用非监督学习做数据预处理和特征提取，再用监督学习做最终预测；大模型的预训练是自监督（类似非监督），微调是监督，对齐阶段用RLHF（强化学习从人类反馈）。</p>
+    </div>
+    <div class="hbox warn">
+      <h4>🔑 入门阶段建议</h4>
+      <p>先把<strong style="color:var(--accent)">监督学习</strong>学扎实！90%的入门项目和工业界落地都是监督学习。非监督学习了解核心思想即可，强化学习等基础打好了再探索。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">29 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">本课程内容安排说明</h2>
+    <h3 class="sub">我们会按什么顺序学习？</h3>
+    <div class="flow" style="margin:2rem 0;flex-direction:column;gap:1rem;align-items:stretch">
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem">
+        <span class="big-num" style="font-size:1.8rem;margin-bottom:0;width:60px">第1章</span>
+        <div>
+          <strong>基础概念篇（第1-3集）</strong>
+          <span style="color:var(--muted);margin-left:1rem">什么是智能、机器学习工作流程、机器学习三大类型</span>
+        </div>
+        <span class="tag g" style="margin-left:auto">✅ 正在进行</span>
+      </div>
+      <div class="flow-node hl" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem">
+        <span class="big-num" style="font-size:1.8rem;margin-bottom:0;width:60px">第2章</span>
+        <div>
+          <strong>监督学习经典算法（第4集起）</strong>
+          <span style="color:var(--muted);margin-left:1rem">线性回归 → 逻辑回归 → 决策树 → SVM → 神经网络 → 项目实战</span>
+        </div>
+        <span class="tag" style="margin-left:auto">🎯 重点！</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem">
+        <span class="big-num" style="font-size:1.8rem;margin-bottom:0;width:60px">第3章</span>
+        <div>
+          <strong>非监督学习 & 进阶主题</strong>
+          <span style="color:var(--muted);margin-left:1rem">K-Means聚类、PCA降维、模型评估、特征工程、集成学习</span>
+        </div>
+        <span class="tag p" style="margin-left:auto">进阶</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto;display:flex;align-items:center;gap:1rem">
+        <span class="big-num" style="font-size:1.8rem;margin-bottom:0;width:60px">第4章</span>
+        <div>
+          <strong>深度学习与前沿</strong>
+          <span style="color:var(--muted);margin-left:1rem">神经网络基础、CNN/RNN、Transformer、大模型入门、强化学习简介</span>
+        </div>
+        <span class="tag pi" style="margin-left:auto">展望</span>
+      </div>
+    </div>
+    <div class="hbox purple">
+      <h4>🗺️ 下集预告：第4集开始正式学算法！</h4>
+      <p>基础概念篇结束，下一集我们开始真正的算法学习——第一个算法就是<strong style="color:var(--success)">线性回归</strong>，这是所有机器学习算法的基石，也是最容易理解的一个。我们会从直觉→数学→代码，一步一步彻底搞懂。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第3集 · 机器学习三大类型</div>
+  <div class="slide-number">30 / 30</div>
+  <div class="slide-content">
+    <h2 class="st">本集小结</h2>
+    <h3 class="sub">恭喜你完成了第3集！来回顾核心要点</h3>
+    <div class="body">
+      <div class="hbox success">
+        <h4>🏷️ 标签(Label)是核心区分点</h4>
+        <p>有标签=有答案=监督学习；无标签=没答案=非监督学习；只有延迟奖惩=强化学习。</p>
+      </div>
+      <div class="hbox">
+        <h4>📊 监督学习是重点</h4>
+        <p>工业界应用最广(90%+)，分为分类（离散类别）和回归（连续数值）。线性/逻辑回归、决策树、SVM、神经网络都是监督算法。</p>
+      </div>
+      <div class="hbox warn">
+        <h4>🔍 非监督学习找结构</h4>
+        <p>聚类（物以类聚）、降维（压缩可视化）、异常检测（找不同），K-Means和PCA是代表算法，常用来做数据分析和预处理。</p>
+      </div>
+      <div class="hbox pink">
+        <h4>🎮 强化学习靠试错</h4>
+        <p>Agent在Environment中试错，通过Reward学习，AlphaGo、自动驾驶、游戏AI、机器人控制是典型应用。很酷但样本效率低，入门先了解即可。</p>
+      </div>
+      <div class="hbox purple">
+        <h4>🎯 学习路线</h4>
+        <p>接下来重点攻克监督学习经典算法，从线性回归开始，一个一个吃透——这是你成为机器学习工程师的必经之路！</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-content">
+    <h1>谢谢观看！</h1>
+    <p class="cover-sub">第3集 · 机器学习的三大类型 完<br><br>
+    <strong style="color:var(--accent)">第2章预告：线性回归——第一个机器学习算法</strong><br><br>
+    B站：机器学习入门教程系列 · BV13e41167ZS</p>
+    <div style="margin-top:2.5rem">
+      <a href="ppt-04.html" style="display:inline-flex;padding:16px 40px;background:linear-gradient(135deg,var(--success),var(--accent));color:white;border-radius:50px;text-decoration:none;font-weight:600;font-size:1.1rem;transition:transform .3s,box-shadow .3s;box-shadow:0 4px 20px rgba(52,211,153,0.3)">🚀 开始第2章学习</a>
+    </div>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag">监督学习</span>
+      <span class="tag w">非监督学习</span>
+      <span class="tag pi">强化学习</span>
+      <span class="tag g">分类/回归</span>
+      <span class="tag p">下集：线性回归</span>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+});
+</script>
+</body></html>

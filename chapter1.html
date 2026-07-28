@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第1章 机器学习基础概念 - ML学习站</title>
+  <style>
+    :root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--bg4:#334155;--ink:#f8fafc;--ink-muted:#cbd5e1;--muted:#94a3b8;--rule:rgba(56,189,248,0.15);--accent:#38bdf8;--accent2:#818cf8;--accent3:#c084fc;--accent-glow:rgba(56,189,248,0.25);--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace;--max:1100px;--radius:12px;--radius-lg:20px;--radius-xl:28px}
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{font-size:16px;scroll-behavior:smooth}
+    body{font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.7;overflow-x:hidden}
+    a{text-decoration:none;color:inherit}
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,14,26,0.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--rule);padding:0 2rem}
+    .navbar-inner{max-width:var(--max);margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+    .logo{display:flex;align-items:center;gap:10px;font-size:1.2rem;font-weight:700;color:var(--accent)}
+    .logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .nav-links{display:flex;gap:1.5rem;list-style:none;align-items:center}
+    .nav-links a{color:var(--muted);font-weight:500;font-size:0.9rem;transition:color .3s}
+    .nav-links a:hover,.nav-links a.active{color:var(--accent)}
+    .back-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:var(--bg3);border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;color:var(--ink-muted);transition:all .3s}
+    .back-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .chapter-hero{padding-top:100px;padding-bottom:3rem;background:linear-gradient(180deg,rgba(56,189,248,0.06) 0%,transparent 100%)}
+    .chapter-hero-inner{max-width:var(--max);margin:0 auto;padding:0 2rem}
+    .breadcrumb{font-size:0.85rem;color:var(--muted);margin-bottom:1.5rem;display:flex;gap:8px;align-items:center}
+    .breadcrumb a{color:var(--accent);transition:opacity .3s}
+    .breadcrumb a:hover{opacity:0.8}
+    .chapter-badge{display:inline-flex;padding:6px 14px;background:rgba(52,211,153,0.12);color:var(--success);border-radius:20px;font-size:0.8rem;font-weight:600;margin-bottom:1rem;border:1px solid rgba(52,211,153,0.2)}
+    .chapter-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.2;margin-bottom:1rem;letter-spacing:-0.02em}
+    .chapter-subtitle{font-size:1.1rem;color:var(--muted);max-width:700px;line-height:1.8}
+    .chapter-meta{display:flex;gap:2rem;margin-top:1.5rem;flex-wrap:wrap}
+    .meta-item{display:flex;align-items:center;gap:6px;font-size:0.9rem;color:var(--ink-muted)}
+    .video-nav{display:flex;gap:0.5rem;margin-top:2rem;flex-wrap:wrap}
+    .vnav-item{padding:8px 16px;background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius);font-size:0.85rem;color:var(--muted);cursor:pointer;transition:all .3s;font-family:var(--font);text-align:left}
+    .vnav-item:hover,.vnav-item.active{border-color:var(--accent);color:var(--accent);background:rgba(56,189,248,0.08)}
+    .vnav-item strong{display:block;color:var(--ink);font-size:0.82rem;margin-bottom:2px}
+    .vnav-item span{font-size:0.75rem}
+    .main{max-width:var(--max);margin:0 auto;padding:0 2rem}
+    .lesson{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+    .lesson:last-child{border-bottom:none}
+    .lesson-header{display:flex;align-items:flex-start;gap:1rem;margin-bottom:2rem}
+    .lesson-num{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--bg);position:relative}
+    .lesson-num.v2{background:linear-gradient(135deg,var(--accent2),var(--accent3))}
+    .lesson-num.v3{background:linear-gradient(135deg,var(--accent3),var(--success))}
+    .lesson-info h2{font-size:1.5rem;font-weight:700;margin-bottom:4px}
+    .lesson-info .lesson-dur{font-size:0.85rem;color:var(--muted)}
+    .video-wrapper{position:relative;width:100%;padding-bottom:56.25%;margin-bottom:2.5rem;background:var(--bg2);border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--rule)}
+    .video-wrapper iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+    .content-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem}
+    .content-card{background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius-lg);padding:1.75rem;transition:border-color .3s}
+    .content-card:hover{border-color:var(--accent)}
+    .content-card.full{grid-column:1/-1}
+    .card-tag{display:inline-block;padding:3px 10px;background:rgba(56,189,248,0.1);color:var(--accent);border-radius:6px;font-size:0.75rem;font-weight:600;margin-bottom:1rem}
+    .content-card h3{font-size:1.15rem;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+    .content-card p{font-size:0.92rem;color:var(--ink-muted);line-height:1.8;margin-bottom:0.8rem}
+    .content-card ul{list-style:none;padding:0}
+    .content-card li{padding:0.5rem 0;font-size:0.9rem;color:var(--ink-muted);display:flex;gap:10px;align-items:flex-start;line-height:1.7}
+    .content-card li::before{content:'▸';color:var(--accent);flex-shrink:0;margin-top:1px}
+    .key-point{background:rgba(56,189,248,0.06);border-left:3px solid var(--accent);border-radius:0 var(--radius) var(--radius) 0;padding:1.25rem 1.5rem;margin:1.5rem 0}
+    .key-point h4{color:var(--accent);font-size:0.95rem;margin-bottom:0.5rem;display:flex;align-items:center;gap:6px}
+    .key-point p{font-size:0.9rem;color:var(--ink-muted);line-height:1.8}
+    .formula-box{background:var(--bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1.25rem 1.5rem;margin:1rem 0;font-family:var(--mono);font-size:0.95rem;color:var(--accent);text-align:center;letter-spacing:0.02em;overflow-x:auto}
+    .compare-table{width:100%;border-collapse:collapse;margin:1rem 0}
+    .compare-table th,.compare-table td{padding:0.75rem 1rem;text-align:left;border-bottom:1px solid var(--rule);font-size:0.88rem}
+    .compare-table th{color:var(--accent);font-weight:600;background:var(--bg3)}
+    .compare-table td{color:var(--ink-muted)}
+    .compare-table tr:hover td{background:rgba(56,189,248,0.04)}
+    .diagram-box{background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius-lg);padding:2rem;margin:1.5rem 0}
+    .diagram-title{font-size:0.9rem;color:var(--muted);margin-bottom:1.5rem;text-align:center}
+    .ml-types{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+    .type-card{background:var(--bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1.5rem;text-align:center;transition:all .3s}
+    .type-card:hover{border-color:var(--accent);transform:translateY(-4px)}
+    .type-icon{font-size:2.5rem;margin-bottom:0.75rem}
+    .type-card h4{font-size:1rem;margin-bottom:0.5rem}
+    .type-card p{font-size:0.82rem;color:var(--muted);line-height:1.6}
+    .type-card .type-ex{font-size:0.78rem;color:var(--accent);margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--rule)}
+    .flow-diagram{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:1.5rem 0}
+    .flow-node{padding:0.8rem 1.2rem;background:var(--bg3);border:1px solid var(--rule);border-radius:var(--radius);font-size:0.88rem;text-align:center;min-width:100px}
+    .flow-node.highlight{border-color:var(--accent);background:rgba(56,189,248,0.08);color:var(--accent)}
+    .flow-arrow{color:var(--muted);font-size:1.5rem;padding:0 0.5rem}
+    .chapter-nav{display:flex;justify-content:space-between;align-items:center;padding:2rem 0;margin-top:2rem;border-top:1px solid var(--rule)}
+    .chapter-nav .prev,.chapter-nav .next{display:flex;align-items:center;gap:8px;padding:12px 20px;background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius);color:var(--ink-muted);font-size:0.9rem;transition:all .3s}
+    .chapter-nav .next{margin-left:auto;text-align:right}
+    .chapter-nav .prev:hover,.chapter-nav .next:hover{border-color:var(--accent);color:var(--accent)}
+    .chapter-nav .nav-label{font-size:0.75rem;color:var(--muted);display:block}
+    .chapter-nav .nav-title{font-weight:600;color:var(--ink)}
+    footer{background:var(--bg2);border-top:1px solid var(--rule);padding:3rem 2rem 2rem;margin-top:3rem}
+    .footer-inner{max-width:var(--max);margin:0 auto;text-align:center;color:var(--muted);font-size:0.82rem}
+    @media(max-width:768px){
+      .content-grid{grid-template-columns:1fr}
+      .ml-types{grid-template-columns:1fr}
+      .nav-links{display:none}
+      .chapter-meta{gap:1rem}
+      .video-nav{flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="ml-learning-site.html" class="logo"><div class="logo-icon">🧠</div><span>ML学习站</span></a>
+      <ul class="nav-links">
+        <li><a href="ml-learning-site.html">首页</a></li>
+        <li><a href="slides.html">📊 PPT版</a></li>
+        <li><a href="#lesson1" class="active">第1集</a></li>
+        <li><a href="#lesson2">第2集</a></li>
+        <li><a href="#lesson3">第3集</a></li>
+        <li><a href="chapter2.html">下一章 →</a></li>
+      </ul>
+      <a href="ml-learning-site.html" class="back-btn">← 返回首页</a>
+    </div>
+  </nav>
+
+  <div class="chapter-hero">
+    <div class="chapter-hero-inner">
+      <div class="breadcrumb"><a href="ml-learning-site.html">首页</a> / <span>第1章 基础概念</span></div>
+      <span class="chapter-badge">📖 概念篇 · 第1-3集</span>
+      <h1 class="chapter-title">机器学习基础概念</h1>
+      <p class="chapter-subtitle">从"什么是智能"出发，理解机器学习的本质思想，掌握监督学习、非监督学习、强化学习三大范式的核心区别，建立机器学习的全局认知。</p>
+      <div class="chapter-meta">
+        <span class="meta-item">📺 3集视频</span>
+        <span class="meta-item">⏱ 共约52分钟</span>
+        <span class="meta-item">🎯 入门必看</span>
+        <span class="meta-item">📝 3个核心知识点</span>
+      </div>
+      <div class="video-nav">
+        <a href="#lesson1" class="vnav-item active"><strong>第1集</strong><span>什么是智能 (16:55)</span></a>
+        <a href="#lesson2" class="vnav-item"><strong>第2集</strong><span>机器学习定义 (18:54)</span></a>
+        <a href="#lesson3" class="vnav-item"><strong>第3集</strong><span>机器学习类型 (16:49)</span></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="lesson" id="lesson1">
+      <div class="lesson-header">
+        <div class="lesson-num">01</div>
+        <div class="lesson-info">
+          <h2>什么是智能，机器是怎么学会思考的</h2>
+          <div class="lesson-dur">⏱ 16分55秒 · BV13bZYBREgr</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV13bZYBREgr&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">核心问题</span>
+          <h3>🤔 什么是"智能"？</h3>
+          <p>智能并非人类专属，而是生物体适应环境、解决问题的通用能力。视频从多个角度探讨了智能的本质：</p>
+          <ul>
+            <li>智能是<strong style="color:var(--ink)">感知→理解→推理→决策</strong>的综合能力</li>
+            <li>智能体现在对<strong style="color:var(--ink)">未知情况</strong>的适应和应对上</li>
+            <li>学习能力是智能最核心的特征——从经验中改进</li>
+            <li>人类智能 vs 人工智能：载体不同，但功能可以相似</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">关键思想</span>
+          <h3>🧠 机器如何"思考"？</h3>
+          <p>机器并不是像人一样"思考"，而是通过<strong style="color:var(--ink)">数学模型和数据</strong>来模拟智能行为：</p>
+          <ul>
+            <li>传统程序：人写规则 → 机器执行规则</li>
+            <li>机器学习：数据+算法 → 机器自动发现规律</li>
+            <li>核心转变：从"人工编码规则"到"数据驱动学习"</li>
+            <li>深度学习：多层神经网络模拟人脑层次化处理</li>
+          </ul>
+        </div>
+      </div>
+      <div class="key-point">
+        <h4>💡 核心洞见</h4>
+        <p>机器学习的本质是<strong style="color:var(--ink)">从数据中自动学习规律，并用学到的规律对未知数据做出预测或决策</strong>。它不需要人为编写每一条规则，而是让计算机通过大量数据自己"总结经验"，这正是"机器学会思考"的真正含义。</p>
+      </div>
+      <div class="diagram-box">
+        <div class="diagram-title">传统编程 vs 机器学习 — 两种解决问题的范式</div>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:2rem;align-items:center">
+          <div style="text-align:center">
+            <div style="font-weight:700;margin-bottom:1rem;color:var(--warning)">传统编程</div>
+            <div class="flow-diagram" style="flex-direction:column">
+              <div class="flow-node">输入数据</div>
+              <div class="flow-arrow">↓</div>
+              <div class="flow-node" style="border-color:var(--warning);color:var(--warning)">人工编写规则</div>
+              <div class="flow-arrow">↓</div>
+              <div class="flow-node">输出答案</div>
+            </div>
+          </div>
+          <div style="font-size:2rem;color:var(--muted)">VS</div>
+          <div style="text-align:center">
+            <div style="font-weight:700;margin-bottom:1rem;color:var(--accent)">机器学习</div>
+            <div class="flow-diagram" style="flex-direction:column">
+              <div class="flow-node">输入数据</div>
+              <div class="flow-arrow">↓</div>
+              <div class="flow-node highlight">算法从数据中<br>自动学习规律</div>
+              <div class="flow-arrow">↓</div>
+              <div class="flow-node">输出模型<br>（用于预测）</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson" id="lesson2">
+      <div class="lesson-header">
+        <div class="lesson-num v2">02</div>
+        <div class="lesson-info">
+          <h2>机器学习是什么：通过数据学习规律，对未来预测</h2>
+          <div class="lesson-dur">⏱ 18分54秒 · BV1BnZZBTEcL</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1BnZZBTEcL&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">正式定义</span>
+          <h3>📚 机器学习的定义</h3>
+          <p>Tom Mitchell 给出了机器学习的经典定义：</p>
+          <div class="formula-box">
+            对于某类任务T和性能度量P<br>
+            如果一个计算机程序在T上以P衡量的性能<br>
+            随着经验E（数据）的增加而自我完善<br>
+            那么我们称这个程序从经验E中学习了
+          </div>
+          <ul>
+            <li><strong style="color:var(--ink)">T（Task）</strong>：要完成的任务，如分类、回归、聚类</li>
+            <li><strong style="color:var(--ink)">E（Experience）</strong>：训练数据/经验</li>
+            <li><strong style="color:var(--ink)">P（Performance）</strong>：衡量好坏的指标，如准确率</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">生活案例</span>
+          <h3>🏠 实例理解</h3>
+          <p>以房价预测为例理解机器学习：</p>
+          <ul>
+            <li><strong style="color:var(--ink)">任务T</strong>：根据房屋特征预测价格</li>
+            <li><strong style="color:var(--ink)">经验E</strong>：历史成交数据（面积、位置、价格等）</li>
+            <li><strong style="color:var(--ink)">性能P</strong>：预测价格与实际价格的误差大小</li>
+            <li>看的房子越多（数据越多），估价越准（性能提升）</li>
+          </ul>
+          <div class="key-point" style="margin-top:1rem">
+            <h4>🎯 关键理解</h4>
+            <p>机器学习不是"魔法"，本质是<strong style="color:var(--ink)">用数学方法从数据中找到一个函数/模型</strong>，使得输入→输出的映射尽可能准确。</p>
+          </div>
+        </div>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">机器学习工作流程</span>
+        <h3>🔄 机器学习完整流程</h3>
+        <div class="flow-diagram" style="margin-top:1.5rem">
+          <div class="flow-node">📊<br>数据收集</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">🧹<br>数据预处理</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">✂️<br>特征工程</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node highlight">🤖<br>模型训练</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">📏<br>模型评估</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-node">🎯<br>预测应用</div>
+        </div>
+        <p style="margin-top:1.5rem;font-size:0.88rem;color:var(--muted);text-align:center">数据预处理和特征工程往往占据80%的工作量，好的数据比好的模型更重要</p>
+      </div>
+    </div>
+
+    <div class="lesson" id="lesson3">
+      <div class="lesson-header">
+        <div class="lesson-num v3">03</div>
+        <div class="lesson-info">
+          <h2>机器学习类型：监督学习、非监督学习、强化学习</h2>
+          <div class="lesson-dur">⏱ 16分49秒 · BV1n3fzBsEu6</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1n3fzBsEu6&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="content-card full" style="margin-bottom:2rem">
+        <span class="card-tag">三大范式</span>
+        <h3>🗂️ 机器学习的三大类型</h3>
+        <p>根据训练数据是否有标签（正确答案），机器学习分为三大类，解决不同性质的问题：</p>
+      </div>
+      <div class="ml-types">
+        <div class="type-card">
+          <div class="type-icon">🏷️</div>
+          <h4 style="color:var(--accent)">监督学习</h4>
+          <p>训练数据有标签（有正确答案），模型学习输入到输出的映射关系</p>
+          <div class="type-ex">分类（垃圾邮件检测）<br>回归（房价预测）</div>
+        </div>
+        <div class="type-card">
+          <div class="type-icon">🔍</div>
+          <h4 style="color:var(--accent2)">非监督学习</h4>
+          <p>训练数据无标签，模型自动发现数据中的内在结构和模式</p>
+          <div class="type-ex">聚类（客户分群）<br>降维（PCA可视化）</div>
+        </div>
+        <div class="type-card">
+          <div class="type-icon">🎮</div>
+          <h4 style="color:var(--accent3)">强化学习</h4>
+          <p>智能体通过与环境交互，根据奖励/惩罚学习最优策略</p>
+          <div class="type-ex">AlphaGo围棋<br>自动驾驶</div>
+        </div>
+      </div>
+      <div style="margin-top:2rem">
+        <div class="content-card full">
+          <span class="card-tag">对比总结</span>
+          <h3>📊 三类机器学习对比</h3>
+          <table class="compare-table">
+            <thead>
+              <tr><th>维度</th><th>监督学习</th><th>非监督学习</th><th>强化学习</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>数据标签</td><td>有标签（有答案）</td><td>无标签（无答案）</td><td>奖励信号</td></tr>
+              <tr><td>学习方式</td><td>老师教（有正确答案对照）</td><td>自学（自己发现规律）</td><td>奖惩中学习（试错）</td></tr>
+              <tr><td>典型任务</td><td>分类、回归</td><td>聚类、降维</td><td>决策、策略优化</td></tr>
+              <tr><td>代表算法</td><td>线性回归、逻辑回归<br>决策树、SVM、神经网络</td><td>K-Means、PCA<br>层次聚类、DBSCAN</td><td>Q-Learning<br>Policy Gradient</td></tr>
+              <tr><td>应用场景</td><td>房价预测、垃圾邮件<br>图像识别、信用评分</td><td>客户分群、异常检测<br>推荐系统、数据压缩</td><td>游戏AI、机器人<br>自动驾驶、推荐策略</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="key-point" style="margin-top:1.5rem">
+        <h4>📌 本课程重点</h4>
+        <p>本课程主要聚焦<strong style="color:var(--ink)">监督学习</strong>（线性回归、逻辑回归、决策树、随机森林、XGBoost）和<strong style="color:var(--ink)">非监督学习</strong>（K-Means聚类、PCA降维），这是工业界最常用、最基础的机器学习方法，也是深入深度学习之前的必备基础。</p>
+      </div>
+    </div>
+
+    <div class="chapter-nav">
+      <a href="ml-learning-site.html" class="prev">
+        <span>←</span>
+        <span><span class="nav-label">返回</span><span class="nav-title">首页</span></span>
+      </a>
+      <a href="chapter2.html" class="next">
+        <span><span class="nav-label">下一章</span><span class="nav-title">第2章 线性回归与优化 →</span></span>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <p>© 2026 ML学习站 | 本站仅作学习整理用途</p>
+      <p style="margin-top:0.5rem"><a href="https://space.bilibili.com/291215958/lists/7468039?type=season" target="_blank" style="color:var(--accent)">前往B站观看原视频 →</a></p>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('a[href^="#"]').forEach(function(a){a.addEventListener('click',function(e){var h=this.getAttribute('href');if(h==='#')return;e.preventDefault();var t=document.querySelector(h);if(t)t.scrollIntoView({behavior:'smooth',block:'start'})})});
+    var vnavs=document.querySelectorAll('.vnav-item');var lessons=document.querySelectorAll('.lesson');window.addEventListener('scroll',function(){var cur=0;lessons.forEach(function(l,i){if(window.scrollY>=l.offsetTop-120)cur=i});vnavs.forEach(function(n,i){n.classList.toggle('active',i===cur)})});
+  </script>
+</body>
+</html>

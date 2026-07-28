@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第2章 线性回归与优化 - ML学习站</title>
+  <style>
+    :root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--bg4:#334155;--ink:#f8fafc;--ink-muted:#cbd5e1;--muted:#94a3b8;--rule:rgba(56,189,248,0.15);--accent:#38bdf8;--accent2:#818cf8;--accent3:#c084fc;--accent-glow:rgba(56,189,248,0.25);--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace;--max:1100px;--radius:12px;--radius-lg:20px;--radius-xl:28px}
+    *{box-sizing:border-box;margin:0;padding:0}html{font-size:16px;scroll-behavior:smooth}
+    body{font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.7;overflow-x:hidden}a{text-decoration:none;color:inherit}
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,14,26,0.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--rule);padding:0 2rem}
+    .navbar-inner{max-width:var(--max);margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+    .logo{display:flex;align-items:center;gap:10px;font-size:1.2rem;font-weight:700;color:var(--accent)}
+    .logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .nav-links{display:flex;gap:1.2rem;list-style:none;align-items:center}
+    .nav-links a{color:var(--muted);font-weight:500;font-size:0.85rem;transition:color .3s}
+    .nav-links a:hover,.nav-links a.active{color:var(--accent)}
+    .back-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:var(--bg3);border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;color:var(--ink-muted);transition:all .3s}
+    .back-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .chapter-hero{padding-top:100px;padding-bottom:3rem;background:linear-gradient(180deg,rgba(56,189,248,0.06) 0%,transparent 100%)}
+    .chapter-hero-inner{max-width:var(--max);margin:0 auto;padding:0 2rem}
+    .breadcrumb{font-size:0.85rem;color:var(--muted);margin-bottom:1.5rem;display:flex;gap:8px;align-items:center}
+    .breadcrumb a{color:var(--accent)}
+    .chapter-badge{display:inline-flex;padding:6px 14px;background:rgba(56,189,248,0.12);color:var(--accent);border-radius:20px;font-size:0.8rem;font-weight:600;margin-bottom:1rem;border:1px solid rgba(56,189,248,0.2)}
+    .chapter-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.2;margin-bottom:1rem}
+    .chapter-subtitle{font-size:1.1rem;color:var(--muted);max-width:700px;line-height:1.8}
+    .chapter-meta{display:flex;gap:2rem;margin-top:1.5rem;flex-wrap:wrap}
+    .meta-item{display:flex;align-items:center;gap:6px;font-size:0.9rem;color:var(--ink-muted)}
+    .video-nav{display:flex;gap:0.5rem;margin-top:2rem;flex-wrap:wrap}
+    .vnav-item{padding:8px 14px;background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius);font-size:0.82rem;color:var(--muted);cursor:pointer;transition:all .3s;font-family:var(--font);text-align:left}
+    .vnav-item:hover,.vnav-item.active{border-color:var(--accent);color:var(--accent);background:rgba(56,189,248,0.08)}
+    .vnav-item strong{display:block;color:var(--ink);font-size:0.8rem;margin-bottom:1px}
+    .vnav-item span{font-size:0.72rem}
+    .main{max-width:var(--max);margin:0 auto;padding:0 2rem}
+    .lesson{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+    .lesson:last-child{border-bottom:none}
+    .lesson-header{display:flex;align-items:flex-start;gap:1rem;margin-bottom:2rem}
+    .lesson-num{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;flex-shrink:0;color:var(--bg)}
+    .lesson-num{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+    .lesson-num.v5{background:linear-gradient(135deg,var(--accent2),var(--accent3))}
+    .lesson-num.v6{background:linear-gradient(135deg,var(--accent3),var(--success))}
+    .lesson-num.v7{background:linear-gradient(135deg,var(--success),var(--warning))}
+    .lesson-num.v8{background:linear-gradient(135deg,var(--warning),var(--danger))}
+    .lesson-info h2{font-size:1.4rem;font-weight:700;margin-bottom:4px;line-height:1.3}
+    .lesson-info .lesson-dur{font-size:0.85rem;color:var(--muted)}
+    .video-wrapper{position:relative;width:100%;padding-bottom:56.25%;margin-bottom:2.5rem;background:var(--bg2);border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--rule)}
+    .video-wrapper iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+    .content-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem}
+    .content-card{background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius-lg);padding:1.75rem;transition:border-color .3s}
+    .content-card:hover{border-color:var(--accent)}
+    .content-card.full{grid-column:1/-1}
+    .card-tag{display:inline-block;padding:3px 10px;background:rgba(56,189,248,0.1);color:var(--accent);border-radius:6px;font-size:0.75rem;font-weight:600;margin-bottom:1rem}
+    .content-card h3{font-size:1.1rem;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+    .content-card p{font-size:0.92rem;color:var(--ink-muted);line-height:1.8;margin-bottom:0.8rem}
+    .content-card ul{list-style:none;padding:0}
+    .content-card li{padding:0.4rem 0;font-size:0.9rem;color:var(--ink-muted);display:flex;gap:10px;align-items:flex-start;line-height:1.7}
+    .content-card li::before{content:'▸';color:var(--accent);flex-shrink:0;margin-top:1px}
+    .key-point{background:rgba(56,189,248,0.06);border-left:3px solid var(--accent);border-radius:0 var(--radius) var(--radius) 0;padding:1.25rem 1.5rem;margin:1.5rem 0}
+    .key-point h4{color:var(--accent);font-size:0.95rem;margin-bottom:0.5rem}
+    .key-point p{font-size:0.9rem;color:var(--ink-muted);line-height:1.8}
+    .key-point.warn{background:rgba(251,191,36,0.06);border-left-color:var(--warning)}
+    .key-point.warn h4{color:var(--warning)}
+    .formula-box{background:var(--bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1.25rem 1.5rem;margin:1rem 0;font-family:var(--mono);font-size:0.92rem;color:var(--accent);text-align:center;letter-spacing:0.02em;overflow-x:auto;line-height:2}
+    .formula-box .comment{color:var(--muted);font-family:var(--font);font-size:0.82rem;display:block;margin-top:0.5rem}
+    .code-block{background:var(--bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1.25rem 1.5rem;margin:1rem 0;overflow-x:auto;font-family:var(--mono);font-size:0.88rem;line-height:1.7;color:var(--ink-muted)}
+    .code-block .kw{color:var(--accent3)}.code-block .fn{color:var(--accent)}.code-block .str{color:var(--success)}.code-block .cm{color:var(--muted);font-style:italic}.code-block .num{color:var(--warning)}
+    .compare-table{width:100%;border-collapse:collapse;margin:1rem 0}
+    .compare-table th,.compare-table td{padding:0.7rem 1rem;text-align:left;border-bottom:1px solid var(--rule);font-size:0.86rem}
+    .compare-table th{color:var(--accent);font-weight:600;background:var(--bg3)}
+    .compare-table td{color:var(--ink-muted)}
+    .diagram-box{background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius-lg);padding:2rem;margin:1.5rem 0}
+    .diagram-title{font-size:0.9rem;color:var(--muted);margin-bottom:1.5rem;text-align:center}
+    .regression-viz{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0}
+    .viz-card{background:var(--bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1.2rem;text-align:center}
+    .viz-card .viz-icon{font-size:2rem;margin-bottom:0.75rem}
+    .viz-card h4{font-size:0.9rem;margin-bottom:0.4rem}
+    .viz-card p{font-size:0.78rem;color:var(--muted);line-height:1.5}
+    .viz-plot{width:100%;height:100px;position:relative;margin:0.8rem 0}
+    .process-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:0.8rem;margin:1.5rem 0}
+    .step-card{background:var(--bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1rem;text-align:center;position:relative}
+    .step-card .step-num{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--bg);font-weight:700;font-size:0.8rem;display:inline-flex;align-items:center;justify-content:center;margin-bottom:0.5rem}
+    .step-card h4{font-size:0.82rem;margin-bottom:0.3rem}
+    .step-card p{font-size:0.72rem;color:var(--muted);line-height:1.4}
+    .gd-visual{display:flex;gap:2rem;align-items:center;margin:1.5rem 0;flex-wrap:wrap}
+    .gd-desc{flex:1;min-width:250px}
+    .overfit-diagram{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0}
+    .fit-card{background:var(--bg);border-radius:var(--radius);padding:1.5rem;text-align:center;border:2px solid var(--rule);transition:all .3s}
+    .fit-card.under{border-color:var(--warning)}
+    .fit-card.good{border-color:var(--success)}
+    .fit-card.over{border-color:var(--danger)}
+    .fit-card .fit-icon{font-size:2.5rem;margin-bottom:0.5rem}
+    .fit-card h4{font-size:1rem;margin-bottom:0.5rem}
+    .fit-card p{font-size:0.8rem;color:var(--muted);line-height:1.5}
+    .pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+    .pros,.cons{padding:1rem;border-radius:var(--radius)}
+    .pros{background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.2)}
+    .cons{background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.2)}
+    .pros h5{color:var(--success);font-size:0.88rem;margin-bottom:0.5rem}
+    .cons h5{color:var(--danger);font-size:0.88rem;margin-bottom:0.5rem}
+    .pros li::before{content:'✓ ';color:var(--success)}
+    .cons li::before{content:'✗ ';color:var(--danger)}
+    .chapter-nav{display:flex;justify-content:space-between;align-items:center;padding:2rem 0;margin-top:2rem;border-top:1px solid var(--rule)}
+    .chapter-nav .prev,.chapter-nav .next{display:flex;align-items:center;gap:8px;padding:12px 20px;background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius);color:var(--ink-muted);font-size:0.9rem;transition:all .3s}
+    .chapter-nav .next{margin-left:auto;text-align:right}
+    .chapter-nav .prev:hover,.chapter-nav .next:hover{border-color:var(--accent);color:var(--accent)}
+    .nav-label{font-size:0.75rem;color:var(--muted);display:block}
+    .nav-title{font-weight:600;color:var(--ink)}
+    footer{background:var(--bg2);border-top:1px solid var(--rule);padding:3rem 2rem 2rem;margin-top:3rem}
+    .footer-inner{max-width:var(--max);margin:0 auto;text-align:center;color:var(--muted);font-size:0.82rem}
+    @media(max-width:768px){
+      .content-grid,.pros-cons,.overfit-diagram,.regression-viz{grid-template-columns:1fr}
+      .process-steps{grid-template-columns:1fr 1fr}
+      .nav-links{display:none}
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="ml-learning-site.html" class="logo"><div class="logo-icon">🧠</div><span>ML学习站</span></a>
+      <ul class="nav-links">
+        <li><a href="ml-learning-site.html">首页</a></li>
+        <li><a href="slides.html">📊 PPT版</a></li>
+        <li><a href="chapter1.html">第1章</a></li>
+        <li><a href="#lesson4" class="active">第4集</a></li>
+        <li><a href="#lesson5">第5集</a></li>
+        <li><a href="#lesson6">第6集</a></li>
+        <li><a href="#lesson7">第7集</a></li>
+        <li><a href="#lesson8">第8集</a></li>
+        <li><a href="chapter3.html">下一章 →</a></li>
+      </ul>
+      <a href="ml-learning-site.html" class="back-btn">← 返回首页</a>
+    </div>
+  </nav>
+
+  <div class="chapter-hero">
+    <div class="chapter-hero-inner">
+      <div class="breadcrumb"><a href="ml-learning-site.html">首页</a> / <span>第2章 线性回归与优化</span></div>
+      <span class="chapter-badge">📐 核心篇 · 第4-8集</span>
+      <h1 class="chapter-title">线性回归与模型优化</h1>
+      <p class="chapter-subtitle">从第一个机器学习模型——线性回归开始，深入理解模型假设、损失函数、梯度下降优化、数据预处理、模型评估指标，以及欠拟合/过拟合的诊断与正则化解决方案。</p>
+      <div class="chapter-meta">
+        <span class="meta-item">📺 5集视频</span>
+        <span class="meta-item">⏱ 约120分钟</span>
+        <span class="meta-item">🔢 公式推导</span>
+        <span class="meta-item">💻 代码实战</span>
+      </div>
+      <div class="video-nav">
+        <a href="#lesson4" class="vnav-item active"><strong>第4集</strong><span>线性回归 (20:36)</span></a>
+        <a href="#lesson5" class="vnav-item"><strong>第5集</strong><span>梯度下降 (29:30)</span></a>
+        <a href="#lesson6" class="vnav-item"><strong>第6集</strong><span>数据预处理 (35:57)</span></a>
+        <a href="#lesson7" class="vnav-item"><strong>第7集</strong><span>模型评估 (14:24)</span></a>
+        <a href="#lesson8" class="vnav-item"><strong>第8集</strong><span>过拟合 (22:02)</span></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="lesson" id="lesson4">
+      <div class="lesson-header">
+        <div class="lesson-num">04</div>
+        <div class="lesson-info">
+          <h2>线性回归——机器学习的第一个模型</h2>
+          <div class="lesson-dur">⏱ 20分36秒 · BV1xrNGzrEJx</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1xrNGzrEJx&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">模型假设</span>
+          <h3>📈 什么是线性回归？</h3>
+          <p>线性回归假设特征x与目标y之间存在<strong style="color:var(--ink)">线性关系</strong>，用一条直线（或超平面）来拟合数据点。</p>
+          <div class="formula-box">
+            单变量：y = wx + b<br>
+            多变量：y = w₁x₁ + w₂x₂ + ... + wₙxₙ + b
+          </div>
+          <ul>
+            <li><strong style="color:var(--ink)">w（权重）</strong>：每个特征对预测值的影响程度</li>
+            <li><strong style="color:var(--ink)">b（偏置）</strong>：截距项，所有特征为0时的基础预测值</li>
+            <li>目标：找到最优的w和b，使预测值尽可能接近真实值</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">损失函数</span>
+          <h3>📉 如何衡量"好坏"？</h3>
+          <p>使用<strong style="color:var(--ink)">均方误差（MSE）</strong>作为损失函数，衡量预测值与真实值的差距：</p>
+          <div class="formula-box">
+            MSE = (1/n) Σ(ŷᵢ - yᵢ)²<br>
+            <span class="comment">ŷᵢ 是预测值，yᵢ 是真实值</span>
+          </div>
+          <ul>
+            <li>为什么用平方？放大较大误差，数学上便于求导优化</li>
+            <li>损失越小，模型拟合越好</li>
+            <li><strong style="color:var(--ink)">最小二乘法</strong>：直接求解使MSE最小的w和b</li>
+          </ul>
+        </div>
+      </div>
+      <div class="key-point">
+        <h4>💡 核心思想</h4>
+        <p>线性回归的核心是<strong style="color:var(--ink)">找到一条直线/超平面，使得所有数据点到该直线的距离平方和最小</strong>。这就是著名的"最小二乘法"。对于简单线性回归，可以通过求导直接得到解析解（正规方程）；对于复杂情况，则需要梯度下降等迭代优化方法。</p>
+      </div>
+    </div>
+
+    <div class="lesson" id="lesson5">
+      <div class="lesson-header">
+        <div class="lesson-num v5">05</div>
+        <div class="lesson-info">
+          <h2>梯度下降——模型如何自己学会找最优参数</h2>
+          <div class="lesson-dur">⏱ 29分30秒 · BV1cpwuz7EgF</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1cpwuz7EgF&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="content-card full" style="margin-bottom:2rem">
+        <span class="card-tag">优化算法</span>
+        <h3>🏔️ 梯度下降：像下山一样找最小值</h3>
+        <p>梯度下降是机器学习中最核心的优化算法。想象你站在一座山上，想要最快到达山谷最低点——你会怎么做？<strong style="color:var(--ink)">环顾四周，找到最陡的下坡方向，走一小步，再重复</strong>。这就是梯度下降的直觉。</p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">算法步骤</span>
+          <h3>📋 梯度下降的过程</h3>
+          <div class="formula-box" style="text-align:left;font-size:0.88rem">
+            repeat until convergence {<br>
+            &nbsp;&nbsp;w = w - α · ∂J/∂w<br>
+            &nbsp;&nbsp;b = b - α · ∂J/∂b<br>
+            }
+          </div>
+          <ul>
+            <li><strong style="color:var(--ink)">α（学习率）</strong>：每步走多大，太大震荡不收敛，太小收敛慢</li>
+            <li><strong style="color:var(--ink)">∂J/∂w</strong>：损失函数对w的偏导（梯度），指示最陡方向</li>
+            <li><strong style="color:var(--ink)">负号</strong>：沿梯度反方向更新（下坡）</li>
+            <li>不断迭代，直到损失不再明显下降</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">关键参数</span>
+          <h3>⚙️ 学习率的选择</h3>
+          <p>学习率α是梯度下降最重要的超参数：</p>
+          <ul>
+            <li><strong style="color:var(--danger)">α太大</strong>：步子迈太大，跨过最低点，来回震荡甚至发散</li>
+            <li><strong style="color:var(--warning)">α太小</strong>：步子太小，收敛极慢，训练时间过长</li>
+            <li><strong style="color:var(--success)">合适的α</strong>：损失函数稳步下降，平稳收敛到最小值</li>
+            <li>通常从0.01、0.001等开始尝试，观察损失曲线调整</li>
+          </ul>
+          <div class="key-point" style="margin-top:1rem">
+            <h4>🎯 三类梯度下降</h4>
+            <p><strong>BGD</strong>（批量）：用全部数据算梯度，稳定但慢<br><strong>SGD</strong>（随机）：单个样本算梯度，快但震荡<br><strong>Mini-batch</strong>：小批量数据，兼顾速度与稳定（最常用）</p>
+          </div>
+        </div>
+      </div>
+      <div class="code-block">
+        <span class="cm"># 梯度下降的简单Python实现</span><br>
+        <span class="kw">import</span> numpy <span class="kw">as</span> np<br><br>
+        <span class="kw">def</span> <span class="fn">gradient_descent</span>(X, y, lr=<span class="num">0.01</span>, epochs=<span class="num">1000</span>):<br>
+        &nbsp;&nbsp;n = len(y)<br>
+        &nbsp;&nbsp;w, b = <span class="num">0.0</span>, <span class="num">0.0</span><br>
+        &nbsp;&nbsp;<span class="kw">for</span> _ <span class="kw">in</span> range(epochs):<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;y_pred = w * X + b<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;dw = (<span class="num">2</span>/n) * np.sum((y_pred - y) * X)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;db = (<span class="num">2</span>/n) * np.sum(y_pred - y)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;w -= lr * dw<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;b -= lr * db<br>
+        &nbsp;&nbsp;<span class="kw">return</span> w, b
+      </div>
+    </div>
+
+    <div class="lesson" id="lesson6">
+      <div class="lesson-header">
+        <div class="lesson-num v6">06</div>
+        <div class="lesson-info">
+          <h2>数据预处理全攻略</h2>
+          <div class="lesson-dur">⏱ 35分57秒 · BV1cGA3zREMA</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1cGA3zREMA&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point warn">
+        <h4>⚠️ 数据决定上限</h4>
+        <p>数据预处理往往占据机器学习项目80%的工作量。<strong style="color:var(--ink)">垃圾进，垃圾出（Garbage In, Garbage Out）</strong>——再好的模型，面对脏数据也无能为力。</p>
+      </div>
+      <div class="process-steps">
+        <div class="step-card"><div class="step-num">1</div><h4>数据清洗</h4><p>处理缺失值、异常值、重复数据</p></div>
+        <div class="step-card"><div class="step-num">2</div><h4>特征编码</h4><p>类别数据→数值数据转换</p></div>
+        <div class="step-card"><div class="step-num">3</div><h4>数据划分</h4><p>训练集/验证集/测试集拆分</p></div>
+        <div class="step-card"><div class="step-num">4</div><h4>特征缩放</h4><p>标准化/归一化统一尺度</p></div>
+        <div class="step-card"><div class="step-num">5</div><h4>特征工程</h4><p>构造、选择有效特征</p></div>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">缺失值处理</span>
+          <h3>🕳️ 数据清洗</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">删除法</strong>：缺失比例高（>30%）时直接删除该特征/样本</li>
+            <li><strong style="color:var(--ink)">填充法</strong>：数值列用均值/中位数填充；分类列用众数填充</li>
+            <li><strong style="color:var(--ink)">模型预测填充</strong>：用其他特征预测缺失值（KNN插值等）</li>
+            <li><strong style="color:var(--ink)">异常值检测</strong>：IQR方法（1.5倍四分位距）、3σ原则、箱线图</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">特征缩放</span>
+          <h3>📏 标准化 vs 归一化</h3>
+          <p>不同特征量纲差异大（如年龄0-100，收入0-100万），会导致梯度下降收敛慢。</p>
+          <div class="formula-box" style="font-size:0.82rem;text-align:left">
+            <strong style="color:var(--accent2)">标准化 Z-score</strong>（常用）：<br>
+            &nbsp;&nbsp;x' = (x - μ) / σ → 均值0，方差1<br><br>
+            <strong style="color:var(--success)">归一化 Min-Max</strong>：<br>
+            &nbsp;&nbsp;x' = (x - min) / (max - min) → [0,1]范围
+          </div>
+          <ul>
+            <li>基于距离的算法（KNN、SVM、线性回归+梯度下降）必须缩放</li>
+            <li>树模型（决策树、随机森林）不需要特征缩放</li>
+          </ul>
+        </div>
+      </div>
+      <div class="code-block">
+        <span class="cm"># 使用sklearn进行数据预处理</span><br>
+        <span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split<br>
+        <span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler<br>
+        <span class="kw">from</span> sklearn.impute <span class="kw">import</span> SimpleImputer<br><br>
+        <span class="cm"># 1. 处理缺失值</span><br>
+        imputer = SimpleImputer(strategy=<span class="str">'mean'</span>)<br>
+        X = imputer.fit_transform(X)<br><br>
+        <span class="cm"># 2. 划分数据集</span><br>
+        X_train, X_test, y_train, y_test = train_test_split(<br>
+        &nbsp;&nbsp;X, y, test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>)<br><br>
+        <span class="cm"># 3. 特征标准化</span><br>
+        scaler = StandardScaler()<br>
+        X_train = scaler.fit_transform(X_train)<br>
+        X_test = scaler.transform(X_test)
+      </div>
+    </div>
+
+    <div class="lesson" id="lesson7">
+      <div class="lesson-header">
+        <div class="lesson-num v7">07</div>
+        <div class="lesson-info">
+          <h2>拟合前提——线性回归模型评估</h2>
+          <div class="lesson-dur">⏱ 14分24秒 · BV1nRXVBBEc4</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1nRXVBBEc4&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">回归评估指标</span>
+          <h3>📊 如何评估回归模型？</h3>
+          <table class="compare-table">
+            <thead><tr><th>指标</th><th>公式含义</th><th>特点</th></tr></thead>
+            <tbody>
+              <tr><td>MSE</td><td>均方误差</td><td>放大误差，单位是y的平方</td></tr>
+              <tr><td>RMSE</td><td>MSE开根号</td><td>与y同单位，更直观</td></tr>
+              <tr><td>MAE</td><td>平均绝对误差</td><td>对异常值不敏感</td></tr>
+              <tr><td>R²</td><td>决定系数</td><td>0~1之间，越接近1越好</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">核心指标</span>
+          <h3>🎯 R²（决定系数）</h3>
+          <p>R²是回归模型最重要的评估指标：</p>
+          <div class="formula-box">
+            R² = 1 - (SS_res / SS_tot)<br>
+            <span class="comment">SS_res: 残差平方和（预测误差）<br>SS_tot: 总平方和（用均值预测的误差）</span>
+          </div>
+          <ul>
+            <li>R² = 1：完美预测，没有误差</li>
+            <li>R² = 0：跟直接猜均值一样差</li>
+            <li>R² < 0：比猜均值还差，模型有问题</li>
+            <li><strong style="color:var(--ink)">注意</strong>：R²高不代表模型好，可能过拟合！</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson" id="lesson8">
+      <div class="lesson-header">
+        <div class="lesson-num v8">08</div>
+        <div class="lesson-info">
+          <h2>欠拟合与过拟合问题诊断与解决</h2>
+          <div class="lesson-dur">⏱ 22分02秒 · BV1Hb9EB9ESo</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1Hb9EB9ESo&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="overfit-diagram">
+        <div class="fit-card under">
+          <div class="fit-icon">📏</div>
+          <h4 style="color:var(--warning)">欠拟合</h4>
+          <p>模型太简单，连训练数据都没学好，训练误差大</p>
+        </div>
+        <div class="fit-card good">
+          <div class="fit-icon">✨</div>
+          <h4 style="color:var(--success)">刚好拟合</h4>
+          <p>模型复杂度适中，泛化能力强，训练和测试误差都小</p>
+        </div>
+        <div class="fit-card over">
+          <div class="fit-icon">🔍</div>
+          <h4 style="color:var(--danger)">过拟合</h4>
+          <p>模型太复杂，死记硬背训练数据，训练误差小但测试误差大</p>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">诊断方法</span>
+          <h3>🔬 如何判断过/欠拟合？</h3>
+          <p>通过<strong style="color:var(--ink)">学习曲线</strong>（训练误差和验证误差随训练量变化的曲线）判断：</p>
+          <ul>
+            <li><strong style="color:var(--warning)">欠拟合信号</strong>：训练误差和验证误差都很高，且两者差距小</li>
+            <li><strong style="color:var(--danger)">过拟合信号</strong>：训练误差很低，验证误差远高于训练误差（差距大）</li>
+            <li><strong style="color:var(--success)">良好拟合</strong>：训练误差和验证误差都较低，两者差距小</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">解决方案</span>
+          <h3>🛠️ 如何解决？</h3>
+          <div class="pros-cons">
+            <div class="cons">
+              <h5>欠拟合解决</h5>
+              <ul>
+                <li>增加模型复杂度（更高级的算法）</li>
+                <li>增加更多有效特征</li>
+                <li>减少正则化强度</li>
+              </ul>
+            </div>
+            <div class="pros">
+              <h5>过拟合解决</h5>
+              <ul>
+                <li>收集更多训练数据</li>
+                <li>正则化（L1/L2）</li>
+                <li>减少特征维度</li>
+                <li>交叉验证</li>
+                <li>早停（Early Stopping）</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">正则化</span>
+        <h3>⚖️ 正则化：给模型加"惩罚"防止过拟合</h3>
+        <p>正则化通过在损失函数中加入对模型复杂度的惩罚项，防止权重过大导致模型过于复杂：</p>
+        <div class="content-grid" style="margin-top:1rem;margin-bottom:0">
+          <div>
+            <div class="formula-box" style="font-size:0.85rem">
+              <strong style="color:var(--accent2)">L2正则化（Ridge/岭回归）</strong><br>
+              J = MSE + λ·Σwᵢ²<br>
+              <span class="comment">让权重趋近于0但不为0<br>防止权重过大，缓解多重共线性</span>
+            </div>
+          </div>
+          <div>
+            <div class="formula-box" style="font-size:0.85rem">
+              <strong style="color:var(--accent3)">L1正则化（Lasso）</strong><br>
+              J = MSE + λ·Σ|wᵢ|<br>
+              <span class="comment">可以让部分权重变为0<br>天然实现特征选择</span>
+            </div>
+          </div>
+        </div>
+        <div class="key-point" style="margin-top:1rem">
+          <h4>🎯 偏差-方差权衡</h4>
+          <p>欠拟合对应<strong style="color:var(--ink)">高偏差</strong>（模型太简单，假设错误），过拟合对应<strong style="color:var(--ink)">高方差</strong>（模型对数据太敏感，波动大）。机器学习的核心挑战就是找到偏差和方差之间的最佳平衡点——这就是著名的<strong style="color:var(--ink)">偏差-方差权衡（Bias-Variance Tradeoff）</strong>。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="chapter-nav">
+      <a href="chapter1.html" class="prev">
+        <span>←</span><span><span class="nav-label">上一章</span><span class="nav-title">第1章 基础概念</span></span>
+      </a>
+      <a href="chapter3.html" class="next">
+        <span><span class="nav-label">下一章</span><span class="nav-title">第3章 分类算法与集成学习 →</span></span>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <p>© 2026 ML学习站 | 本站仅作学习整理用途</p>
+      <p style="margin-top:0.5rem"><a href="https://space.bilibili.com/291215958/lists/7468039?type=season" target="_blank" style="color:var(--accent)">前往B站观看原视频 →</a></p>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('a[href^="#"]').forEach(function(a){a.addEventListener('click',function(e){var h=this.getAttribute('href');if(h==='#')return;e.preventDefault();var t=document.querySelector(h);if(t)t.scrollIntoView({behavior:'smooth',block:'start'})})});
+    var vnavs=document.querySelectorAll('.vnav-item');var lessons=document.querySelectorAll('.lesson');window.addEventListener('scroll',function(){var cur=0;lessons.forEach(function(l,i){if(window.scrollY>=l.offsetTop-120)cur=i});vnavs.forEach(function(n,i){n.classList.toggle('active',i===cur)})});
+  </script>
+</body>
+</html>

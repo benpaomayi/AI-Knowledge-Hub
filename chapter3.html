@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第3章 分类算法与集成学习 - ML学习站</title>
+  <style>
+    :root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--bg4:#334155;--ink:#f8fafc;--ink-muted:#cbd5e1;--muted:#94a3b8;--rule:rgba(56,189,248,0.15);--accent:#38bdf8;--accent2:#818cf8;--accent3:#c084fc;--accent-glow:rgba(56,189,248,0.25);--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace;--max:1100px;--radius:12px;--radius-lg:20px}
+    *{box-sizing:border-box;margin:0;padding:0}html{font-size:16px;scroll-behavior:smooth}
+    body{font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.7;overflow-x:hidden}a{text-decoration:none;color:inherit}
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(10,14,26,0.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--rule);padding:0 2rem}
+    .navbar-inner{max-width:var(--max);margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+    .logo{display:flex;align-items:center;gap:10px;font-size:1.2rem;font-weight:700;color:var(--accent)}
+    .logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .nav-links{display:flex;gap:1.2rem;list-style:none;align-items:center}
+    .nav-links a{color:var(--muted);font-weight:500;font-size:0.85rem;transition:color .3s}
+    .nav-links a:hover,.nav-links a.active{color:var(--accent)}
+    .back-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:var(--bg3);border:1px solid var(--rule);border-radius:8px;font-size:0.85rem;color:var(--ink-muted);transition:all .3s}
+    .back-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .chapter-hero{padding-top:100px;padding-bottom:3rem;background:linear-gradient(180deg,rgba(129,140,248,0.06) 0%,transparent 100%)}
+    .chapter-hero-inner{max-width:var(--max);margin:0 auto;padding:0 2rem}
+    .breadcrumb{font-size:0.85rem;color:var(--muted);margin-bottom:1.5rem;display:flex;gap:8px;align-items:center}
+    .breadcrumb a{color:var(--accent)}
+    .chapter-badge{display:inline-flex;padding:6px 14px;background:rgba(129,140,248,0.12);color:var(--accent2);border-radius:20px;font-size:0.8rem;font-weight:600;margin-bottom:1rem;border:1px solid rgba(129,140,248,0.2)}
+    .chapter-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.2;margin-bottom:1rem}
+    .chapter-subtitle{font-size:1.1rem;color:var(--muted);max-width:700px;line-height:1.8}
+    .chapter-meta{display:flex;gap:2rem;margin-top:1.5rem;flex-wrap:wrap}
+    .meta-item{display:flex;align-items:center;gap:6px;font-size:0.9rem;color:var(--ink-muted)}
+    .video-nav{display:flex;gap:0.5rem;margin-top:2rem;flex-wrap:wrap}
+    .vnav-item{padding:8px 14px;background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius);font-size:0.82rem;color:var(--muted);cursor:pointer;transition:all .3s;font-family:var(--font);text-align:left}
+    .vnav-item:hover,.vnav-item.active{border-color:var(--accent2);color:var(--accent2);background:rgba(129,140,248,0.08)}
+    .vnav-item strong{display:block;color:var(--ink);font-size:0.8rem;margin-bottom:1px}
+    .vnav-item span{font-size:0.72rem}
+    .main{max-width:var(--max);margin:0 auto;padding:0 2rem}
+    .lesson{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+    .lesson:last-child{border-bottom:none}
+    .lesson-header{display:flex;align-items:flex-start;gap:1rem;margin-bottom:2rem}
+    .lesson-num{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;flex-shrink:0;color:var(--bg)}
+    .lesson-num{background:linear-gradient(135deg,var(--accent2),var(--accent))}
+    .lesson-num.v10{background:linear-gradient(135deg,var(--accent2),var(--accent3))}
+    .lesson-num.v11{background:linear-gradient(135deg,var(--accent3),var(--success))}
+    .lesson-num.v12{background:linear-gradient(135deg,var(--success),var(--warning))}
+    .lesson-info h2{font-size:1.4rem;font-weight:700;margin-bottom:4px;line-height:1.3}
+    .lesson-info .lesson-dur{font-size:0.85rem;color:var(--muted)}
+    .video-wrapper{position:relative;width:100%;padding-bottom:56.25%;margin-bottom:2.5rem;background:var(--bg2);border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--rule)}
+    .video-wrapper iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+    .content-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem}
+    .content-card{background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius-lg);padding:1.75rem;transition:border-color .3s}
+    .content-card:hover{border-color:var(--accent2)}
+    .content-card.full{grid-column:1/-1}
+    .card-tag{display:inline-block;padding:3px 10px;background:rgba(129,140,248,0.1);color:var(--accent2);border-radius:6px;font-size:0.75rem;font-weight:600;margin-bottom:1rem}
+    .content-card h3{font-size:1.1rem;margin-bottom:1rem}
+    .content-card p{font-size:0.92rem;color:var(--ink-muted);line-height:1.8;margin-bottom:0.8rem}
+    .content-card ul{list-style:none;padding:0}
+    .content-card li{padding:0.4rem 0;font-size:0.9rem;color:var(--ink-muted);display:flex;gap:10px;align-items:flex-start;line-height:1.7}
+    .content-card li::before{content:'▸';color:var(--accent2);flex-shrink:0;margin-top:1px}
+    .key-point{background:rgba(129,140,248,0.06);border-left:3px solid var(--accent2);border-radius:0 var(--radius) var(--radius) 0;padding:1.25rem 1.5rem;margin:1.5rem 0}
+    .key-point h4{color:var(--accent2);font-size:0.95rem;margin-bottom:0.5rem}
+    .key-point p{font-size:0.9rem;color:var(--ink-muted);line-height:1.8}
+    .key-point.green{background:rgba(52,211,153,0.06);border-left-color:var(--success)}
+    .key-point.green h4{color:var(--success)}
+    .formula-box{background:var(--bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1.25rem 1.5rem;margin:1rem 0;font-family:var(--mono);font-size:0.9rem;color:var(--accent2);text-align:center;letter-spacing:0.02em;overflow-x:auto;line-height:2}
+    .formula-box .comment{color:var(--muted);font-family:var(--font);font-size:0.82rem;display:block;margin-top:0.3rem}
+    .code-block{background:var(--bg);border:1px solid var(--rule);border-radius:var(--radius);padding:1.25rem 1.5rem;margin:1rem 0;overflow-x:auto;font-family:var(--mono);font-size:0.86rem;line-height:1.7;color:var(--ink-muted)}
+    .code-block .kw{color:var(--accent3)}.code-block .fn{color:var(--accent2)}.code-block .str{color:var(--success)}.code-block .cm{color:var(--muted);font-style:italic}.code-block .num{color:var(--warning)}
+    .compare-table{width:100%;border-collapse:collapse;margin:1rem 0}
+    .compare-table th,.compare-table td{padding:0.7rem 1rem;text-align:left;border-bottom:1px solid var(--rule);font-size:0.86rem}
+    .compare-table th{color:var(--accent2);font-weight:600;background:var(--bg3)}
+    .compare-table td{color:var(--ink-muted)}
+    .sigmoid-viz{display:flex;align-items:center;gap:2rem;margin:1.5rem 0;flex-wrap:wrap}
+    .sigmoid-curve{flex:1;min-width:200px;height:120px;position:relative;background:var(--bg);border-radius:var(--radius);border:1px solid var(--rule);padding:1rem}
+    .tree-viz{background:var(--bg);border-radius:var(--radius-lg);border:1px solid var(--rule);padding:2rem;margin:1.5rem 0;text-align:center}
+    .tree-level{display:flex;justify-content:center;gap:2rem;margin-bottom:1rem}
+    .tree-node{padding:0.5rem 1rem;border-radius:8px;font-size:0.8rem;font-weight:600;min-width:80px}
+    .tree-node.root{background:rgba(129,140,248,0.2);border:1px solid var(--accent2);color:var(--accent2)}
+    .tree-node.split{background:rgba(56,189,248,0.12);border:1px solid var(--accent);color:var(--accent)}
+    .tree-node.leaf{background:rgba(52,211,153,0.12);border:1px solid var(--success);color:var(--success)}
+    .ensemble-compare{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+    .ensemble-card{background:var(--bg);border-radius:var(--radius-lg);padding:1.5rem;border:1px solid var(--rule)}
+    .ensemble-card h4{font-size:1rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:8px}
+    .ensemble-card p{font-size:0.85rem;color:var(--muted);line-height:1.6;margin-bottom:0.75rem}
+    .metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin:1rem 0}
+    .metric-card{background:var(--bg);border-radius:var(--radius);padding:1rem;border:1px solid var(--rule);text-align:center}
+    .metric-card .metric-val{font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .metric-card .metric-name{font-size:0.8rem;color:var(--muted);margin-top:4px}
+    .chapter-nav{display:flex;justify-content:space-between;align-items:center;padding:2rem 0;margin-top:2rem;border-top:1px solid var(--rule)}
+    .chapter-nav .prev,.chapter-nav .next{display:flex;align-items:center;gap:8px;padding:12px 20px;background:var(--bg2);border:1px solid var(--rule);border-radius:var(--radius);color:var(--ink-muted);font-size:0.9rem;transition:all .3s}
+    .chapter-nav .next{margin-left:auto;text-align:right}
+    .chapter-nav .prev:hover,.chapter-nav .next:hover{border-color:var(--accent2);color:var(--accent2)}
+    .nav-label{font-size:0.75rem;color:var(--muted);display:block}.nav-title{font-weight:600;color:var(--ink)}
+    footer{background:var(--bg2);border-top:1px solid var(--rule);padding:3rem 2rem 2rem;margin-top:3rem}
+    .footer-inner{max-width:var(--max);margin:0 auto;text-align:center;color:var(--muted);font-size:0.82rem}
+    @media(max-width:768px){.content-grid,.ensemble-compare,.metric-grid{grid-template-columns:1fr}.nav-links{display:none}}
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="ml-learning-site.html" class="logo"><div class="logo-icon">🧠</div><span>ML学习站</span></a>
+      <ul class="nav-links">
+        <li><a href="ml-learning-site.html">首页</a></li>
+        <li><a href="slides.html">📊 PPT版</a></li>
+        <li><a href="chapter1.html">第1章</a></li>
+        <li><a href="chapter2.html">第2章</a></li>
+        <li><a href="#lesson9" class="active">第9集</a></li>
+        <li><a href="#lesson10">第10集</a></li>
+        <li><a href="#lesson11">第11集</a></li>
+        <li><a href="#lesson12">第12集</a></li>
+        <li><a href="chapter4.html">下一章 →</a></li>
+      </ul>
+      <a href="ml-learning-site.html" class="back-btn">← 返回首页</a>
+    </div>
+  </nav>
+
+  <div class="chapter-hero">
+    <div class="chapter-hero-inner">
+      <div class="breadcrumb"><a href="ml-learning-site.html">首页</a> / <span>第3章 分类算法与集成学习</span></div>
+      <span class="chapter-badge">🌳 进阶篇 · 第9-12集</span>
+      <h1 class="chapter-title">分类算法与集成学习</h1>
+      <p class="chapter-subtitle">从最常用的分类模型逻辑回归出发，学习直观易懂的决策树，再到集成学习两大流派——Bagging（随机森林）和Boosting（XGBoost/LightGBM/CatBoost），掌握工业界最实用的分类算法。</p>
+      <div class="chapter-meta">
+        <span class="meta-item">📺 4集视频</span><span class="meta-item">⏱ 约83分钟</span><span class="meta-item">🌳 树模型</span><span class="meta-item">⚡ 工业实战</span>
+      </div>
+      <div class="video-nav">
+        <a href="#lesson9" class="vnav-item active"><strong>第9集</strong><span>逻辑回归 (29:22)</span></a>
+        <a href="#lesson10" class="vnav-item"><strong>第10集</strong><span>决策树 (17:04)</span></a>
+        <a href="#lesson11" class="vnav-item"><strong>第11集</strong><span>随机森林 (12:57)</span></a>
+        <a href="#lesson12" class="vnav-item"><strong>第12集</strong><span>Boosting (23:50)</span></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="lesson" id="lesson9">
+      <div class="lesson-header">
+        <div class="lesson-num">09</div>
+        <div class="lesson-info">
+          <h2>逻辑回归—最常用的分类模型</h2>
+          <div class="lesson-dur">⏱ 29分22秒 · BV1gZDVBUEqC</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1gZDVBUEqC&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point">
+        <h4>💡 核心思想</h4>
+        <p>线性回归输出连续值（如房价），但分类问题需要输出类别（如"是/否垃圾邮件"）。逻辑回归的核心思想：<strong style="color:var(--ink)">先用线性回归算出一个值，再通过Sigmoid函数把它"压缩"到0~1之间，表示属于正类的概率</strong>。</p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">Sigmoid函数</span>
+          <h3>📈 从线性到概率的映射</h3>
+          <div class="formula-box">
+            σ(z) = 1 / (1 + e<sup>-z</sup>)<br>
+            <span class="comment">其中 z = wx + b（线性回归的输出）</span>
+          </div>
+          <p>Sigmoid函数将任意实数映射到(0,1)区间，完美表示概率：</p>
+          <ul>
+            <li>z很大（正数）→ σ(z)接近1 → 预测为正类</li>
+            <li>z很小（负数）→ σ(z)接近0 → 预测为负类</li>
+            <li>z=0 → σ(z)=0.5 → 决策边界</li>
+            <li>输出0.7表示有70%概率属于正类</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">损失函数</span>
+          <h3>📉 对数损失（交叉熵损失）</h3>
+          <p>不能用MSE（非凸，有局部最优），改用对数损失：</p>
+          <div class="formula-box">
+            J = -(1/n)Σ[y·log(ŷ) + (1-y)·log(1-ŷ)]
+          </div>
+          <ul>
+            <li>当真实y=1时，惩罚- log(ŷ)，预测越接近0惩罚越大</li>
+            <li>当真实y=0时，惩罚- log(1-ŷ)，预测越接近1惩罚越大</li>
+            <li>对数损失是凸函数，梯度下降保证找到全局最优</li>
+          </ul>
+        </div>
+      </div>
+      <div class="content-card full">
+        <span class="card-tag">分类评估指标</span>
+        <h3>🎯 分类模型如何评估？</h3>
+        <div class="metric-grid">
+          <div class="metric-card"><div class="metric-val">TP/TN</div><div class="metric-name">真阳性/真阴性（预测正确）</div></div>
+          <div class="metric-card"><div class="metric-val">FP/FN</div><div class="metric-name">假阳性/假阴性（预测错误）</div></div>
+          <div class="metric-card"><div class="metric-val">Precision</div><div class="metric-name">精确率 = TP/(TP+FP)<br>预测为正中真的比例</div></div>
+          <div class="metric-card"><div class="metric-val">Recall</div><div class="metric-name">召回率 = TP/(TP+FN)<br>真实正中被找出的比例</div></div>
+          <div class="metric-card"><div class="metric-val">F1</div><div class="metric-name">F1 = 2·P·R/(P+R)<br>精确率和召回率的调和平均</div></div>
+          <div class="metric-card"><div class="metric-val">AUC</div><div class="metric-name">ROC曲线下面积<br>越接近1越好，衡量排序能力</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson" id="lesson10">
+      <div class="lesson-header">
+        <div class="lesson-num v10">10</div>
+        <div class="lesson-info">
+          <h2>决策树——会 if...else 就能懂的机器学习算法</h2>
+          <div class="lesson-dur">⏱ 17分04秒 · BV1M8D7BWEVQ</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1M8D7BWEVQ&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="key-point green">
+        <h4>💡 直觉理解</h4>
+        <p>决策树就是一层一层的if-else判断。比如判断"今天要不要出去玩"：if 天气=晴 → if 湿度<70% → 去；else → 不去。<strong style="color:var(--ink)">你每天其实都在用决策树做决策！</strong></p>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">划分准则</span>
+          <h3>🌳 如何选择最佳划分特征？</h3>
+          <p>核心问题：每次分裂时，哪个特征最能区分数据？</p>
+          <ul>
+            <li><strong style="color:var(--ink)">信息增益（ID3）</strong>：划分后信息熵减少多少，减少越多越好</li>
+            <li><strong style="color:var(--ink)">信息增益率（C4.5）</strong>：修正信息增益偏向多值特征的问题</li>
+            <li><strong style="color:var(--ink)">基尼系数（CART）</strong>：随机抽两个样本类别不一致的概率，越小越纯</li>
+          </ul>
+          <div class="formula-box" style="font-size:0.82rem;text-align:left;margin-top:1rem">
+            信息熵：H(S) = -Σpᵢ·log(pᵢ)<br>
+            基尼系数：Gini(S) = 1 - Σpᵢ²<br>
+            <span class="comment">pᵢ是第i类样本的比例，熵/基尼越小说明节点越"纯"</span>
+          </div>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">关键问题</span>
+          <h3>✂️ 剪枝：防止过拟合</h3>
+          <p>决策树如果不限制，会一直分裂直到每个叶子节点只有一个样本——完美记住训练数据，但在新数据上表现很差（过拟合）。</p>
+          <ul>
+            <li><strong style="color:var(--ink)">预剪枝</strong>：训练时提前停止<br>　- 限制树的最大深度（max_depth）<br>　- 限制叶子节点最少样本数（min_samples_leaf）<br>　- 分裂所需最小样本数（min_samples_split）</li>
+            <li><strong style="color:var(--ink)">后剪枝</strong>：先训练完整树，再裁掉没用的分支</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tree-viz">
+        <div class="diagram-title" style="margin-bottom:1rem">决策树结构示意</div>
+        <div class="tree-level"><div class="tree-node root">年龄≤30?</div></div>
+        <div style="color:var(--muted);font-size:0.8rem;margin:0.3rem 0">↙ 是 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ↘ 否</div>
+        <div class="tree-level" style="gap:4rem">
+          <div class="tree-node split">学生?</div>
+          <div class="tree-node split">信用评级?</div>
+        </div>
+        <div style="color:var(--muted);font-size:0.8rem;margin:0.3rem 0">↙&nbsp;&nbsp;↘ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ↙&nbsp;&nbsp;↘</div>
+        <div class="tree-level" style="gap:1rem">
+          <div class="tree-node leaf">不买</div>
+          <div class="tree-node leaf">购买</div>
+          <div class="tree-node leaf">购买</div>
+          <div class="tree-node leaf">不买</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson" id="lesson11">
+      <div class="lesson-header">
+        <div class="lesson-num v11">11</div>
+        <div class="lesson-info">
+          <h2>随机森林——决策树模型升级版</h2>
+          <div class="lesson-dur">⏱ 12分57秒 · BV1NgQuBFEVY</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1NgQuBFEVY&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">集成学习·Bagging</span>
+          <h3>🌲🌲🌲 三个臭皮匠赛过诸葛亮</h3>
+          <p>单棵决策树容易过拟合，且对训练数据敏感。<strong style="color:var(--ink)">随机森林训练多棵决策树，让它们投票决定最终结果</strong>，大大提升稳定性和准确率。</p>
+          <div class="formula-box" style="font-size:0.85rem;text-align:left">
+            随机森林 = Bagging + 随机特征选择<br>
+            <span class="comment">1. Bootstrap有放回抽样生成不同子集<br>2. 每个子集训练一棵决策树<br>3. 分裂时随机选部分特征<br>4. 所有树投票/平均得出结果</span>
+          </div>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">为什么"随机"？</span>
+          <h3>🎲 双重随机保证多样性</h3>
+          <ul>
+            <li><strong style="color:var(--ink)">随机样本</strong>：每棵树用Bootstrap抽样（有放回）得到不同训练集，约63%原始样本</li>
+            <li><strong style="color:var(--ink)">随机特征</strong>：每次分裂只考虑随机选的部分特征（通常√n个）</li>
+            <li>双重随机确保树之间差异大，集成效果更好</li>
+            <li>未被抽到的37%数据称为<strong style="color:var(--ink)">袋外数据（OOB）</strong>，可用于验证</li>
+          </ul>
+          <div class="key-point green" style="margin-top:1rem">
+            <h4>✅ 随机森林优势</h4>
+            <p>几乎不需要调参就能取得好效果、抗过拟合能力强、能输出特征重要性、并行训练速度快、工业界最常用的baseline模型之一。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lesson" id="lesson12">
+      <div class="lesson-header">
+        <div class="lesson-num v12">12</div>
+        <div class="lesson-info">
+          <h2>集成学习之Boosting模型——XGBoost、LightGBM、CatBoost</h2>
+          <div class="lesson-dur">⏱ 23分50秒 · BV1QdQJBTEGV</div>
+        </div>
+      </div>
+      <div class="video-wrapper">
+        <iframe src="//player.bilibili.com/player.html?bvid=BV1QdQJBTEGV&page=1&high_quality=1&danmaku=0&autoplay=0" scrolling="no" frameborder="0" allowfullscreen="true"></iframe>
+      </div>
+      <div class="ensemble-compare">
+        <div class="ensemble-card" style="border-color:rgba(56,189,248,0.3)">
+          <h4 style="color:var(--accent)">📦 Bagging（并行）</h4>
+          <p>独立训练多个模型，投票/平均<br><strong>代表：随机森林</strong></p>
+          <p style="color:var(--success);font-size:0.82rem">✓ 减少方差，防过拟合<br>✓ 并行训练速度快<br>✗ 对偏差改善有限</p>
+        </div>
+        <div class="ensemble-card" style="border-color:rgba(129,140,248,0.3)">
+          <h4 style="color:var(--accent2)">🚀 Boosting（串行）</h4>
+          <p> sequentially训练，每棵树纠正前一棵树的错误<br><strong>代表：AdaBoost/GBDT/XGBoost</strong></p>
+          <p style="color:var(--accent2);font-size:0.82rem">✓ 减少偏差，精度极高<br>✓ 工业竞赛大杀器<br>✗ 串行训练相对较慢</p>
+        </div>
+      </div>
+      <div class="content-grid">
+        <div class="content-card">
+          <span class="card-tag">GBDT原理</span>
+          <h3>🔧 梯度提升决策树</h3>
+          <p>Boosting的核心思想：<strong style="color:var(--ink)">每棵新树学习前面所有树的残差（预测误差），逐步逼近真实值</strong>。</p>
+          <ul>
+            <li>第1棵树：直接预测目标值</li>
+            <li>第2棵树：预测第1棵树的残差（真实值-预测值）</li>
+            <li>第3棵树：预测前两棵树加起来后的残差</li>
+            <li>最终预测 = 所有树的预测值加起来</li>
+            <li>用梯度下降的思路拟合负梯度（残差是梯度的特例）</li>
+          </ul>
+        </div>
+        <div class="content-card">
+          <span class="card-tag">三大神器</span>
+          <h3>⚡ XGBoost / LightGBM / CatBoost</h3>
+          <ul>
+            <li><strong style="color:var(--accent2)">XGBoost</strong>：GBDT工程优化版，正则化防过拟合、二阶泰勒展开、并行处理、缺失值自动处理，Kaggle竞赛神器</li>
+            <li><strong style="color:var(--success)">LightGBM</strong>：微软出品，直方图算法+按叶子生长（leaf-wise），速度比XGBoost快10倍，内存占用更低</li>
+            <li><strong style="color:var(--warning)">CatBoost</strong>：Yandex出品，自动处理类别特征（无需手动编码），对类别变量友好，鲁棒性强</li>
+          </ul>
+        </div>
+      </div>
+      <div class="code-block">
+        <span class="cm"># sklearn中使用集成学习</span><br>
+        <span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier<br>
+        <span class="kw">from</span> xgboost <span class="kw">import</span> XGBClassifier<br>
+        <span class="kw">from</span> lightgbm <span class="kw">import</span> LGBMClassifier<br><br>
+        <span class="cm"># 随机森林</span><br>
+        rf = RandomForestClassifier(n_estimators=<span class="num">100</span>, max_depth=<span class="num">10</span>)<br>
+        rf.fit(X_train, y_train)<br><br>
+        <span class="cm"># XGBoost (竞赛最常用)</span><br>
+        xgb = XGBClassifier(n_estimators=<span class="num">200</span>, learning_rate=<span class="num">0.1</span>, max_depth=<span class="num">6</span>)<br>
+        xgb.fit(X_train, y_train, eval_set=[(X_val,y_val)], early_stopping_rounds=<span class="num">20</span>)<br><br>
+        <span class="cm"># LightGBM (速度最快)</span><br>
+        lgb = LGBMClassifier(n_estimators=<span class="num">200</span>, learning_rate=<span class="num">0.1</span>)<br>
+        lgb.fit(X_train, y_train)
+      </div>
+    </div>
+
+    <div class="chapter-nav">
+      <a href="chapter2.html" class="prev">
+        <span>←</span><span><span class="nav-label">上一章</span><span class="nav-title">第2章 线性回归与优化</span></span>
+      </a>
+      <a href="chapter4.html" class="next">
+        <span><span class="nav-label">下一章</span><span class="nav-title">第4章 无监督学习与总结 →</span></span>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <p>© 2026 ML学习站 | 本站仅作学习整理用途</p>
+      <p style="margin-top:0.5rem"><a href="https://space.bilibili.com/291215958/lists/7468039?type=season" target="_blank" style="color:var(--accent2)">前往B站观看原视频 →</a></p>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('a[href^="#"]').forEach(function(a){a.addEventListener('click',function(e){var h=this.getAttribute('href');if(h==='#')return;e.preventDefault();var t=document.querySelector(h);if(t)t.scrollIntoView({behavior:'smooth',block:'start'})})});
+    var vnavs=document.querySelectorAll('.vnav-item');var lessons=document.querySelectorAll('.lesson');window.addEventListener('scroll',function(){var cur=0;lessons.forEach(function(l,i){if(window.scrollY>=l.offsetTop-120)cur=i});vnavs.forEach(function(n,i){n.classList.toggle('active',i===cur)})});
+  </script>
+</body>
+</html>

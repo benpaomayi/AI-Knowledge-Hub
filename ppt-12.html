@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>第12集 Boosting集成模型 - ML学习站PPT</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#38bdf8;--accent2:#818cf8;--accent3:#c084fc;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--accent2);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent2),var(--accent3),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent2);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(129,140,248,0.15) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(192,132,252,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(129,140,248,0.1);border:1px solid rgba(129,140,248,0.25);border-radius:50px;font-size:1rem;color:var(--accent2);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent2),var(--accent3),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:800px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(129,140,248,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:2rem;margin:1.5rem 0;text-align:center;font-family:var(--mono);font-size:clamp(1rem,1.8vw,1.3rem);color:var(--accent2);line-height:2}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:1rem;display:block;text-align:left;line-height:1.7}
+.katex{color:var(--accent3)}.katex .mord.text{color:var(--ink2)}
+.hbox{background:rgba(129,140,248,0.08);border-left:4px solid var(--accent2);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1.5rem 0}
+.hbox h4{color:var(--accent2);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(251,191,36,0.08);border-left-color:var(--warning)}.hbox.warn h4{color:var(--warning)}
+.hbox.danger{background:rgba(248,113,114,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.blue{background:rgba(56,189,248,0.08);border-left-color:var(--accent)}.hbox.blue h4{color:var(--accent)}
+.hbox.pink{background:rgba(192,132,252,0.08);border-left-color:var(--accent3)}.hbox.pink h4{color:var(--accent3)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:1rem}
+table.cmp th{background:var(--bg3);color:var(--accent2);padding:12px 16px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.95rem}
+table.cmp td{padding:10px 16px;border-bottom:1px solid var(--rule);color:var(--ink2)}
+table.cmp tr:hover td{background:rgba(129,140,248,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent2);background:rgba(129,140,248,0.1);color:var(--accent2);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent2)}
+.tag.b{color:var(--accent)}.tag.pi{color:var(--accent3)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}.tag.r{color:var(--danger)}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent2),var(--accent3),var(--accent));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent2);color:var(--accent2)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent2)}
+.topnav-left{color:var(--accent2);font-weight:600}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;background:linear-gradient(135deg,var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.code{background:var(--bg);border:1px solid var(--rule);border-radius:14px;padding:1.5rem 2rem;margin:1.5rem 0;font-family:var(--mono);font-size:clamp(0.85rem,1.4vw,1rem);line-height:1.8;color:var(--ink2);overflow-x:auto;white-space:pre}
+.code .kw{color:var(--accent3)}.code .fn{color:var(--accent2)}.code .str{color:var(--success)}.code .cm{color:var(--muted);font-style:italic}.code .num{color:var(--warning)}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:2rem;align-items:center;margin:2rem 0}
+.vs-side{padding:2rem;border-radius:16px;text-align:center}
+.vs-left{background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.2)}
+.vs-right{background:rgba(129,140,248,0.06);border:1px solid rgba(129,140,248,0.2)}
+.vs-divider{font-size:2rem;font-weight:800;color:var(--muted)}
+.four-col{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1.5rem}
+.num-demo{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:2rem;margin:1.5rem 0}
+.num-step{display:flex;align-items:center;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--rule)}
+.num-step:last-child{border-bottom:none}
+.num-step .step-label{min-width:80px;font-weight:600;color:var(--accent2)}
+.num-step .step-val{font-family:var(--mono);font-size:1.1rem}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col,.vs,.four-col{grid-template-columns:1fr}.vs-divider{text-align:center}.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="chapter3.html" class="topnav-left">📊 PPT课件 · 第3章</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="ppt-11.html">← 上一集</a>
+    <a href="chapter3.html">回到视频页</a>
+    <a href="ppt-13.html" style="color:var(--accent2);font-weight:600">下一章 →</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">机器学习入门教程 · 第12集</div>
+    <h1 class="cover-title">集成学习Boosting模型</h1>
+    <p class="cover-sub">XGBoost / LightGBM / CatBoost<br>三大Boosting神器深度解析<br>BV1QdQJBTEGV · 时长 23分50秒</p>
+    <div class="tags">
+      <span class="tag">集成学习</span>
+      <span class="tag.pi">XGBoost</span>
+      <span class="tag.b">LightGBM</span>
+      <span class="tag.g">CatBoost</span>
+      <span class="tag.w">Kaggle神器</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">2 / 39</div>
+  <div class="slide-content">
+    <h1 class="st">本集学习目标</h1>
+    <h3 class="sub">通过这一集，你将掌握Boosting集成学习的核心精髓</h3>
+    <div class="body">
+      <ul>
+        <li><strong>理解Boosting核心思想</strong>——串行训练、逐步改进、聚焦错误样本</li>
+        <li><strong>掌握AdaBoost原理</strong>——如何通过调整样本权重提升性能</li>
+        <li><strong>深入理解GBDT</strong>——梯度提升决策树，拟合残差的核心机制</li>
+        <li><strong>精通XGBoost六大创新点</strong>——为什么它是Kaggle竞赛王者</li>
+        <li><strong>理解LightGBM四大优化</strong>——直方图、Leaf-wise、GOSS、EFB</li>
+        <li><strong>了解CatBoost特色</strong>——自动处理类别特征的秘密武器</li>
+        <li><strong>学会三大神器选型</strong>——什么场景用哪个算法</li>
+        <li><strong>掌握代码实现</strong>——sklearn和XGBoost实战</li>
+      </ul>
+    </div>
+    <div class="hbox success">
+      <h4>🎯 学习建议</h4>
+      <p>这一集是第3章的高潮！建议先复习上一集的Bagging和随机森林，然后对比着学Boosting，理解两种集成思路的本质区别。重点是GBDT的残差拟合思想和XGBoost的工程优化。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">3 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">复习：Bagging（随机森林）的特点</h2>
+    <h3 class="sub">温故而知新——先回顾上一集学的Bagging流派</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="card-icon">🎒</div>
+        <h4>Bagging核心</h4>
+        <p><strong>B</strong>ootstrap <strong>A</strong>ggregat<strong>ing</strong><br>自助采样 + 聚合投票</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon">⚡</div>
+        <h4>训练方式</h4>
+        <p><strong style="color:var(--accent2)">并行训练</strong><br>各个基学习器独立训练，互不依赖</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎯</div>
+        <h4>主要作用</h4>
+        <p><strong>降低方差（Variance）</strong><br>解决过拟合问题，让模型更稳定</p>
+      </div>
+    </div>
+    <div class="body">
+      <p><strong>随机森林的关键特性：</strong></p>
+    </div>
+    <div class="two-col">
+      <div class="body">
+        <ul>
+          <li>有放回随机采样（Bootstrap）生成不同子集</li>
+          <li>特征随机选择，增加基学习器多样性</li>
+          <li>分类：投票；回归：平均</li>
+        </ul>
+      </div>
+      <div class="hbox blue">
+        <h4>🌲 代表算法</h4>
+        <p>随机森林（Random Forest）是Bagging的典型代表，用决策树作为基学习器，简单实用、鲁棒性强。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">4 / 39</div>
+  <div class="slide-content">
+    <h1 class="st">集成学习两大流派总览</h1>
+    <h3 class="sub">Bagging vs Boosting——两种截然不同的集成哲学</h3>
+    <div class="vs">
+      <div class="vs-side vs-left">
+        <h3 style="color:var(--accent);margin-bottom:1rem">🎒 Bagging流派</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul style="font-size:0.95rem">
+            <li><strong>并行训练</strong>，各学习器独立</li>
+            <li>平等投票/平均</li>
+            <li>侧重<strong>降低方差</strong></li>
+            <li>基学习器可以很复杂（深树）</li>
+            <li>代表：随机森林</li>
+            <li>类似"三个臭皮匠顶个诸葛亮"</li>
+          </ul>
+        </div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side vs-right">
+        <h3 style="color:var(--accent2);margin-bottom:1rem">🚀 Boosting流派</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul style="font-size:0.95rem">
+            <li><strong>串行训练</strong>，逐步改进</li>
+            <li>加权融合，重点关注错误</li>
+            <li>侧重<strong>降低偏差</strong></li>
+            <li>基学习器通常很简单（浅树）</li>
+            <li>代表：AdaBoost、GBDT、XGBoost</li>
+            <li>类似"错题本反复练习"</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>💡 核心区别一句话</h4>
+      <p>Bagging是"集体决策"，大家独立思考然后投票；Boosting是"迭代精进"，每一轮都专门弥补上一轮的错误。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">5 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">Bagging回顾：并行独立训练</h2>
+    <h3 class="sub">用"集体智慧"降低方差——三个臭皮匠赛过诸葛亮</h3>
+    <div class="flow" style="margin:2rem 0">
+      <div class="flow-node" style="min-width:140px">📊 原始数据集</div>
+      <div class="flow-arrow">↓ Bootstrap采样</div>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center">
+        <div class="flow-node" style="background:rgba(56,189,248,0.1);border-color:rgba(56,189,248,0.3)">🌲 树1</div>
+        <div class="flow-node" style="background:rgba(56,189,248,0.1);border-color:rgba(56,189,248,0.3)">🌲 树2</div>
+        <div class="flow-node" style="background:rgba(56,189,248,0.1);border-color:rgba(56,189,248,0.3)">🌲 树3</div>
+        <div class="flow-node" style="color:var(--muted)">...</div>
+        <div class="flow-node" style="background:rgba(56,189,248,0.1);border-color:rgba(56,189,248,0.3)">🌲 树n</div>
+      </div>
+      <div class="flow-arrow">↓ 投票/平均</div>
+      <div class="flow-node hl" style="min-width:140px;border-color:var(--accent);background:rgba(56,189,248,0.1);color:var(--accent)">🎯 最终预测</div>
+    </div>
+    <div class="three-col">
+      <div class="hbox blue" style="margin:0">
+        <h4>🔀 随机采样</h4>
+        <p>有放回地从原数据中采样，每个基学习器看到的数据略有不同。</p>
+      </div>
+      <div class="hbox blue" style="margin:0">
+        <h4>⚡ 并行训练</h4>
+        <p>所有树可以同时训练，互相没有依赖，训练速度快。</p>
+      </div>
+      <div class="hbox blue" style="margin:0">
+        <h4>📉 降低方差</h4>
+        <p>多个高方差低偏差的模型平均后，方差显著降低，泛化能力提升。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">6 / 39</div>
+  <div class="slide-content">
+    <h1 class="st">Boosting核心思想：串行训练，逐步改进</h1>
+    <h3 class="sub">不是"三个臭皮匠"，而是"学霸养成记"——从错误中学习</h3>
+    <div class="flow" style="margin:2rem 0;flex-direction:column;gap:1rem;align-items:stretch">
+      <div style="display:flex;align-items:center;gap:1rem">
+        <div class="flow-node" style="min-width:100px">第1轮</div>
+        <div style="flex:1" class="card" style="margin:0">
+          <p style="margin:0">🌱 训练第一个弱学习器 f₁(x)，在数据上做预测</p>
+        </div>
+      </div>
+      <div style="text-align:center;color:var(--accent2);font-size:1.5rem">↓ 找出预测错误的样本，重点关注</div>
+      <div style="display:flex;align-items:center;gap:1rem">
+        <div class="flow-node" style="min-width:100px;background:rgba(129,140,248,0.1);border-color:var(--accent2);color:var(--accent2)">第2轮</div>
+        <div style="flex:1" class="card accent" style="margin:0">
+          <p style="margin:0">🎯 针对错误，训练第二个学习器 f₂(x) 来弥补 f₁ 的不足</p>
+        </div>
+      </div>
+      <div style="text-align:center;color:var(--accent2);font-size:1.5rem">↓ 继续找不足，再训练新的学习器</div>
+      <div style="display:flex;align-items:center;gap:1rem">
+        <div class="flow-node" style="min-width:100px">...</div>
+        <div style="flex:1" class="card" style="margin:0">
+          <p style="margin:0">🔁 重复这个过程，每一轮都在前一轮的基础上改进</p>
+        </div>
+      </div>
+      <div style="text-align:center;color:var(--accent2);font-size:1.5rem">↓ 加权融合所有学习器</div>
+      <div style="display:flex;align-items:center;gap:1rem">
+        <div class="flow-node hl" style="min-width:100px">最终</div>
+        <div style="flex:1" class="card" style="margin:0;background:rgba(129,140,248,0.1);border-color:var(--accent2)">
+          <p style="margin:0"><strong>F(x) = w₁f₁(x) + w₂f₂(x) + ... + wₙfₙ(x)</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">7 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">Boosting直觉：学生做题，每次改正之前的错误</h2>
+    <h3 class="sub">用一个生活类比理解Boosting——这和你备考刷题一模一样！</h3>
+    <div class="card" style="margin-bottom:1.5rem">
+      <h4>📚 场景：准备数学考试</h4>
+      <p style="margin-bottom:1rem">想象你要准备一场数学考试，有100道练习题。你不是随便做，而是这样高效学习：</p>
+    </div>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node" style="min-width:130px">📝 第一遍做题</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:130px;color:var(--danger)">❌ 对答案，标记错题</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:150px">🔍 重点做错题</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:130px">📈 成绩提高！</div>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="hbox warn" style="margin-top:0">
+          <h4>🤔 如果用Bagging方式学习</h4>
+          <p>每次随机抽一些题做，做完也不重点关注错题，做很多遍后求"平均感觉"——这样效率很低，错的题可能一直错。</p>
+        </div>
+      </div>
+      <div>
+        <div class="hbox success" style="margin-top:0">
+          <h4>✨ Boosting学习法（学霸法）</h4>
+          <p>每次做完都重点分析错题，把更多时间花在不会的题上，第二遍专门针对错题练习，逐步消灭薄弱点——这才是高效学习！</p>
+        </div>
+      </div>
+    </div>
+    <div class="hbox pink">
+      <h4>🎯 Boosting的精髓</h4>
+      <p>把注意力集中在<strong>之前做错的样本</strong>上，每一轮都专门解决上一轮没解决好的问题，逐步把模型变强。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">8 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">AdaBoost：自适应提升——提高错误样本权重</h2>
+    <h3 class="sub">AdaBoost = Adaptive Boosting，Boosting家族的开山之作</h3>
+    <div class="body">
+      <p><strong>核心思想：</strong>让之前被分错的样本在后续训练中获得更高的权重，"强迫"后续学习器重点关注这些难样本。</p>
+    </div>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node">初始权重相等</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">训练弱分类器</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="color:var(--danger)">计算错误率</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl">更新样本权重<br><small>错的↑ 对的↓</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">下一轮...</div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h4>📊 权重更新逻辑</h4>
+        <p style="margin-bottom:0.8rem">每个样本都有一个权重：</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>分类<strong>正确</strong>的样本 → 权重<strong>降低</strong></li>
+          <li>分类<strong>错误</strong>的样本 → 权重<strong>升高</strong></li>
+          <li>下一轮训练时，分类器会"更重视"权重大的样本</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <h4>⚖️ 弱分类器权重</h4>
+        <p style="margin-bottom:0.8rem">不是所有分类器话语权相同：</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>准确率高的分类器 → 投票权重<strong>大</strong></li>
+          <li>准确率低的分类器 → 投票权重<strong>小</strong></li>
+          <li>最终结果 = 加权投票</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox blue">
+      <h4>📌 关于AdaBoost</h4>
+      <p>AdaBoost是第一个实用的Boosting算法，思想简单优美。但它对噪声和异常点比较敏感，因为异常点会一直获得高权重，干扰后续训练。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">9 / 39</div>
+  <div class="slide-content">
+    <h1 class="st">GBDT：梯度提升决策树核心思想</h1>
+    <h3 class="sub">Gradient Boosting Decision Tree——工业界最常用的Boosting算法</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="card-icon">🌲</div>
+        <h4>基学习器</h4>
+        <p><strong>CART回归树</strong><br>（通常是很浅的树，深度1-8）</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon">📉</div>
+        <h4>核心方法</h4>
+        <p><strong>拟合残差/负梯度</strong><br>每棵新树学习之前的预测误差</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">➕</div>
+        <h4>结果融合</h4>
+        <p><strong>所有树结果相加</strong><br>F(x) = f₁ + f₂ + ... + fₙ</p>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>🎯 GBDT vs AdaBoost的关键区别</h4>
+      <p>AdaBoost通过<strong>调整样本权重</strong>来关注错误样本；GBDT则是直接让新的树去<strong>拟合前面所有树的残差（预测误差）</strong>，通过减小残差来逐步提升性能。</p>
+    </div>
+    <div class="hbox success">
+      <h4>💡 一句话理解GBDT</h4>
+      <p>GBDT就像一个不断进步的预测团队：第一个人先做一个粗略预测，第二个人专门预测第一个人"差多少"，第三个人再预测前两个人加起来还差多少……最后所有人的预测加起来就是最终答案。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">10 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">GBDT：每棵新树学习残差（预测误差）</h2>
+    <h3 class="sub">这是GBDT最核心的机制——什么是"残差"？</h3>
+    <div class="card" style="margin-bottom:1.5rem">
+      <h4>📖 残差定义</h4>
+      <p style="font-size:1.2rem;text-align:center;margin:1rem 0;font-family:var(--mono);color:var(--accent2)">
+        残差 = 真实值 - 当前预测值
+      </p>
+      <p>残差就是"还差多少"——真实答案和目前预测之间的差距。GBDT的每一棵新树，不是去预测最终结果，而是去预测<strong>这个差距</strong>！</p>
+    </div>
+    <div class="formula">
+      <strong>预测过程是累加的：</strong><br><br>
+      F₁(x) = f₁(x) &nbsp;&nbsp;（第一棵树的预测）<br>
+      F₂(x) = F₁(x) + f₂(x) &nbsp;&nbsp;（加上第二棵树对残差的预测）<br>
+      F₃(x) = F₂(x) + f₃(x) &nbsp;&nbsp;（加上第三棵树...）<br>
+      ...<br>
+      Fₘ(x) = Fₘ₋₁(x) + fₘ(x) &nbsp;&nbsp;（最终结果）
+      <span class="desc">每加一棵树，都是在弥补之前的不足，让预测更接近真实值。这就是"提升"（Boosting）的含义。</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">11 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">GBDT预测过程：所有树的结果相加</h2>
+    <h3 class="sub">不是投票，而是累加——GBDT是"加法模型"</h3>
+    <div class="flow" style="margin:2rem 0;flex-direction:column;gap:1.5rem;align-items:center">
+      <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;justify-content:center">
+        <div class="flow-node" style="background:rgba(56,189,248,0.1);border-color:var(--accent);color:var(--accent);min-width:100px">f₁(x)<br><small>第一棵树</small></div>
+        <div style="font-size:1.5rem;color:var(--muted)">+</div>
+        <div class="flow-node" style="background:rgba(129,140,248,0.1);border-color:var(--accent2);color:var(--accent2);min-width:100px">f₂(x)<br><small>第二棵树</small></div>
+        <div style="font-size:1.5rem;color:var(--muted)">+</div>
+        <div class="flow-node" style="background:rgba(192,132,252,0.1);border-color:var(--accent3);color:var(--accent3);min-width:100px">f₃(x)<br><small>第三棵树</small></div>
+        <div style="font-size:1.5rem;color:var(--muted)">+</div>
+        <div style="color:var(--muted)">...</div>
+        <div style="font-size:1.5rem;color:var(--muted)">+</div>
+        <div class="flow-node" style="background:rgba(52,211,153,0.1);border-color:var(--success);color:var(--success);min-width:100px">fₙ(x)<br><small>第n棵树</small></div>
+      </div>
+      <div style="font-size:2rem;color:var(--accent2);font-weight:800">↓</div>
+      <div class="flow-node hl" style="min-width:280px;padding:1.5rem 2rem">
+        <strong style="font-size:1.3rem">F(x) = Σ fₖ(x)</strong><br>
+        <small style="color:var(--muted)">最终预测 = 所有树的预测之和</small>
+      </div>
+    </div>
+    <div class="hbox warn">
+      <h4>⚠️ 注意：GBDT用的是回归树！</h4>
+      <p>即使是分类任务，GBDT内部也用回归树拟合残差，最后通过Sigmoid/Softmax转换成概率。因为残差是连续值，需要回归来拟合。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">12 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">GBDT拟合残差的具体例子</h2>
+    <h3 class="sub">用数字说话——看一个简单的年龄预测例子</h3>
+    <div class="body">
+      <p><strong>任务：</strong>预测一个人的年龄，真实年龄是 <strong style="color:var(--success)">30岁</strong></p>
+    </div>
+    <div class="num-demo">
+      <div class="num-step">
+        <span class="step-label">🌲 树1预测</span>
+        <span class="step-val">f₁ = 20岁</span>
+        <span style="color:var(--muted);margin-left:1rem">→ 残差 = 30 - 20 = <strong style="color:var(--danger)">10岁</strong></span>
+      </div>
+      <div class="num-step">
+        <span class="step-label">🌲 树2预测</span>
+        <span class="step-val">f₂ = 6岁</span>
+        <span style="color:var(--muted);margin-left:1rem">→ 累计预测 = 20+6 = 26，残差 = 30-26 = <strong style="color:var(--warning)">4岁</strong></span>
+      </div>
+      <div class="num-step">
+        <span class="step-label">🌲 树3预测</span>
+        <span class="step-val">f₃ = 3岁</span>
+        <span style="color:var(--muted);margin-left:1rem">→ 累计预测 = 26+3 = 29，残差 = 30-29 = <strong style="color:var(--success)">1岁</strong></span>
+      </div>
+      <div class="num-step">
+        <span class="step-label">🌲 树4预测</span>
+        <span class="step-val">f₄ = 0.8岁</span>
+        <span style="color:var(--muted);margin-left:1rem">→ 累计预测 = 29.8，越来越接近30！</span>
+      </div>
+      <div class="num-step" style="background:rgba(129,140,248,0.1);border-radius:8px;margin-top:0.5rem;padding:1rem">
+        <span class="step-label" style="color:var(--accent2)">✅ 最终</span>
+        <span class="step-val" style="color:var(--accent2);font-weight:600">F = 20 + 6 + 3 + 0.8 + ... ≈ 30岁</span>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>💡 看到了吗？</h4>
+      <p>每一棵树都没有试图直接预测30岁，而是在预测"还差多少"。通过不断累加小的改进，最终逼近真实值。这就是GBDT工作的方式！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">13 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">GBDT vs Bagging关键区别对比表</h2>
+    <h3 class="sub">一张表彻底搞懂两种集成思路的差异</h3>
+    <table class="cmp">
+      <tr>
+        <th style="width:22%">对比维度</th>
+        <th style="width:39%">🎒 Bagging（随机森林）</th>
+        <th style="width:39%">🚀 GBDT（Boosting）</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">训练方式</strong></td>
+        <td><strong style="color:var(--accent)">并行</strong>，各树独立训练</td>
+        <td><strong style="color:var(--accent2)">串行</strong>，后一棵树依赖前面的结果</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">树的特点</strong></td>
+        <td>深树（可以很复杂，甚至不剪枝）</td>
+        <td>浅树（通常深度3-8，高偏差低方差）</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">样本权重</strong></td>
+        <td>权重相等，均匀采样</td>
+        <td>（通过拟合残差）重点关注难样本</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">结果融合</strong></td>
+        <td>分类：投票；回归：平均</td>
+        <td>所有树结果<strong>加权累加</strong></td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">主要作用</strong></td>
+        <td>降低<strong>方差</strong>（解决过拟合）</td>
+        <td>降低<strong>偏差</strong>（解决欠拟合）</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">对异常值</strong></td>
+        <td>不敏感（投票/平均天然鲁棒）</td>
+        <td>敏感（异常值残差大，会持续干扰）</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">训练速度</strong></td>
+        <td>快（可并行）</td>
+        <td>慢（只能串行）</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">调参难度</strong></td>
+        <td>简单，默认参数效果就好</td>
+        <td>较复杂，需要精细调参</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">14 / 39</div>
+  <div class="slide-content">
+    <h1 class="st">GBDT的问题：训练慢、需要精细调参</h1>
+    <h3 class="sub">经典GBDT虽然强大，但工程实现上有很多痛点</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="card-icon">🐢</div>
+        <h4>训练速度慢</h4>
+        <p>树之间有依赖，无法并行。每次节点分裂都要遍历所有特征的所有分割点，数据量大时非常慢。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎛️</div>
+        <h4>调参复杂</h4>
+        <p>学习率、树深度、树数量、子采样……参数很多，对新手不友好，调不好容易过拟合或欠拟合。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🤷</div>
+        <h4>缺失值处理弱</h4>
+        <p>原生GBDT没有内置缺失值处理，需要人工预处理填充，使用不便。</p>
+      </div>
+    </div>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h4>贪心算法效率低</h4>
+        <p>精确贪心分裂在数据量大时内存和计算开销都很大。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚠️</div>
+        <h4>容易过拟合</h4>
+        <p>没有内置正则化，加树太多容易过拟合，需要早停等策略。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">💾</div>
+        <h4>大数据支持差</h4>
+        <p>原生实现难以高效处理工业级海量数据。</p>
+      </div>
+    </div>
+    <div class="hbox pink">
+      <h4>🔥 需求催生创新</h4>
+      <p>正是因为GBDT效果好但工程痛点多，才有了后来XGBoost、LightGBM、CatBoost这些"工程优化版"——它们在算法思想上还是GBDT，但工程实现上做到了极致！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">15 / 39</div>
+  <div class="slide-content">
+    <h1 class="st">XGBoost登场——GBDT的工程极致优化版</h1>
+    <h3 class="sub">2014年由陈天奇等人开发，一经推出横扫Kaggle竞赛</h3>
+    <div style="text-align:center;margin:2rem 0">
+      <div class="big-num" style="font-size:clamp(4rem,10vw,8rem)">XGBoost</div>
+      <p style="font-size:1.5rem;color:var(--accent2);font-weight:600;margin:1rem 0">eXtreme Gradient Boosting</p>
+      <p style="color:var(--muted);max-width:700px;margin:0 auto;line-height:1.8">
+        被称为"大杀器""竞赛神器"，发布后几乎成为结构化数据竞赛的标配，
+        帮助无数队伍夺得冠军。它在GBDT基础上做了大量工程和算法优化，
+        速度更快、效果更好、功能更强。
+      </p>
+    </div>
+    <div class="tags" style="justify-content:center">
+      <span class="tag">⚡ 速度快10倍</span>
+      <span class="tag.g">✅ 内置正则化</span>
+      <span class="tag.b">🔧 缺失值处理</span>
+      <span class="tag.w">💻 支持并行</span>
+      <span class="tag.pi">🏆 Kaggle王者</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">16 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">XGBoost = Extreme Gradient Boosting</h2>
+    <h3 class="sub">为什么叫"Extreme"？因为它把工程优化做到了极致</h3>
+    <div class="card" style="margin-bottom:1.5rem;text-align:center;padding:3rem">
+      <p style="font-size:1.2rem;color:var(--muted);line-height:2">
+        XGBoost ≈ <strong style="color:var(--accent2)">GBDT思想</strong> + <strong style="color:var(--success)">工程极致优化</strong> + <strong style="color:var(--accent)">算法创新</strong>
+      </p>
+    </div>
+    <p class="body" style="text-align:center;margin-bottom:1.5rem"><strong>接下来我们逐个拆解XGBoost的六大核心创新点：</strong></p>
+    <div class="flow" style="gap:0.8rem">
+      <div class="flow-node hl" style="min-width:auto;padding:0.8rem 1.2rem">1️⃣ 正则化</div>
+      <div class="flow-node hl" style="min-width:auto;padding:0.8rem 1.2rem">2️⃣ 二阶泰勒展开</div>
+      <div class="flow-node hl" style="min-width:auto;padding:0.8rem 1.2rem">3️⃣ 近似算法</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="min-width:auto;padding:0.8rem 1.2rem">4️⃣ 并行处理</div>
+      <div class="flow-node hl" style="min-width:auto;padding:0.8rem 1.2rem">5️⃣ 缺失值处理</div>
+      <div class="flow-node hl" style="min-width:auto;padding:0.8rem 1.2rem">6️⃣ 列块存储</div>
+    </div>
+    <div class="hbox">
+      <h4>📌 学习提示</h4>
+      <p>这六点不需要死记硬背数学推导，重点理解"每一点解决了什么问题、带来了什么好处"。面试常考！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">17 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">XGBoost创新点一：正则化防过拟合</h2>
+    <h3 class="sub">在损失函数中加入L1/L2惩罚项，控制模型复杂度</h3>
+    <div class="formula">
+      Obj = Σ l(yᵢ, ŷᵢ) + <strong style="color:var(--warning)">Σ Ω(fₖ)</strong><br><br>
+      <small style="color:var(--muted)">
+      其中 Ω(f) = γT + ½λ||w||²<br>
+      T = 叶子节点数，w = 叶子权重
+      </small>
+      <span class="desc">传统GBDT只有前面的损失项l，XGBoost增加了后面的正则项Ω：惩罚树的复杂度，叶子节点越多、叶子权重越大，惩罚越重。</span>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h4>🎯 L1正则化 (Lasso)</h4>
+        <p style="margin-bottom:0.5rem">对叶子权重绝对值求和惩罚</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>倾向于让部分叶子权重变为0</li>
+          <li>自带特征选择效果</li>
+          <li>让模型更稀疏</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <h4>🎯 L2正则化 (Ridge)</h4>
+        <p style="margin-bottom:0.5rem">对叶子权重平方求和惩罚</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>让叶子权重不会太大</li>
+          <li>防止单个树影响过强</li>
+          <li>让模型更稳定、泛化更好</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>✅ 带来的好处</h4>
+      <p>内置正则化，XGBoost天然更抗过拟合，不需要太依赖手动剪枝，模型更稳定。参数alpha控制L1，lambda控制L2。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">18 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">XGBoost创新点二：二阶泰勒展开</h2>
+    <h3 class="sub">对损失函数做二阶近似，更精确、支持自定义损失函数</h3>
+    <div class="vs" style="margin:1.5rem 0">
+      <div class="vs-side vs-left">
+        <h4 style="color:var(--accent);margin-bottom:0.8rem">传统GBDT</h4>
+        <p style="font-family:var(--mono);font-size:0.95rem;color:var(--accent)">只用到一阶导数（梯度）</p>
+        <p style="font-size:0.9rem;color:var(--muted);margin-top:0.5rem">本质是用一阶信息做梯度下降，近似比较粗糙</p>
+      </div>
+      <div class="vs-divider">→</div>
+      <div class="vs-side vs-right">
+        <h4 style="color:var(--accent2);margin-bottom:0.8rem">XGBoost</h4>
+        <p style="font-family:var(--mono);font-size:0.95rem;color:var(--accent2)">用到一阶 + 二阶导数</p>
+        <p style="font-size:0.9rem;color:var(--muted);margin-top:0.5rem">二阶泰勒展开，损失近似更精确，收敛更快</p>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:1rem">
+      <h4>📐 二阶泰勒展开公式</h4>
+      <p style="font-family:var(--mono);text-align:center;margin:1rem 0;font-size:1.1rem;color:var(--accent2)">
+        f(x+Δx) ≈ f(x) + g·Δx + ½h·Δx²
+      </p>
+      <p style="font-size:0.95rem;color:var(--muted)">其中g是一阶梯度（gradient），h是二阶梯度（hessian）。有了二阶信息，可以更准确地知道损失下降的方向和幅度。</p>
+    </div>
+    <div class="hbox pink">
+      <h4>🌟 额外好处：支持自定义损失函数</h4>
+      <p>XGBoost把目标函数抽象成只需要输入g和h的形式，用户只要写出自己损失函数的一、二阶导数，就能自定义损失！非常灵活。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">19 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">XGBoost创新点三：近似算法与直方图加速</h2>
+    <h3 class="sub">处理大数据——不用遍历所有分裂点，速度大幅提升</h3>
+    <div class="vs" style="margin:1.5rem 0">
+      <div class="vs-side vs-left">
+        <h4 style="color:var(--accent);margin-bottom:0.8rem">传统精确贪心算法</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);text-align:left">
+          <li>遍历每个特征的<strong>所有取值</strong>作为候选分裂点</li>
+          <li>计算每个分裂点的增益，选最大的</li>
+          <li>优点：找到最优分裂点</li>
+          <li>缺点：数据量大时<strong style="color:var(--danger)">极慢</strong>，内存吃不消</li>
+        </ul>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side vs-right">
+        <h4 style="color:var(--accent2);margin-bottom:0.8rem">XGBoost近似算法</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);text-align:left">
+          <li>先根据特征分布<strong>分桶（bin）</strong>，比如分成几百个桶</li>
+          <li>只在桶边界候选分裂点</li>
+          <li>候选点从几万个减少到几百个</li>
+          <li>优点：<strong style="color:var(--success)">速度快很多倍</strong>，精度损失很小</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>💡 分桶思想</h4>
+      <p>就像考试打分不需要精确到0.1分，分成90-100、80-89、70-79这些档位就够了。XGBoost还支持按特征值的百分位数分桶，保证每个桶里样本量差不多。</p>
+    </div>
+    <div class="hbox warn">
+      <h4>⚙️ 两种模式</h4>
+      <p>XGBoost提供两种分裂算法：<code style="color:var(--warning)">exact</code>（精确贪心，小数据用）和<code style="color:var(--warning)">hist</code>（直方图近似，大数据用），用户可配置。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">20 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">XGBoost创新点四：特征级别的并行处理</h2>
+    <h3 class="sub">注意：树之间不能并行，但特征粒度可以！</h3>
+    <div class="hbox danger" style="margin-bottom:1.5rem">
+      <h4>⚠️ 常见误区澄清</h4>
+      <p>很多人以为XGBoost能并行训练树——错！因为Boosting的树之间有依赖，第n棵树必须等前n-1棵训练完才能开始。<strong>树级别是串行的，无法并行。</strong></p>
+    </div>
+    <div class="card" style="margin-bottom:1.5rem">
+      <h4>✅ XGBoost的并行在什么粒度？</h4>
+      <p style="margin-bottom:1rem">答案是：<strong style="color:var(--accent2)">特征粒度的并行</strong>！</p>
+      <p>在寻找每个节点的最佳分裂点时，需要遍历各个特征、计算每个特征的最佳分裂点。这个过程中，不同特征之间是独立的，可以并行计算！</p>
+    </div>
+    <div class="flow">
+      <div class="flow-node" style="min-width:150px">🔍 找最佳分裂点时</div>
+      <div class="flow-arrow">→</div>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center">
+        <div class="flow-node" style="background:rgba(129,140,248,0.1);border-color:var(--accent2)">特征1计算</div>
+        <div class="flow-node" style="background:rgba(129,140,248,0.1);border-color:var(--accent2)">特征2计算</div>
+        <div class="flow-node" style="background:rgba(129,140,248,0.1);border-color:var(--accent2)">特征3计算</div>
+        <div style="color:var(--muted)">...</div>
+        <div class="flow-node" style="background:rgba(129,140,248,0.1);border-color:var(--accent2)">特征n计算</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl">选出最优</div>
+    </div>
+    <div class="hbox success">
+      <h4>⚡ 效果</h4>
+      <p>特征粒度并行+预排序，让分裂点查找速度大幅提升，训练时间可以缩短好几倍。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">21 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">XGBoost创新点五：缺失值自动处理</h2>
+    <h3 class="sub">数据有缺失？不用手动填充，XGBoost原生支持！</h3>
+    <div class="body">
+      <p>真实数据中缺失值（NaN）非常常见。传统GBDT/sklearn需要你手动预处理：均值填充、中位数填充、删除等等。</p>
+    </div>
+    <div class="vs" style="margin:1.5rem 0">
+      <div class="vs-side vs-left">
+        <h4 style="color:var(--danger);margin-bottom:0.8rem">😰 传统做法</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);text-align:left">
+          <li>手动检查缺失值</li>
+          <li>选择填充策略（均值/中位数/众数）</li>
+          <li>填充不好可能引入噪声</li>
+          <li>增加预处理工作量</li>
+          <li>测试集缺失值处理要和训练集一致</li>
+        </ul>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side vs-right">
+        <h4 style="color:var(--success);margin-bottom:0.8rem">😊 XGBoost做法</h4>
+        <ul style="font-size:0.95rem;color:var(--muted);text-align:left">
+          <li><strong>自动处理缺失值</strong>，无需手动填充</li>
+          <li>训练时自动学习缺失值应该分到左子树还是右子树</li>
+          <li>选择能让增益最大的方向</li>
+          <li>预测时遇到缺失值自动走默认方向</li>
+          <li>省时间、效果可能比手动填充更好</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox pink">
+      <h4>🎯 原理简述</h4>
+      <p>在枚举分裂点时，XGBoost会同时尝试把缺失值分到左边和右边两种情况，选择哪个方向分裂增益更大，就把这个方向作为该特征缺失值的默认方向。非常聪明！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">22 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">XGBoost创新点六：列块存储与Cache优化</h2>
+    <h3 class="sub">底层数据结构优化——让CPU缓存命中率更高</h3>
+    <div class="card" style="margin-bottom:1.5rem">
+      <h4>💾 列块存储（Block）</h4>
+      <p style="margin-bottom:1rem">XGBoost将数据按<strong style="color:var(--accent2)">列（特征）</strong>压缩存储，而不是行存储。每个特征的列块预先排序好，分裂点查找时直接用，不用每次都重新排序。</p>
+      <p style="font-size:0.95rem;color:var(--muted)">→ 预排序只做一次，后面反复使用，这也是特征并行能高效实现的基础。</p>
+    </div>
+    <div class="card" style="margin-bottom:1.5rem">
+      <h4>⚡ Cache-aware访问优化</h4>
+      <p>CPU缓存比内存快很多，如果数据访问模式好、能命中缓存，速度会大幅提升。XGBoost做了专门优化：</p>
+      <ul style="font-size:0.95rem;color:var(--muted);margin-top:0.8rem">
+        <li>为每个线程分配内部缓冲区，存储梯度统计信息</li>
+        <li>数据访问模式对CPU缓存友好</li>
+        <li>减少缓存不命中（cache miss）</li>
+      </ul>
+    </div>
+    <div class="hbox">
+      <h4>🔧 还有更多工程优化</h4>
+      <p>除了以上六点，XGBoost还支持：列采样防过拟合、Shrinkage（学习率/步长）、早停、块压缩、外存计算（数据太大放不进内存也能跑）等等。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">23 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">XGBoost为什么是Kaggle竞赛大杀器？</h2>
+    <h3 class="sub">XGBoost一经推出就称霸结构化数据竞赛，原因是什么？</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card accent">
+        <div class="card-icon">🏆</div>
+        <h4>精度高</h4>
+        <p>正则化+二阶优化，泛化能力强，比传统GBDT效果更好，稍作调参就能得到很不错的成绩。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <h4>速度快</h4>
+        <p>并行+直方图+缓存优化，训练速度比原生GBDT快10倍以上，迭代调参效率高。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔧</div>
+        <h4>功能全</h4>
+        <p>缺失值处理、正则化、自定义损失、早停、特征重要性……开箱即用，不用自己造轮子。</p>
+      </div>
+    </div>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-icon">🖥️</div>
+        <h4>支持广</h4>
+        <p>支持Python/R/Java/C++，有sklearn接口，系统支持Linux/Windows/macOS，使用方便。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h4>鲁棒性强</h4>
+        <p>对数据分布要求不严格，不需要太多特征预处理（缩放等），对缺失值不敏感。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">💬</div>
+        <h4>社区活跃</h4>
+        <p>文档完善，资料多，遇到问题容易找到答案，大量竞赛冠军分享过XGBoost调参经验。</p>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>📌 现实情况</h4>
+      <p>在深度学习爆发之前，Kaggle结构化数据竞赛的冠军方案几乎清一色用XGBoost。现在虽然有了LightGBM/CatBoost等竞争者，但XGBoost依然是最常用的baseline之一。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">24 / 39</div>
+  <div class="slide-content">
+    <h1 class="st">LightGBM登场——微软出品更快的GBDT</h2>
+    <h3 class="sub">2017年微软开源，在XGBoost基础上继续优化，速度更快</h3>
+    <div style="text-align:center;margin:2rem 0">
+      <div class="big-num" style="font-size:clamp(3.5rem,8vw,7rem);background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">LightGBM</div>
+      <p style="font-size:1.3rem;color:var(--accent);font-weight:600;margin:1rem 0">Light Gradient Boosting Machine</p>
+      <p style="color:var(--muted);max-width:700px;margin:0 auto;line-height:1.8">
+        微软亚洲研究院开发，主打一个"Light"——轻量、快速、内存占用小。
+        在很多任务上比XGBoost快好几倍，精度还不打折，
+        现在已经成为工业界和竞赛的新宠。
+      </p>
+    </div>
+    <div class="tags" style="justify-content:center">
+      <span class="tag.b">🚀 更快的训练速度</span>
+      <span class="tag.g">💾 更低内存占用</span>
+      <span class="tag">📈 更高准确率</span>
+      <span class="tag.pi">🤝 分布式支持</span>
+      <span class="tag.w">⚡ 海量数据友好</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">25 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">LightGBM核心优化一：直方图算法</h2>
+    <h3 class="sub">把连续特征离散化到bin中，大幅减少计算量和内存</h3>
+    <div class="card" style="margin-bottom:1.5rem">
+      <h4>📊 直方图算法思想</h4>
+      <p style="margin-bottom:1rem">把连续的浮点特征值<strong style="color:var(--accent)">离散化成k个整数（bin）</strong>，构造一个宽度为k的直方图。遍历数据时，用离散化后的值作为索引累积统计量，遍历一次后就能从直方图中找到最佳分裂点。</p>
+    </div>
+    <div class="two-col">
+      <div class="hbox blue" style="margin-top:0">
+        <h4>✅ 好处1：速度极快</h4>
+        <p>XGBoost的近似算法已经分桶了，但LightGBM更激进：默认只用<code style="color:var(--warning)">256个bin</code>！分裂点查找从O(#data·#feature)变成O(k·#feature)，k=256非常小，速度提升明显。</p>
+      </div>
+      <div class="hbox success" style="margin-top:0">
+        <h4>✅ 好处2：内存占用小</h4>
+        <p>原来的连续值是32位浮点数（4字节），离散化后只需要存8位整数（0-255，1字节），内存占用降低到原来的1/4！</p>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>💡 额外惊喜：直方图差加速</h4>
+      <p>LightGBM还有一个巧妙优化：一个叶子的直方图可以由它父亲节点的直方图减去兄弟节点的直方图快速得到，速度又快了一倍！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">26 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">LightGBM核心优化二：Leaf-wise生长策略</h2>
+    <h3 class="sub">对比XGBoost的Level-wise——更高效的树生长方式</h3>
+    <div class="vs" style="margin:1.5rem 0">
+      <div class="vs-side vs-left">
+        <h4 style="color:var(--accent);margin-bottom:0.8rem">🌳 Level-wise（XGBoost默认）</h4>
+        <p style="font-size:0.95rem;color:var(--muted);margin-bottom:0.8rem;text-align:left">按层生长，同一层所有节点同时分裂</p>
+        <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:1rem;font-family:monospace;font-size:0.8rem;text-align:center;line-height:1.5">
+        <span style="color:var(--accent)">●</span><br>
+        <span style="color:var(--accent)">/</span>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--accent)">\</span><br>
+        <span style="color:var(--accent)">●</span>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--accent)">●</span><br>
+        <span style="color:var(--accent)">/ \</span>&nbsp;&nbsp;<span style="color:var(--accent)">/ \</span><br>
+        <span style="color:var(--accent)">● ● ● ●</span>
+        </div>
+        <ul style="font-size:0.9rem;color:var(--muted);text-align:left;margin-top:0.8rem">
+          <li>✅ 容易控制模型复杂度，不易过拟合</li>
+          <li>❌ 但不加区分地分裂所有节点，很多节点增益低，浪费计算</li>
+        </ul>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side vs-right">
+        <h4 style="color:var(--accent2);margin-bottom:0.8rem">🍃 Leaf-wise（LightGBM默认）</h4>
+        <p style="font-size:0.95rem;color:var(--muted);margin-bottom:0.8rem;text-align:left">每次只选当前增益最大的叶子分裂</p>
+        <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:1rem;font-family:monospace;font-size:0.8rem;text-align:center;line-height:1.5">
+        <span style="color:var(--accent2)">●</span><br>
+        <span style="color:var(--muted)">/</span>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--accent2)">\</span><br>
+        <span style="color:var(--muted)">○</span>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--accent2)">●</span><br>
+        <span style="color:var(--muted)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/</span>&nbsp;&nbsp;<span style="color:var(--accent2)">\</span><br>
+        <span style="color:var(--muted)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;●</span>&nbsp;&nbsp;&nbsp;<span style="color:var(--accent2)">●</span>
+        </div>
+        <ul style="font-size:0.9rem;color:var(--muted);text-align:left;margin-top:0.8rem">
+          <li>✅ 相同叶子数下，<strong style="color:var(--success)">误差更低、精度更高</strong></li>
+          <li>⚠️ 可能长出深树，需要加max_depth限制防过拟合</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">27 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">LightGBM核心优化三：GOSS梯度单边采样</h2>
+    <h3 class="sub">Gradient-based One-Side Sampling——不用所有样本，只重点采样</h3>
+    <div class="card" style="margin-bottom:1.5rem">
+      <h4>🎯 核心观察</h4>
+      <p>梯度小的样本，说明已经拟合得很好了（训练误差小）；梯度大的样本，说明还没拟合好，是更需要关注的"难样本"。</p>
+    </div>
+    <div class="formula">
+      <strong>GOSS采样策略：</strong><br><br>
+      1️⃣ 保留所有梯度大的样本（比如前a%大梯度样本）<br>
+      2️⃣ 从梯度小的样本中随机抽样一部分（比如b%）<br>
+      3️⃣ 计算增益时，对小梯度样本乘上权重(1-a)/b，保持分布不变
+      <span class="desc">这样既把注意力放在了有信息的样本上，又不会太改变数据分布，用更少的数据就能得到和用全量数据差不多的效果！</span>
+    </div>
+    <div class="hbox success">
+      <h4>⚡ 效果</h4>
+      <p>数据量越大，GOSS效果越明显。在百万级以上数据上，GOSS可以让训练速度提升2倍以上，而精度几乎不变。</p>
+    </div>
+    <div class="hbox warn">
+      <h4>💡 这和AdaBoost/SBM思想相通</h4>
+      <p>本质也是"更关注难样本"，但GOSS是通过采样实现的，优雅且高效。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">28 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">LightGBM核心优化四：EFB互斥特征捆绑</h2>
+    <h3 class="sub">Exclusive Feature Bundling——把互斥特征"打包"，减少特征数量</h3>
+    <div class="card" style="margin-bottom:1.5rem">
+      <h4>🎯 高维稀疏数据的痛点</h4>
+      <p>工业界数据经常是高维稀疏的（比如One-Hot编码后几百上千维），大量特征是互斥的——即这些特征从不同时取非零值。EFB可以把这样的特征捆绑成一个特征，大幅减少特征数！</p>
+    </div>
+    <div class="two-col">
+      <div class="hbox pink" style="margin-top:0">
+        <h4>📦 什么是互斥特征？</h4>
+        <p>比如One-Hot编码后的特征："颜色=红""颜色=黄""颜色=蓝"——这三个特征中永远只有一个是1，其他是0，它们就是互斥的。</p>
+      </div>
+      <div class="hbox success" style="margin-top:0">
+        <h4>✨ EFB怎么做？</h4>
+        <p>通过图着色算法，把互斥的特征分到同一"bundle"里，通过给特征值加偏移量（offset），把多个特征合并成一个特征。</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:1rem">
+      <h4>🌰 简单例子</h4>
+      <p style="font-family:var(--mono);font-size:0.95rem;margin:1rem 0">
+        特征A取值范围 [0, 10) &nbsp;&nbsp; 特征B取值范围 [0, 20)<br>
+        A和B互斥 → 捆绑后：新特征 = A + B * 10（加偏移量）<br>
+        这样2个特征就变成1个特征了！
+      </p>
+    </div>
+    <div class="hbox blue">
+      <h4>⚡ 效果</h4>
+      <p>EFB可以在不损失信息的前提下，把特征数大幅减少（高维稀疏场景下可能减少90%），直方图构建速度成倍提升。这是LightGBM处理稀疏数据的秘密武器。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">29 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">XGBoost vs LightGBM对比表</h2>
+    <h3 class="sub">两个最常用的Boosting库，到底选哪个？</h3>
+    <table class="cmp">
+      <tr>
+        <th style="width:20%">对比维度</th>
+        <th style="width:40%">🌟 XGBoost</th>
+        <th style="width:40%">💡 LightGBM</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">训练速度</strong></td>
+        <td>快（比原生GBDT快10倍）</td>
+        <td style="color:var(--success)"><strong>更快</strong>（比XGBoost快2-10倍）</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">内存占用</strong></td>
+        <td>较大</td>
+        <td style="color:var(--success)"><strong>更小</strong>（约为XGBoost的1/2到1/3）</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">准确率</strong></td>
+        <td>很高</td>
+        <td>和XGBoost相当，很多场景略高</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">树生长策略</strong></td>
+        <td>默认Level-wise</td>
+        <td>默认Leaf-wise（更高效）</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">分裂算法</strong></td>
+        <td>exact/hist/gpu_hist</td>
+        <td>直方图算法（更快）+ GOSS采样</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">类别特征</strong></td>
+        <td>需要手动编码</td>
+        <td>原生支持（无需One-Hot）</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">大数据支持</strong></td>
+        <td>较好</td>
+        <td style="color:var(--success)">优秀（特别适合海量数据）</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">过拟合风险</strong></td>
+        <td>较低（正则化完善）</td>
+        <td>Leaf-wise若不限制深度可能过拟合</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">调参难度</strong></td>
+        <td>参数较多</td>
+        <td>相对更容易得到好结果</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent2)">推荐场景</strong></td>
+        <td>中小数据集、需要精确分裂</td>
+        <td>大数据、追求速度、工业界部署</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">30 / 39</div>
+  <div class="slide-content">
+    <h1 class="st">CatBoost——Yandex出品，自动处理类别特征</h2>
+    <h3 class="sub">2017年俄罗斯搜索巨头Yandex开源，Boosting家族又一猛将</h3>
+    <div style="text-align:center;margin:2rem 0">
+      <div class="big-num" style="font-size:clamp(3.5rem,8vw,7rem);background:linear-gradient(135deg,var(--success),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">CatBoost</div>
+      <p style="font-size:1.3rem;color:var(--success);font-weight:600;margin:1rem 0">Category + Boosting</p>
+      <p style="color:var(--muted);max-width:700px;margin:0 auto;line-height:1.8">
+        名字里的"Cat"就是Category（类别）的意思——它最大的卖点就是
+        <strong style="color:var(--success)">对类别特征的完美处理</strong>。
+        不用手动One-Hot、不用手动标签编码，传给它它自动处理，效果还比手动处理好！
+      </p>
+    </div>
+    <div class="tags" style="justify-content:center">
+      <span class="tag.g">🐱 自动处理类别特征</span>
+      <span class="tag">🔄 有序提升防泄露</span>
+      <span class="tag.pi">🛡️ 鲁棒性强</span>
+      <span class="tag.b">⚡ GPU训练快</span>
+      <span class="tag.w">📊 默认参数好</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">31 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">CatBoost特点：类别特征友好、鲁棒性强</h2>
+    <h3 class="sub">CatBoost的两大核心创新</h3>
+    <div class="two-col" style="margin-bottom:1.5rem">
+      <div class="card accent">
+        <div class="card-icon">🐱</div>
+        <h4>创新一：创新的类别特征处理</h4>
+        <p style="margin-bottom:0.8rem">不用One-Hot！CatBoost用<strong style="color:var(--accent2)">目标统计（Target Statistics）</strong>自动处理类别特征：</p>
+        <ul style="font-size:0.9rem;color:var(--muted)">
+          <li>对于每个类别，计算该类别下目标变量的期望</li>
+          <li>用这个统计值替换类别值</li>
+          <li>采用<strong>Ordered Target Statistics</strong>，用"历史"样本计算，避免目标泄露</li>
+          <li>高基数类别特征也能高效处理</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-icon">🛡️</div>
+        <h4>创新二：Ordered Boosting有序提升</h4>
+        <p style="margin-bottom:0.8rem">解决梯度偏差（Gradient Bias）导致的过拟合：</p>
+        <ul style="font-size:0.9rem;color:var(--muted)">
+          <li>传统GBDT中，用同一批样本计算梯度然后拟合，有泄露</li>
+          <li>CatBoost采用类似时间序列的"有序"方式</li>
+          <li>每个样本的残差只用它之前的样本训练的模型计算</li>
+          <li>有效防止过拟合，模型更鲁棒</li>
+        </ul>
+      </div>
+    </div>
+    <div class="three-col">
+      <div class="hbox success" style="margin:0">
+        <h4>✅ 无需手动编码</h4>
+        <p>直接把类别特征列名传给cat_features参数，不用做One-Hot/Label Encoding，省大量预处理时间。</p>
+      </div>
+      <div class="hbox pink" style="margin:0">
+        <h4>✅ 默认参数友好</h4>
+        <p>默认参数效果就很好，新手不用精细调参也能得到不错结果，对小白友好。</p>
+      </div>
+      <div class="hbox blue" style="margin:0">
+        <h4>✅ 鲁棒性强</h4>
+        <p>对异常值、噪声数据更不敏感，泛化能力好，在很多数据集上表现稳定。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">32 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">三大Boosting神器选型建议表</h2>
+    <h3 class="sub">XGBoost / LightGBM / CatBoost 怎么选？看这张表就够了</h3>
+    <table class="cmp">
+      <tr>
+        <th style="width:25%">场景</th>
+        <th style="width:25%">🌟 XGBoost</th>
+        <th style="width:25%">💡 LightGBM</th>
+        <th style="width:25%">🐱 CatBoost</th>
+      </tr>
+      <tr>
+        <td><strong>数据量小（<1万）</strong></td>
+        <td style="color:var(--success)">✅ 首选，精确分裂效果好</td>
+        <td>也可以，优势不明显</td>
+        <td>也可以</td>
+      </tr>
+      <tr>
+        <td><strong>数据量大（>10万）</strong></td>
+        <td>可以，但较慢</td>
+        <td style="color:var(--success)">✅ 首选，速度快内存小</td>
+        <td>也可以，GPU版很快</td>
+      </tr>
+      <tr>
+        <td><strong>类别特征很多</strong></td>
+        <td>需要手动编码</td>
+        <td>支持原生类别输入</td>
+        <td style="color:var(--success)">✅ 首选，类别处理最强</td>
+      </tr>
+      <tr>
+        <td><strong>追求训练速度</strong></td>
+        <td>快</td>
+        <td style="color:var(--success)">✅ 最快</td>
+        <td>CPU较慢，GPU快</td>
+      </tr>
+      <tr>
+        <td><strong>新手/不想调参</strong></td>
+        <td>需要调参</td>
+        <td>默认参数不错</td>
+        <td style="color:var(--success)">✅ 默认参数最友好</td>
+      </tr>
+      <tr>
+        <td><strong>需要GPU训练</strong></td>
+        <td>支持gpu_hist</td>
+        <td>支持GPU</td>
+        <td style="color:var(--success)">✅ GPU支持最好</td>
+      </tr>
+      <tr>
+        <td><strong>竞赛打榜</strong></td>
+        <td colspan="3" style="text-align:center;color:var(--warning)">⚔️ 三个都试！通常融合（Ensemble）效果最好</td>
+      </tr>
+      <tr>
+        <td><strong>工业界部署</strong></td>
+        <td>成熟稳定</td>
+        <td style="color:var(--success)">✅ 速度快内存小，最常用</td>
+        <td>也在普及中</td>
+      </tr>
+    </table>
+    <div class="hbox success">
+      <h4>💡 老司机建议</h4>
+      <p>实际工作中，<strong style="color:var(--accent2)">优先用LightGBM</strong>，它速度快效果好，工业界用得最多；如果类别特征特别多，试试CatBoost；竞赛的话三个都跑，然后做模型融合。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">33 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">Bagging vs Boosting完整对比表</h2>
+    <h3 class="sub">第3章的核心——集成学习两大流派终极对比</h3>
+    <table class="cmp">
+      <tr>
+        <th style="width:22%">对比维度</th>
+        <th style="width:39%">🎒 Bagging</th>
+        <th style="width:39%">🚀 Boosting</th>
+      </tr>
+      <tr>
+        <td><strong>训练顺序</strong></td>
+        <td><strong style="color:var(--accent)">并行</strong>，各学习器独立</td>
+        <td><strong style="color:var(--accent2)">串行</strong>，后一个依赖前一个</td>
+      </tr>
+      <tr>
+        <td><strong>样本权重</strong></td>
+        <td>均匀采样，权重相等</td>
+        <td>重点关注之前错分/残差大的样本</td>
+      </tr>
+      <tr>
+        <td><strong>学习器权重</strong></td>
+        <td>平等投票/平均，权重相等</td>
+        <td>加权累加，性能好的/后面的树权重不同</td>
+      </tr>
+      <tr>
+        <td><strong>主要降低</strong></td>
+        <td><strong style="color:var(--accent)">方差（Variance）</strong></td>
+        <td><strong style="color:var(--accent2)">偏差（Bias）</strong></td>
+      </tr>
+      <tr>
+        <td><strong>基学习器</strong></td>
+        <td>强学习器（深树、复杂模型）</td>
+        <td>弱学习器（浅树，通常深度≤8）</td>
+      </tr>
+      <tr>
+        <td><strong>类似类比</strong></td>
+        <td>集体投票，三个臭皮匠</td>
+        <td>迭代精进，学霸错题本</td>
+      </tr>
+      <tr>
+        <td><strong>过拟合风险</strong></td>
+        <td>不易过拟合，天生抗过拟合</td>
+        <td>参数不当容易过拟合</td>
+      </tr>
+      <tr>
+        <td><strong>对异常值</strong></td>
+        <td style="color:var(--success)">不敏感（投票/平均鲁棒）</td>
+        <td style="color:var(--danger)">敏感（异常值残差大）</td>
+      </tr>
+      <tr>
+        <td><strong>代表算法</strong></td>
+        <td>随机森林（Random Forest）</td>
+        <td>AdaBoost、GBDT、XGBoost、LightGBM、CatBoost</td>
+      </tr>
+      <tr>
+        <td><strong>训练速度</strong></td>
+        <td>快（可并行）</td>
+        <td>慢（串行），但工程优化后也很快</td>
+      </tr>
+      <tr>
+        <td><strong>调参难度</strong></td>
+        <td style="color:var(--success)">简单，默认参数就好</td>
+        <td>较复杂，参数多需要调优</td>
+      </tr>
+      <tr>
+        <td><strong>最终精度</strong></td>
+        <td>高</td>
+        <td style="color:var(--success)">通常更高（调得好的话）</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">34 / 39</div>
+  <div class="slide-content">
+    <h1 class="st">集成学习总结</h1>
+    <h3 class="sub">第3章核心知识点回顾——集成学习全览</h3>
+    <div class="three-col" style="margin:1.5rem 0">
+      <div class="card">
+        <div class="card-icon">🎒</div>
+        <h4>Bagging流派</h4>
+        <p style="margin-bottom:0.5rem">并行训练，降低方差</p>
+        <ul style="font-size:0.9rem;color:var(--muted)">
+          <li>Bootstrap随机采样</li>
+          <li>特征随机选择</li>
+          <li><strong>随机森林</strong>是代表</li>
+          <li>简单、鲁棒、不易过拟合</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <div class="card-icon">🚀</div>
+        <h4>Boosting流派</h4>
+        <p style="margin-bottom:0.5rem">串行训练，降低偏差</p>
+        <ul style="font-size:0.9rem;color:var(--muted)">
+          <li>AdaBoost：调整样本权重</li>
+          <li>GBDT：拟合残差</li>
+          <li>XGBoost/LightGBM/CatBoost：工程优化</li>
+          <li>精度高，竞赛/工业界主力</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔀</div>
+        <h4>Stacking/融合</h4>
+        <p style="margin-bottom:0.5rem">多层模型组合</p>
+        <ul style="font-size:0.9rem;color:var(--muted)">
+          <li>用多个基模型输出作为输入</li>
+          <li>训练一个元模型做最终预测</li>
+          <li>竞赛常用提分手段</li>
+          <li>复杂度高，部署成本高</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🎉 第3章完成！</h4>
+      <p>到这里，集成学习的核心内容就学完了。从决策树→随机森林→Bagging→Boosting→XGBoost/LightGBM/CatBoost，我们一步步走完了树模型集成的完整路线。这些是工业界最常用的机器学习模型，一定要掌握！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">35 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">sklearn/xgboost使用代码示例</h2>
+    <h3 class="sub">来看看实际怎么用——代码非常简洁</h3>
+    <div class="code"><span class="cm"># sklearn中的GradientBoosting和RandomForest对比</span>
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> GradientBoostingClassifier, RandomForestClassifier
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_breast_cancer
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> accuracy_score
+
+X, y = load_breast_cancer(return_X_y=<span class="kw">True</span>)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>)
+
+<span class="cm"># 随机森林（Bagging）</span>
+rf = RandomForestClassifier(n_estimators=<span class="num">100</span>, max_depth=<span class="num">8</span>, random_state=<span class="num">42</span>)
+rf.<span class="fn">fit</span>(X_train, y_train)
+<span class="fn">print</span>(<span class="str">"随机森林准确率:"</span>, accuracy_score(y_test, rf.<span class="fn">predict</span>(X_test)))
+
+<span class="cm"># GBDT（Boosting）</span>
+gbdt = GradientBoostingClassifier(n_estimators=<span class="num">100</span>, learning_rate=<span class="num">0.1</span>, max_depth=<span class="num">3</span>, random_state=<span class="num">42</span>)
+gbdt.<span class="fn">fit</span>(X_train, y_train)
+<span class="fn">print</span>(<span class="str">"GBDT准确率:"</span>, accuracy_score(y_test, gbdt.<span class="fn">predict</span>(X_test)))</div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">36 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">XGBoost/LightGBM/CatBoost代码示例</h2>
+    <h3 class="sub">三大神器调用方式和sklearn很像，非常方便</h3>
+    <div class="code"><span class="cm"># XGBoost使用示例</span>
+<span class="kw">import</span> xgboost <span class="kw">as</span> xgb
+
+model_xgb = xgb.XGBClassifier(
+    n_estimators=<span class="num">200</span>,        <span class="cm"># 树的数量</span>
+    learning_rate=<span class="num">0.1</span>,      <span class="cm"># 学习率/步长</span>
+    max_depth=<span class="num">5</span>,            <span class="cm"># 树最大深度</span>
+    subsample=<span class="num">0.8</span>,          <span class="cm"># 样本采样比例</span>
+    colsample_bytree=<span class="num">0.8</span>,   <span class="cm"># 特征采样比例</span>
+    reg_alpha=<span class="num">0.1</span>,          <span class="cm"># L1正则化</span>
+    reg_lambda=<span class="num">1.0</span>,         <span class="cm"># L2正则化</span>
+    random_state=<span class="num">42</span>,
+    use_label_encoder=<span class="kw">False</span>,
+    eval_metric=<span class="str">'logloss'</span>
+)
+model_xgb.<span class="fn">fit</span>(X_train, y_train)
+<span class="fn">print</span>(<span class="str">"XGBoost准确率:"</span>, accuracy_score(y_test, model_xgb.<span class="fn">predict</span>(X_test)))
+
+<span class="cm"># LightGBM使用示例（类似）</span>
+<span class="kw">import</span> lightgbm <span class="kw">as</span> lgb
+model_lgb = lgb.LGBMClassifier(n_estimators=<span class="num">200</span>, learning_rate=<span class="num">0.1</span>, num_leaves=<span class="num">31</span>)
+model_lgb.<span class="fn">fit</span>(X_train, y_train)
+
+<span class="cm"># CatBoost使用示例（指定类别特征）</span>
+<span class="kw">from</span> catboost <span class="kw">import</span> CatBoostClassifier
+model_cat = CatBoostClassifier(iterations=<span class="num">200</span>, learning_rate=<span class="num">0.1</span>, cat_features=cat_cols, verbose=<span class="num">0</span>)
+model_cat.<span class="fn">fit</span>(X_train, y_train)</div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">37 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">本集小结（第3章完成！）</h2>
+    <h3 class="sub">恭喜你完成了第3章！来回顾一下核心要点</h3>
+    <div class="body">
+      <div class="hbox success">
+        <h4>🚀 Boosting核心思想</h4>
+        <p><strong>串行训练、逐步改进</strong>，每棵新树学习前面所有树的残差，聚焦之前预测错误的样本，通过累加所有树的结果来不断逼近真实值。主要作用是降低偏差。</p>
+      </div>
+      <div class="hbox">
+        <h4>🌲 GBDT原理</h4>
+        <p>Gradient Boosting Decision Tree，用CART回归树作为基学习器，每棵树拟合负梯度（残差），F(x) = f₁ + f₂ + ... + fₙ，所有树结果相加。</p>
+      </div>
+      <div class="hbox pink">
+        <h4">🌟 XGBoost六大创新</h4>
+        <p>正则化防过拟合、二阶泰勒展开、近似直方图算法、特征级别并行、缺失值自动处理、列块存储+Cache优化，是Kaggle竞赛大杀器。</p>
+      </div>
+      <div class="hbox blue">
+        <h4>💡 LightGBM四大优化</h4>
+        <p>直方图算法更省内存更快、Leaf-wise生长更高效、GOSS梯度采样关注难样本、EFB互斥特征捆绑减少特征数，大数据时代首选。</p>
+      </div>
+      <div class="hbox warn">
+        <h4>🐱 CatBoost特色</h4>
+        <p>原生自动处理类别特征无需手动编码、Ordered Boosting防过拟合、默认参数效果好、GPU训练快，类别特征多的时候首选。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第12集 · Boosting模型</div>
+  <div class="slide-number">38 / 39</div>
+  <div class="slide-content">
+    <h2 class="st">集成学习知识地图回顾</h2>
+    <h3 class="sub">第3章你学完了这些内容——来看看你的技能树</h3>
+    <div class="card" style="margin-bottom:1.5rem;padding:2.5rem">
+      <div style="text-align:center">
+        <div style="display:inline-block;text-align:left;line-height:2.2;font-size:1.05rem">
+          <div style="color:var(--accent2);font-weight:700;font-size:1.2rem;margin-bottom:0.8rem">🌳 第3章：集成学习</div>
+          <div style="padding-left:1.5rem">
+            ✅ 信息熵、信息增益、基尼系数<br>
+            ✅ ID3/C4.5/CART决策树<br>
+            ✅ 决策树剪枝（预剪枝/后剪枝）<br>
+            ✅ <strong style="color:var(--accent)">🎒 Bagging：并行集成、降低方差</strong><br>
+            <div style="padding-left:1.5rem">
+              ✅ Bootstrap自助采样<br>
+              ✅ 随机森林（Random Forest）<br>
+              ✅ 特征重要性评估
+            </div>
+            ✅ <strong style="color:var(--accent2)">🚀 Boosting：串行集成、降低偏差</strong><br>
+            <div style="padding-left:1.5rem">
+              ✅ AdaBoost：样本权重调整<br>
+              ✅ GBDT：梯度提升、拟合残差<br>
+              ✅ 🌟 XGBoost：正则化/二阶/并行/缺失值处理<br>
+              ✅ 💡 LightGBM：直方图/Leaf-wise/GOSS/EFB<br>
+              ✅ 🐱 CatBoost：类别特征自动处理<br>
+              ✅ ⚔️ 三大神器选型与调参
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🎓 技能点Get！</h4>
+      <p>现在你已经掌握了工业界最常用的一类机器学习模型——树模型和集成学习！这些模型在结构化数据任务上表现非常出色，是数据分析师、算法工程师的必备技能。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-content">
+    <h1>🎉 第3章完成！</h1>
+    <p class="cover-sub">第12集 · Boosting集成模型 完<br><br>
+    恭喜你完成了<strong style="color:var(--accent2)">第3章：集成学习</strong>的全部内容！<br>
+    从决策树到随机森林，再到XGBoost/LightGBM/CatBoost，你已经掌握了工业界最实用的机器学习武器库。<br><br>
+    <strong style="color:var(--accent)">下一章：第4章 - 支持向量机SVM</strong></p>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag.g">✅ 第3章完成</span>
+      <span class="tag.pi">🚀 准备进入第4章</span>
+      <span class="tag">SVM支持向量机</span>
+      <span class="tag.b">核技巧</span>
+    </div>
+    <div style="margin-top:3rem">
+      <a href="ppt-13.html" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg,var(--accent2),var(--accent3));color:white;border-radius:50px;text-decoration:none;font-weight:600;font-size:1.1rem;transition:transform .3s">
+        开始第4章学习 →
+      </a>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+});
+</script>
+</body></html>

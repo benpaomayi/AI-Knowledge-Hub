@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<title>第1集 什么是智能 - ML学习站PPT</title>
+<style>
+:root{--bg:#0a0e1a;--bg2:#111827;--bg3:#1e293b;--ink:#f8fafc;--ink2:#e2e8f0;--muted:#94a3b8;--rule:rgba(255,255,255,0.08);--accent:#38bdf8;--accent2:#818cf8;--accent3:#c084fc;--success:#34d399;--warning:#fbbf24;--danger:#f87171;--font:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei','Segoe UI',Roboto,sans-serif;--mono:'SF Mono','Fira Code',Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--ink)}
+.slide-container{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:70px 90px 90px;opacity:0;transform:translateX(60px);transition:opacity .5s ease,transform .5s ease;pointer-events:none;overflow-y:auto}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}.slide.prev{transform:translateX(-60px)}
+.slide-number{position:absolute;top:28px;right:45px;font-size:0.85rem;color:var(--muted);z-index:10}
+.slide-chapter{position:absolute;top:28px;left:45px;font-size:0.8rem;color:var(--success);font-weight:600;z-index:10}
+.slide-content{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1100px;margin:0 auto;width:100%}
+h1.st{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.15;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2.st{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem}
+h3.sub{font-size:clamp(1.2rem,2.5vw,1.6rem);font-weight:400;color:var(--muted);line-height:1.6;margin-bottom:2rem}
+.body{font-size:clamp(1rem,1.8vw,1.2rem);line-height:1.9;color:var(--ink2)}.body p{margin-bottom:1rem}
+.body ul{list-style:none;padding:0}.body li{padding:0.5rem 0 0.5rem 2rem;position:relative;line-height:1.7}.body li::before{content:'▸';position:absolute;left:0;color:var(--accent);font-weight:700}
+.cover-slide{display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(ellipse at 30% 20%,rgba(52,211,153,0.1) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(56,189,248,0.1) 0%,transparent 50%),var(--bg)}
+.cover-badge{display:inline-flex;padding:10px 24px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);border-radius:50px;font-size:1rem;color:var(--success);font-weight:600;margin-bottom:2rem}
+.cover-title{font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem;background:linear-gradient(135deg,var(--success),var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cover-sub{font-size:clamp(1.1rem,2vw,1.4rem);color:var(--muted);max-width:700px;line-height:1.8;margin-bottom:3rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem}
+.card{background:var(--bg2);border:1px solid var(--rule);border-radius:16px;padding:2rem;transition:border-color .3s}.card.accent{border-color:rgba(56,189,248,0.3)}
+.card h4{font-size:1.2rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:10px}.card p{font-size:1rem;color:var(--muted);line-height:1.7}
+.card-icon{font-size:2.5rem;margin-bottom:1rem}
+.formula{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;padding:2rem;margin:1.5rem 0;text-align:center;font-family:var(--mono);font-size:clamp(1rem,1.8vw,1.3rem);color:var(--accent);line-height:2}
+.formula .desc{font-family:var(--font);font-size:0.9rem;color:var(--muted);margin-top:1rem;display:block;text-align:left;line-height:1.7}
+.katex{color:var(--accent3)}.katex .mord.text{color:var(--ink2)}
+.hbox{background:rgba(56,189,248,0.08);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:1.5rem 2rem;margin:1.5rem 0}
+.hbox h4{color:var(--accent);font-size:1.1rem;margin-bottom:0.5rem}.hbox p{font-size:1rem;color:var(--ink2);line-height:1.8}
+.hbox.warn{background:rgba(251,191,36,0.08);border-left-color:var(--warning)}.hbox.warn h4{color:var(--warning)}
+.hbox.danger{background:rgba(248,113,113,0.08);border-left-color:var(--danger)}.hbox.danger h4{color:var(--danger)}
+.hbox.success{background:rgba(52,211,153,0.08);border-left-color:var(--success)}.hbox.success h4{color:var(--success)}
+.hbox.purple{background:rgba(129,140,248,0.08);border-left-color:var(--accent2)}.hbox.purple h4{color:var(--accent2)}
+.hbox.pink{background:rgba(192,132,252,0.08);border-left-color:var(--accent3)}.hbox.pink h4{color:var(--accent3)}
+table.cmp{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:1rem}
+table.cmp th{background:var(--bg3);color:var(--accent);padding:12px 16px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:0.95rem}
+table.cmp td{padding:10px 16px;border-bottom:1px solid var(--rule);color:var(--ink2)}
+table.cmp tr:hover td{background:rgba(56,189,248,0.04)}
+.flow{display:flex;align-items:center;justify-content:center;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.flow-node{padding:1rem 1.5rem;background:var(--bg2);border:1px solid var(--rule);border-radius:12px;font-size:1rem;text-align:center;min-width:120px;font-weight:500}
+.flow-node.hl{border-color:var(--accent);background:rgba(56,189,248,0.1);color:var(--accent);font-weight:600}
+.flow-arrow{color:var(--muted);font-size:1.5rem}
+.big-num{font-size:clamp(3rem,8vw,6rem);font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:1rem}
+.tags{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1rem}.tag{padding:6px 16px;background:var(--bg3);border:1px solid var(--rule);border-radius:20px;font-size:0.9rem;color:var(--accent)}
+.tag.p{color:var(--accent2)}.tag.pi{color:var(--accent3)}.tag.g{color:var(--success)}.tag.w{color:var(--warning)}
+.progress{position:fixed;bottom:0;left:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));z-index:100;transition:width .3s}
+.ctrl{position:fixed;bottom:30px;right:40px;display:flex;gap:10px;z-index:100}
+.ctrl button{width:48px;height:48px;border-radius:50%;background:var(--bg2);border:1px solid var(--rule);color:var(--ink);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;font-family:var(--font)}
+.ctrl button:hover{background:var(--bg3);border-color:var(--accent);color:var(--accent)}
+.hint{position:fixed;bottom:36px;left:45px;font-size:0.8rem;color:var(--muted);z-index:100}
+.topnav{position:fixed;top:0;left:0;right:0;height:64px;display:flex;align-items:center;padding:0 45px;justify-content:space-between;background:rgba(10,14,26,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--rule);z-index:50}
+.topnav a{color:var(--muted);text-decoration:none;font-size:0.85rem;transition:color .3s}.topnav a:hover{color:var(--accent)}
+.end-slide{text-align:center;justify-content:center;align-items:center}
+.end-slide h1{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;background:linear-gradient(135deg,var(--success),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1.5rem}
+.code{background:var(--bg);border:1px solid var(--rule);border-radius:14px;padding:1.5rem 2rem;margin:1.5rem 0;font-family:var(--mono);font-size:clamp(0.85rem,1.4vw,1rem);line-height:1.8;color:var(--ink2);overflow-x:auto;white-space:pre}
+.code .kw{color:var(--accent3)}.code .fn{color:var(--accent)}.code .str{color:var(--success)}.code .cm{color:var(--muted);font-style:italic}.code .num{color:var(--warning)}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:2rem;align-items:center;margin:2rem 0}
+.vs-side{padding:2rem;border-radius:16px;text-align:center}.vs-left{background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.2)}
+.vs-right{background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.2)}
+.vs-divider{font-size:2rem;font-weight:800;color:var(--muted)}
+@media(max-width:768px){.slide{padding:70px 30px 80px}.two-col,.three-col,.vs{grid-template-columns:1fr}.vs-divider{text-align:center}.hint{display:none}}
+</style>
+</head>
+<body>
+<div class="progress" id="pbar"></div>
+<div class="topnav">
+  <a href="slides.html" style="font-weight:600;color:var(--success)">📊 PPT课件</a>
+  <div style="display:flex;gap:1.5rem;align-items:center">
+    <a href="chapter1.html">回到视频页</a>
+    <a href="ppt-02.html">下一集 →</a>
+  </div>
+</div>
+<div class="slide-container" id="sc">
+
+<div class="slide cover-slide">
+  <div class="slide-content" style="align-items:center">
+    <div class="cover-badge">机器学习入门教程 · 第1集</div>
+    <h1 class="cover-title">什么是智能？</h1>
+    <p class="cover-sub">从人类智能到人工智能，理解机器学习的本质<br>BV13bZYBREgr · 时长 12分59秒</p>
+    <div class="tags">
+      <span class="tag g">AI入门</span>
+      <span class="tag">机器学习基础</span>
+      <span class="tag p">图灵测试</span>
+      <span class="tag pi">中文房间</span>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">2 / 24</div>
+  <div class="slide-content">
+    <h1 class="st">本集学习目标</h1>
+    <h3 class="sub">通过这一集，你将理解以下核心问题</h3>
+    <div class="body">
+      <ul>
+        <li><strong>理解"智能"的本质</strong>——智能到底包含哪些维度的能力？</li>
+        <li><strong>区分人类智能与人工智能</strong>——它们的相同与不同之处</li>
+        <li><strong>了解AI领域的经典思想实验</strong>——图灵测试、中文房间</li>
+        <li><strong>理解强AI与弱AI的区别</strong>——我们现在处于哪个阶段？</li>
+        <li><strong>认识传统编程的局限</strong>——为什么需要机器学习？</li>
+        <li><strong>建立机器学习的核心直觉</strong>——什么是"从数据中学习"？</li>
+      </ul>
+    </div>
+    <div class="hbox success">
+      <h4>🎯 学习建议</h4>
+      <p>这一集是整个课程的基础，不用着急记公式，重点是建立直觉。带着"机器如何才能像人一样学习"这个问题往下看。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">3 / 24</div>
+  <div class="slide-content">
+    <h1 class="st">为什么要学机器学习？</h1>
+    <h3 class="sub">我们正处在一个AI深刻改变世界的时代</h3>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-icon">📱</div>
+        <h4>AI无处不在</h4>
+        <p>刷短视频的推荐、拍照的美颜、语音转文字、导航路线规划……你每天都在使用AI，只是可能没意识到。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon">💼</div>
+        <h4>职业需求</h4>
+        <p>算法工程师、数据科学家、AI产品经理……机器学习相关岗位薪资高、需求大，是未来十年的黄金赛道。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🧠</div>
+        <h4>思维升级</h4>
+        <p>学习机器学习不仅是学技术，更是学习一种"数据驱动"的思维方式，帮你更好地理解这个智能时代。</p>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>💡 关键认知</h4>
+      <p>机器学习不是某个遥远的黑科技，它已经渗透到你生活的每一个角落。理解它，才能更好地驾驭它，而不是被它淘汰。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">4 / 24</div>
+  <div class="slide-content">
+    <h1 class="st">核心问题：什么是智能？</h1>
+    <h3 class="sub">这是人工智能领域最根本、也最有争议的问题</h3>
+    <div class="body">
+      <p>当我们说一个人"聪明"，或者说一台机器"有智能"，我们到底在说什么？</p>
+      <p>想象一下：</p>
+      <ul>
+        <li>一个婴儿能认出妈妈的脸——这是智能吗？</li>
+        <li>一只狗学会了握手——这是智能吗？</li>
+        <li>计算器能一秒算出100位数的乘法——这是智能吗？</li>
+        <li>ChatGPT能写文章、编代码——这是智能吗？</li>
+      </ul>
+    </div>
+    <div class="hbox warn">
+      <h4>🤔 先停下来想一想</h4>
+      <p>不要急着往下看，先花10秒思考：你认为"智能"最核心的特征是什么？是计算速度？是记忆能力？还是学习能力？你的答案，决定了你如何理解人工智能。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">5 / 24</div>
+  <div class="slide-content">
+    <h1 class="st">智能的五个核心维度</h1>
+    <h3 class="sub">智能不是单一能力，而是多种能力的综合体现</h3>
+    <div class="flow" style="margin:1rem 0">
+      <div class="flow-node">👁️ 感知能力</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">💾 记忆能力</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">🤔 思维能力</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl">📚 学习能力</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">🏃 行为能力</div>
+    </div>
+    <div class="body">
+      <p>这五种能力层层递进，构成了完整的智能体系：</p>
+      <ul>
+        <li><strong>感知</strong>是获取外界信息的入口</li>
+        <li><strong>记忆</strong>是存储经验的基础</li>
+        <li><strong>思维</strong>是处理信息、推理决策的核心</li>
+        <li><strong>学习</strong>是从经验中改进、适应新环境的关键（这也是机器学习的核心）</li>
+        <li><strong>行为</strong>是将决策输出、作用于世界的最终体现</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">6 / 24</div>
+  <div class="slide-content">
+    <h2 class="st">维度一：感知能力</h2>
+    <h3 class="sub">通过感官获取外界信息的能力——智能的起点</h3>
+    <div class="two-col">
+      <div class="body">
+        <p><strong>人类的感知：</strong></p>
+        <ul>
+          <li>视觉——用眼睛看世界，识别物体、人脸、文字</li>
+          <li>听觉——用耳朵听声音，理解语言、识别音乐</li>
+          <li>触觉、嗅觉、味觉——感知物理世界的其他属性</li>
+        </ul>
+        <p style="margin-top:1.5rem"><strong>AI的对应技术：</strong></p>
+        <ul>
+          <li>计算机视觉（CV）——图像识别、目标检测、人脸识别</li>
+          <li>语音识别（ASR）——Siri、小爱同学的"耳朵"</li>
+          <li>各种传感器——激光雷达、压力传感器等</li>
+        </ul>
+      </div>
+      <div>
+        <div class="card">
+          <h4>📷 例子：人脸识别</h4>
+          <p>手机解锁时，摄像头捕捉你的面部图像（感知），然后与存储的面部特征比对（记忆+思维），最终判断是否解锁（行为）。</p>
+        </div>
+        <div class="hbox purple" style="margin-top:1rem">
+          <h4>🔬 感知的重要性</h4>
+          <p>没有感知，智能就成了无源之水。今天AI的快速发展，很大程度上得益于感知能力的突破——计算机视觉已经能在很多任务上超过人类。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">7 / 24</div>
+  <div class="slide-content">
+    <h2 class="st">维度二、三：记忆与思维能力</h2>
+    <h3 class="sub">存储经验 + 加工处理信息——智能的"CPU"</h3>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-icon">💾</div>
+        <h4>记忆能力</h4>
+        <p style="margin-bottom:0.8rem">存储和提取信息的能力</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>记住知识和经验</li>
+          <li>在需要时快速调用</li>
+          <li>人类记忆会遗忘，但会提炼精华</li>
+          <li>AI对应：数据库、向量存储、模型参数</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <div class="card-icon">🤔</div>
+        <h4>思维能力</h4>
+        <p style="margin-bottom:0.8rem">对信息进行加工、推理、决策的能力</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>逻辑推理：因为A所以B</li>
+          <li>归纳总结：从多个例子找规律</li>
+          <li>演绎判断：根据规律预测新情况</li>
+          <li>AI对应：推理算法、搜索、规划</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>⚡ 计算器 vs 人类</h4>
+      <p>计算器的记忆和计算速度远超人类，但它只是机械执行指令，没有真正的"思维"——它不知道自己在算什么，也不理解数字的意义。这就是为什么"快"不等于"聪明"。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">8 / 24</div>
+  <div class="slide-content">
+    <h2 class="st">维度四、五：学习与行为能力</h2>
+    <h3 class="sub">适应新环境 + 输出行动——智能的价值所在</h3>
+    <div class="two-col">
+      <div class="card accent">
+        <div class="card-icon">📚</div>
+        <h4>学习能力 <span class="tag g">核心！</span></h4>
+        <p style="margin-bottom:0.8rem">从经验中学习、改进、适应新情况的能力</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>小孩通过看几只猫就认识了"猫"</li>
+          <li>学骑车时摔几次就会了</li>
+          <li>从错误中总结教训，下次做得更好</li>
+          <li><strong style="color:var(--success)">这正是机器学习要模拟的能力！</strong></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-icon">🏃</div>
+        <h4>行为能力</h4>
+        <p style="margin-bottom:0.8rem">将决策转化为行动，作用于外部世界</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>说话、写字、表情——表达观点</li>
+          <li>走路、奔跑、操作工具——改变环境</li>
+          <li>AI对应：机器人控制、语音合成、生成内容</li>
+          <li>行为是智能的最终输出和目的</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🎯 划重点</h4>
+      <p><strong>学习能力是智能最核心、最关键的特征！</strong>传统程序有"记忆"（存储数据）也有"思维"（执行逻辑），但没有真正的"学习能力"——它们不会从经验中自动改进。这就是机器学习带来的革命。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">9 / 24</div>
+  <div class="slide-content">
+    <h1 class="st">人工智能 vs 人类智能</h1>
+    <h3 class="sub">AI不是"人造的人"，而是用不同方式实现的智能</h3>
+    <div class="vs">
+      <div class="vs-side vs-left">
+        <h3 style="color:var(--warning);margin-bottom:1rem">🧑 人类智能</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul style="font-size:0.95rem">
+            <li>通用能力强，能跨领域举一反三</li>
+            <li>真正理解意义，有自我意识</li>
+            <li>能耗极低（大脑仅20瓦）</li>
+            <li>小样本学习——看几个例子就会</li>
+            <li>有情感、创造力、直觉</li>
+            <li>容易遗忘、疲劳、犯错</li>
+            <li>计算速度慢</li>
+          </ul>
+        </div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="vs-side vs-right">
+        <h3 style="color:var(--accent);margin-bottom:1rem">🤖 人工智能</h3>
+        <div class="body" style="text-align:left;font-size:0.95rem">
+          <ul style="font-size:0.95rem">
+            <li>专用能力强，但"偏科"严重</li>
+            <li>目前不理解意义，无自我意识</li>
+            <li>能耗高（GPT训练耗电百万度）</li>
+            <li>需要海量数据学习</li>
+            <li>无情感，但能生成创造性内容</li>
+            <li>不会遗忘、不知疲倦、稳定一致</li>
+            <li>计算速度极快</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">10 / 24</div>
+  <div class="slide-content">
+    <h1 class="st">如何判断机器有智能？</h1>
+    <h3 class="sub">图灵测试——人工智能领域最著名的测试</h3>
+    <div class="body">
+      <p>1950年，计算机科学之父<strong style="color:var(--accent)">艾伦·图灵</strong>发表了一篇划时代的论文《计算机器与智能》，提出了一个著名的问题："机器能思考吗？"</p>
+      <p>图灵没有直接定义"智能"，而是设计了一个<strong>模仿游戏</strong>，后来被称为"图灵测试"：</p>
+    </div>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node" style="min-width:150px">🧑 人类裁判</div>
+      <div class="flow-arrow">通过文字聊天 ↓</div>
+      <div class="flow-node hl" style="min-width:180px">❓ 对方身份隐藏</div>
+      <div class="flow-arrow">判断是 ↓</div>
+      <div class="flow-node" style="min-width:150px">人还是机器？</div>
+    </div>
+    <div class="hbox">
+      <h4>📜 图灵测试的核心思想</h4>
+      <p>如果一台机器能够在文字对话中，让人类裁判无法区分它是机器还是人，那么我们就应该认为这台机器具有"智能"。——图灵认为，"能表现出智能"和"真的有智能"，在实践中没有区别。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">11 / 24</div>
+  <div class="slide-content">
+    <h2 class="st">图灵测试的现状与争议</h2>
+    <h3 class="sub">70多年过去了，图灵测试被通过了吗？</h3>
+    <div class="two-col">
+      <div>
+        <div class="hbox success">
+          <h4>✅ 看似已"通过"</h4>
+          <p>2014年，一个叫"尤金·古斯特曼"的聊天程序声称通过了图灵测试（让33%的裁判误以为是人类）。2022年底ChatGPT发布后，在日常对话中，大多数人已经很难分辨对方是人还是AI了。</p>
+        </div>
+        <div class="hbox warn" style="margin-top:1rem">
+          <h4>⚠️ 但争议从未停止</h4>
+          <p>很多人认为，即使AI骗过了人类，也不代表它"理解"自己在说什么。它只是在做高级的"模式匹配"——根据训练数据生成看起来合理的回答。</p>
+        </div>
+      </div>
+      <div class="body">
+        <p><strong>图灵测试的局限：</strong></p>
+        <ul>
+          <li>它只测试<strong>语言行为</strong>，不测试感知、行动能力</li>
+          <li>"欺骗成功"不等于"真正理解"</li>
+          <li>人类裁判的判断标准很主观</li>
+          <li>可以用"装傻"等技巧作弊（比如故意算错数学题）</li>
+        </ul>
+        <p style="margin-top:1rem;color:var(--muted);font-size:0.95rem">尽管有争议，图灵测试的意义依然巨大——它第一次将"机器能否思考"这个哲学问题，转化为了一个<strong>可操作、可验证</strong>的实验。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">12 / 24</div>
+  <div class="slide-content">
+    <h1 class="st">中文房间思想实验</h1>
+    <h3 class="sub">哲学家塞尔对强AI的经典反驳——"语法"不等于"语义"</h3>
+    <div class="card" style="margin-bottom:1.5rem">
+      <h4>🏠 实验描述</h4>
+      <p>想象一个完全不懂中文的人被关在房间里，房间里有一本<strong>规则手册</strong>（用他的母语写的），告诉他：当收到一张写着中文符号的纸条时，应该如何查阅手册，找出对应的中文符号组合，然后写在纸条上递出去。</p>
+      <p style="margin-top:0.8rem">外面的人用中文提问，房间里的人按照规则手册"对答如流"，外面的人以为房间里的人懂中文。</p>
+    </div>
+    <div class="hbox danger">
+      <h4>🎯 塞尔的核心论点</h4>
+      <p>房间里的人<strong>完全不懂中文</strong>，他只是在按照规则机械地操作符号，他不理解任何一个中文词语的<strong>意义</strong>。塞尔认为，<strong>数字计算机本质上就是这个房间里的人</strong>——它只是根据规则操作符号，永远不会真正"理解"任何东西。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">13 / 24</div>
+  <div class="slide-content">
+    <h2 class="st">强AI vs 弱AI</h2>
+    <h3 class="sub">两种AI观的根本分歧：机器能"真正思考"吗？</h3>
+    <table class="cmp">
+      <tr>
+        <th style="width:20%"></th>
+        <th style="width:40%">弱AI（Weak AI / Narrow AI）</th>
+        <th style="width:40%">强AI（Strong AI / AGI）</th>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">核心观点</strong></td>
+        <td>机器只是<strong>模拟</strong>智能，是一种好用的工具</td>
+        <td>机器可以<strong>真正</strong>思考，拥有真正的心灵</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">理解能力</strong></td>
+        <td>不理解意义，只是高级模式匹配</td>
+        <td>真正理解内容，有自我意识</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">能力范围</strong></td>
+        <td>只能解决特定领域问题（"偏科天才"）</td>
+        <td>通用智能，能胜任人类所有智力任务</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">当前状态</strong></td>
+        <td style="color:var(--success)"><strong>✅ 我们现在就在这里</strong></td>
+        <td style="color:var(--warning)">❓ 尚未实现，未来不确定</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--accent)">典型代表</strong></td>
+        <td>AlphaGo、人脸识别、ChatGPT、自动驾驶</td>
+        <td>科幻电影中的AI（如《终结者》《她》）</td>
+      </tr>
+    </table>
+    <div class="hbox purple">
+      <h4>💡 实用主义视角</h4>
+      <p>作为学习者和开发者，我们可以暂时搁置哲学争论。无论AI是"真智能"还是"模拟智能"，它能解决实际问题就够了——机器学习的强大之处，恰恰在于它不需要"理解"，也能把事情做好。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">14 / 24</div>
+  <div class="slide-content">
+    <h1 class="st">传统计算机程序的局限</h1>
+    <h3 class="sub">为什么"人工编写所有规则"这条路走不通？</h3>
+    <div class="code"><span class="cm"># 传统编程范式：程序员手动写所有规则</span>
+<span class="kw">def</span> <span class="fn">is_cat</span>(image):
+    <span class="cm"># 程序员尝试写出"识别猫"的所有规则...</span>
+    <span class="kw">if</span> has_four_legs(image) <span class="kw">and</span> has_whiskers(image):
+        <span class="kw">if</span> has_pointy_ears(image) <span class="kw">and</span> has_tail(image):
+            <span class="kw">if</span> fur_color_is(image, [orange, black, white, gray]):
+                <span class="cm"># ... 还有几千、几万条例外？</span>
+                <span class="kw">return</span> <span class="str">"是猫"</span>
+    <span class="kw">return</span> <span class="str">"不是猫"</span>
+
+<span class="cm"># 问题：你能写全所有规则吗？</span></div>
+    <div class="two-col" style="margin-top:1rem">
+      <div class="hbox danger">
+        <h4>❌ 规则爆炸问题</h4>
+        <p>现实世界太复杂了。识别一只猫需要多少条规则？猫有各种姿势、角度、光照、遮挡……规则永远写不完，而且规则之间还会冲突。</p>
+      </div>
+      <div class="hbox warn">
+        <h4>❌ 无法处理未知</h4>
+        <p>遇到没见过的情况，程序就彻底懵了。传统程序只能处理程序员提前预料到的情况，泛化能力几乎为零。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">15 / 24</div>
+  <div class="slide-content">
+    <h2 class="st">生活中的AI（一）：视觉与语音</h2>
+    <h3 class="sub">你每天都在使用的AI，背后都是机器学习</h3>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-icon">👤</div>
+        <h4>人脸识别</h4>
+        <p>手机解锁、刷脸支付、门禁系统……</p>
+        <p style="margin-top:0.5rem">机器学习模型看过<strong style="color:var(--accent)">数百万张人脸</strong>后，自动学会了如何提取面部特征，区分不同的人——没有人能写出"人脸是什么"的完整规则。</p>
+        <div class="tags"><span class="tag">计算机视觉</span><span class="tag p">深度学习</span></div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎤</div>
+        <h4>语音助手</h4>
+        <p>Siri、小爱同学、小度、车载语音……</p>
+        <p style="margin-top:0.5rem">对着手机说"今天天气怎么样"，它能听懂你的话并回答。语音识别模型听了<strong style="color:var(--accent)">数万小时</strong>的语音数据，学会了把声音转换成文字。</p>
+        <div class="tags"><span class="tag">语音识别</span><span class="tag p">NLP</span></div>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>🔍 观察一下</h4>
+      <p>打开你的手机，数一数今天用了多少个AI功能：拍照美颜、输入法联想、推荐视频、地图导航、垃圾邮件过滤……你会发现AI比你想象的近得多。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">16 / 24</div>
+  <div class="slide-content">
+    <h2 class="st">生活中的AI（二）：推荐与博弈</h2>
+    <h3 class="sub">从娱乐到顶尖智力博弈，机器学习无处不在</h3>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-icon">📺</div>
+        <h4>推荐系统</h4>
+        <p>抖音、B站、淘宝、网易云音乐……</p>
+        <p style="margin-top:0.5rem">为什么APP总能推你喜欢的内容？因为推荐算法根据你的<strong style="color:var(--accent)">点击、点赞、停留时长</strong>等行为数据，学习你的偏好，预测你还喜欢什么。</p>
+        <div class="tags"><span class="tag g">推荐算法</span><span class="tag">协同过滤</span></div>
+      </div>
+      <div class="card accent">
+        <div class="card-icon">♟️</div>
+        <h4>AlphaGo</h4>
+        <p>2016年击败李世石，震惊世界</p>
+        <p style="margin-top:0.5rem">围棋有<strong style="color:var(--accent)">10^170</strong>种可能局面，比宇宙原子数还多！没人能写出所有下棋规则。AlphaGo通过<strong style="color:var(--accent)">自我对弈数千万局</strong>，自己学会了下棋。</p>
+        <div class="tags"><span class="tag pi">强化学习</span><span class="tag p">蒙特卡洛树搜索</span></div>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>🌟 共同点</h4>
+      <p>这些AI都不是靠人写规则实现的——它们都是<strong>从数据中学习</strong>来的。这就是机器学习的核心思想。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">17 / 24</div>
+  <div class="slide-content">
+    <h1 class="st">这些AI背后都是机器学习</h1>
+    <h3 class="sub">从"人写规则"到"机器从数据中学习"——范式的革命</h3>
+    <div class="flow" style="margin:2rem 0">
+      <div class="flow-node" style="min-width:180px">👨‍💻 传统编程<br><small style="color:var(--muted)">输入：规则 + 数据</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:120px">💻 程序</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:120px">📤 输出答案</div>
+    </div>
+    <div class="flow" style="margin:2rem 0">
+      <div class="flow-node hl" style="min-width:180px">🤖 机器学习<br><small style="color:var(--muted)">输入：数据 + 答案</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:120px">🧠 模型</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="min-width:120px">📝 输出规则</div>
+    </div>
+    <div class="two-col">
+      <div class="hbox warn">
+        <h4>🔄 传统编程</h4>
+        <p>程序员把规则用代码写好，程序拿着规则处理数据，给出答案。<strong>人是规则的提供者。</strong></p>
+      </div>
+      <div class="hbox success">
+        <h4>🚀 机器学习</h4>
+        <p>我们给机器大量的数据和对应的答案（标签），机器自己从数据中<strong>学习出规则</strong>，然后用学到的规则处理新数据。<strong>机器自己发现规则。</strong></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">18 / 24</div>
+  <div class="slide-content">
+    <h1 class="st">范式转变：从规则到数据</h1>
+    <h3 class="sub">这是一种全新的解决问题的思路</h3>
+    <div class="body">
+      <p>想象一下，让你写一个程序判断邮件是不是垃圾邮件：</p>
+    </div>
+    <div class="two-col" style="margin:1rem 0">
+      <div class="card">
+        <h4 style="color:var(--warning)">👴 老方法：手动写规则</h4>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>如果包含"中奖""免费""点击领取"→ 垃圾</li>
+          <li>如果发件人在黑名单 → 垃圾</li>
+          <li>如果全是大写字母 + 感叹号 → 垃圾</li>
+          <li>…… 写几百条规则？</li>
+        </ul>
+        <p style="margin-top:1rem;color:var(--danger);font-size:0.95rem"><strong>问题：</strong>垃圾邮件制造者只要换个词（比如"恭贺中奖"→"恭喜您获得"），规则就失效了，你得天天更新规则。</p>
+      </div>
+      <div class="card accent">
+        <h4 style="color:var(--accent)">✨ 新方法：机器学习</h4>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>收集10万封邮件，人工标记哪些是垃圾邮件</li>
+          <li>把这些数据喂给机器学习算法</li>
+          <li>算法自己学习垃圾邮件的特征规律</li>
+          <li>新邮件来了，自动判断是不是垃圾</li>
+        </ul>
+        <p style="margin-top:1rem;color:var(--success);font-size:0.95rem"><strong>优势：</strong>新型垃圾邮件出现，只要把新样本喂给模型重训练，它就能自动适应——不用人手动改规则！</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">19 / 24</div>
+  <div class="slide-content">
+    <h1 class="st">机器学习的核心直觉</h1>
+    <h3 class="sub">什么叫"从数据中学习"？其实和人的学习很像</h3>
+    <div class="formula">
+      <strong style="font-size:1.5em">经验（数据） + 反馈 → 性能提升</strong>
+      <span class="desc">这就是"学习"的本质：对于某类任务T，随着经验E的增加，在性能度量P上不断提高。—— Tom Mitchell（机器学习教父）</span>
+    </div>
+    <div class="body">
+      <p>用大白话讲，机器学习就是：</p>
+      <ul>
+        <li>给机器看<strong>大量的例子</strong>（数据）</li>
+        <li>告诉它什么是对、什么是错（反馈/标签）</li>
+        <li>它通过数学方法不断调整自己的"内部参数"</li>
+        <li>在反复试错中，在这个任务上<strong>越做越好</strong></li>
+        <li>最后，面对它<strong>从没见过的新数据</strong>，也能做出正确判断（泛化能力）</li>
+      </ul>
+    </div>
+    <div class="hbox">
+      <h4>🎯 关键词：泛化（Generalization）</h4>
+      <p>机器学习真正的威力，不是记住训练过的例子，而是能举一反三，处理从未见过的新情况。这才是"学习"的真正含义。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">20 / 24</div>
+  <div class="slide-content">
+    <h2 class="st">生活中的"学习"类比（一）</h2>
+    <h3 class="sub">人是怎么学骑车的？和机器学习的原理一样</h3>
+    <div class="flow" style="margin:1.5rem 0">
+      <div class="flow-node">🚲 上车尝试</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="color:var(--danger)">😵 摔倒了</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="color:var(--warning)">🤔 调整姿势</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">🔁 反复练习</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl" style="color:var(--success)">✅ 学会了！</div>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="body">
+          <p><strong>学骑车时：</strong></p>
+          <ul>
+            <li>没有人会给你写一本"骑车规则手册"（身体往左歪多少度、手转多少角度……）</li>
+            <li>你是通过<strong>不断尝试、摔倒、调整</strong>学会的</li>
+            <li>你的大脑在这个过程中，潜移默化地学会了保持平衡的"感觉"</li>
+            <li>学会后，换一辆自行车你也会骑——<strong>泛化能力</strong></li>
+          </ul>
+        </div>
+      </div>
+      <div class="hbox purple">
+        <h4>🤖 对应到机器学习</h4>
+        <p>模型训练时也是这样：<br>• 做预测（上车尝试）<br>• 算误差（知道摔了/错了）<br>• 调整参数（调整姿势）<br>• 重复成千上万次<br>• 最终学会这个任务<br><br><strong>不同的是：机器学习用的是数学，人用的是大脑神经。</strong></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">21 / 24</div>
+  <div class="slide-content">
+    <h2 class="st">生活中的"学习"类比（二）</h2>
+    <h3 class="sub">教小孩认猫——也是从例子中学习</h3>
+    <div class="two-col">
+      <div class="card">
+        <h4>👶 小孩认猫的过程</h4>
+        <p style="margin-bottom:0.8rem">你会怎么教小孩认识"猫"？</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>不是给他背定义："猫是哺乳纲食肉目猫科动物……"</li>
+          <li>而是<strong>指给他看</strong>："看，这是猫"（橘猫）</li>
+          <li>"这也是猫"（黑猫）</li>
+          <li>"这还是猫"（小猫、趴着的猫、打哈欠的猫）</li>
+          <li>"那个不是猫，是狗"（反例）</li>
+          <li>看多了，小孩自己就总结出规律了</li>
+          <li>下次见到一只从没见过的白猫，他也知道是猫！</li>
+        </ul>
+      </div>
+      <div class="card accent">
+        <h4>🤖 机器认猫的过程</h4>
+        <p style="margin-bottom:0.8rem">图像分类模型也是这么做的！</p>
+        <ul style="font-size:0.95rem;color:var(--muted)">
+          <li>收集<strong>大量图片</strong>（ImageNet有1400万张）</li>
+          <li>每张图片都标好标签："这是猫""这是狗"……</li>
+          <li>把这些"例子"喂给神经网络</li>
+          <li>网络通过数学方法，自己学习"猫"的视觉特征</li>
+          <li>训练完成后，给它一张新图片，它能判断是不是猫</li>
+          <li><strong style="color:var(--accent)">原理和小孩认猫惊人地相似！</strong></li>
+        </ul>
+      </div>
+    </div>
+    <div class="hbox success">
+      <h4>💡 大道至简</h4>
+      <p>机器学习听起来很高深，核心思想却很朴素：<strong>从例子中学习规律，再用规律判断新事物</strong>。这本来就是人类最自然的学习方式。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">22 / 24</div>
+  <div class="slide-content">
+    <h1 class="st">机器学习不是魔法</h1>
+    <h3 class="sub">它的本质是：数学 + 数据 + 计算</h3>
+    <div class="three-col" style="margin:2rem 0">
+      <div class="card">
+        <div class="card-icon" style="color:var(--accent3)">📐</div>
+        <h4>数学</h4>
+        <p>线性代数、概率统计、微积分……机器学习没有玄学，所有"学习"过程都可以用精确的数学公式描述。</p>
+      </div>
+      <div class="card accent">
+        <div class="card-icon" style="color:var(--accent)">📊</div>
+        <h4>数据</h4>
+        <p>数据是机器学习的"燃料"。没有高质量的大量数据，再厉害的算法也巧妇难为无米之炊。数据决定了性能上限。</p>
+      </div>
+      <div class="card">
+        <div class="card-icon" style="color:var(--success)">⚡</div>
+        <h4>计算</h4>
+        <p>GPU/TPU等算力硬件提供强大的并行计算能力，让我们能在合理时间内训练出复杂的深度神经网络。</p>
+      </div>
+    </div>
+    <div class="hbox">
+      <h4>🚫 破除神秘感</h4>
+      <p>很多人觉得AI很神秘、像魔法。但等你学完就会发现，机器学习背后没有黑魔法——它就是工程和数学。你完全可以理解它、掌握它、用它解决实际问题。这也是这个系列教程的目标。</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">23 / 24</div>
+  <div class="slide-content">
+    <h1 class="st">课程预告</h1>
+    <h3 class="sub">接下来我们会学什么？学习路线图一览</h3>
+    <div class="flow" style="margin:2rem 0;flex-direction:column;gap:1rem;align-items:stretch">
+      <div class="flow-node hl" style="text-align:left;min-width:auto">
+        <strong>✅ 第1集：什么是智能</strong>
+        <span style="color:var(--muted);margin-left:1rem">建立基本概念和直觉</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto">
+        <strong>📌 第2集：机器学习的主要分类</strong>
+        <span style="color:var(--muted);margin-left:1rem">监督学习、无监督学习、强化学习</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto">
+        <strong>📌 第3集起：经典算法逐个讲解</strong>
+        <span style="color:var(--muted);margin-left:1rem">线性回归、逻辑回归、决策树、SVM、神经网络……</span>
+      </div>
+      <div class="flow-node" style="text-align:left;min-width:auto">
+        <strong>📌 实战项目</strong>
+        <span style="color:var(--muted);margin-left:1rem">手写代码实现算法，用真实数据集做项目</span>
+      </div>
+    </div>
+    <div class="hbox purple">
+      <h4>🗺️ 学习建议</h4>
+      <p>教程会按照"直觉先行、数学跟上、代码落地"的原则来讲。不要害怕数学，我们会从最基础的讲起，每一步都讲清楚"为什么"。跟着节奏走就好！</p>
+    </div>
+  </div>
+</div>
+
+<div class="slide">
+  <div class="slide-chapter">第1集 · 什么是智能</div>
+  <div class="slide-number">24 / 24</div>
+  <div class="slide-content">
+    <h2 class="st">本集小结</h2>
+    <h3 class="sub">恭喜你完成了第1集！来回顾一下核心要点</h3>
+    <div class="body">
+      <div class="hbox success">
+        <h4>🧠 智能的五个维度</h4>
+        <p>感知 → 记忆 → 思维 → <strong>学习</strong> → 行为，其中学习能力是核心。</p>
+      </div>
+      <div class="hbox">
+        <h4>🤖 AI的哲学思考</h4>
+        <p>图灵测试、中文房间、强AI vs 弱AI——我们现在处于弱AI阶段，而且它已经很有用了。</p>
+      </div>
+      <div class="hbox warn">
+        <h4>💻 传统编程的局限</h4>
+        <p>现实世界太复杂，人工写不完所有规则，规则还会不断过时。</p>
+      </div>
+      <div class="hbox purple">
+        <h4>✨ 机器学习的本质</h4>
+        <p>从<strong>数据/经验</strong>中自动学习规律，而不是靠人手动写规则。这和人类的学习方式（学骑车、认猫）本质相通。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="slide end-slide">
+  <div class="slide-content">
+    <h1>谢谢观看！</h1>
+    <p class="cover-sub">第1集 · 什么是智能 完<br><br>
+    <strong style="color:var(--accent)">下一集：机器学习的三大类别</strong><br><br>
+    B站：机器学习入门教程系列 · BV13bZYBREgr</p>
+    <div class="tags" style="justify-content:center;margin-top:2rem">
+      <span class="tag g">监督学习</span>
+      <span class="tag">无监督学习</span>
+      <span class="tag p">强化学习</span>
+      <span class="tag pi">下集预告</span>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="hint">← → 键翻页 | 点击左右区域翻页</div>
+<div class="ctrl"><button id="prev">←</button><button id="next">→</button></div>
+<script>
+(function(){var s=document.querySelectorAll('.slide'),t=s.length,cur=0;var pb=document.getElementById('pbar');
+function show(i){if(i<0||i>=t)return;s.forEach(function(el,j){el.classList.remove('active','prev');if(j<i)el.classList.add('prev')});s[i].classList.add('active');cur=i;pb.style.width=((cur+1)/t*100)+'%';s[i].scrollTop=0}
+function nx(){if(cur<t-1)show(cur+1)}function pv(){if(cur>0)show(cur-1)}
+document.getElementById('next').onclick=nx;document.getElementById('prev').onclick=pv;
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nx()}if(e.key==='ArrowLeft'){e.preventDefault();pv()}if(e.key==='Home'){e.preventDefault();show(0)}if(e.key==='End'){e.preventDefault();show(t-1)}});
+var tx=0;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',function(e){var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)d<0?nx():pv()},{passive:true});
+document.addEventListener('click',function(e){if(e.target.closest('a')||e.target.closest('button'))return;var x=e.clientX/window.innerWidth;if(x>0.7)nx();else if(x<0.3)pv()});
+show(0)})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  function renderKatex(){
+    if(typeof renderMathInElement !== 'undefined'){
+      renderMathInElement(document.body,{
+        delimiters:[
+          {left:'$$',right:'$$',display:true},
+          {left:'\\(',right:'\\)',display:false}
+        ],
+        throwOnError:false,
+        strict:false
+      });
+    }else{
+      setTimeout(renderKatex,100);
+    }
+  }
+  renderKatex();
+});
+</script>
+</body></html>
